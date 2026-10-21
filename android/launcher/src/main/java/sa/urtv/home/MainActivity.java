@@ -357,6 +357,10 @@ public class MainActivity extends Activity {
      * Pill button: just its Material icon until it has focus; then its label opens beside the icon, growing to
      * the left as Arabic is read (the label is right-aligned, so it shows from its first letter on).
      */
+    // ease in-out with a long, soft landing (CSS cubic-bezier(.32,.72,0,1), the curve iOS uses for sheets)
+    static final android.view.animation.Interpolator EASE =
+            new android.view.animation.PathInterpolator(0.32f, 0.72f, 0f, 1f);
+
     final class Pill extends LinearLayout {
         final TextView label;
         final android.widget.ImageView icon;
@@ -400,13 +404,13 @@ public class MainActivity extends Activity {
             bg.setColor(has ? 0xF2FFFFFF : 0x66000000);
             icon.getDrawable().setTint(has ? 0xFF111111 : 0xE6FFFFFF);
             animate().scaleX(has ? 1.06f : 1f).scaleY(has ? 1.06f : 1f)
-                    .setInterpolator(new DecelerateInterpolator()).setDuration(180).start();
+                    .setInterpolator(EASE).setDuration(has ? 420 : 320).start();
             expand(has);
             if (has) {
                 lastFocusedId = getId();
                 scroll.smoothScrollTo(0, 0);
                 fadeGlow(1f);
-                title.animate().alpha(0f).translationX(dp(12)).setDuration(180).start();   // no app is chosen up here
+                title.animate().alpha(0f).translationX(dp(12)).setInterpolator(EASE).setDuration(360).start();   // no app is chosen up here
             }
         }
 
@@ -421,13 +425,14 @@ public class MainActivity extends Activity {
             }
             int target = to;
             open = ValueAnimator.ofInt(from, target);
-            open.setDuration(on ? 220 : 160);
-            open.setInterpolator(new DecelerateInterpolator(1.6f));
+            open.setDuration(on ? 460 : 320);
+            open.setInterpolator(EASE);
             open.addUpdateListener(a -> {
                 lp.width = (int) a.getAnimatedValue();
                 label.setLayoutParams(lp);
                 float f = target == 0 ? lp.width / (float) Math.max(1, from) : lp.width / (float) target;
-                label.setAlpha(on ? Math.max(0f, (f - 0.35f) / 0.65f) : f * f);
+                // the text follows the width: in over the last 60% of the opening, out over the first 60% of closing
+                label.setAlpha(on ? Math.max(0f, (f - 0.4f) / 0.6f) : Math.max(0f, (f - 0.4f) / 0.6f));
             });
             open.start();
         }
@@ -579,7 +584,7 @@ public class MainActivity extends Activity {
             lastFocusedId = v.getId();
             if (inDock) {
                 title.setText(app.label);
-                title.animate().alpha(1f).translationX(0).setDuration(200).start();
+                title.animate().alpha(1f).translationX(0).setInterpolator(EASE).setDuration(360).start();
                 animateGlow(app.color);
                 fadeGlow(1f);
                 scroll.smoothScrollTo(0, 0);
