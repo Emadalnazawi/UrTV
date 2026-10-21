@@ -12,8 +12,8 @@ import java.net.URL;
 
 /** Pulls the latest page from GitHub so screen changes reach the TV without a new APK. */
 final class Updater {
-    static final String URL_PAGE =
-        PhotoCache.REPO + "dist/tv.html";
+    /** The page's address: res/values page_repo (the original repository, or a fork's branch) + dist/tv.html. */
+    static String pageUrl(Context c) { return c.getString(R.string.page_repo) + "dist/tv.html"; }
     static final long INTERVAL_MS = 6L * 3600 * 1000;
 
     private Updater() {}
@@ -32,7 +32,7 @@ final class Updater {
         new File(out.getParentFile(), "urtv.html").delete();   // the old, heavier page
         HttpURLConnection con = null;
         try {
-            con = (HttpURLConnection) new URL(URL_PAGE).openConnection();
+            con = (HttpURLConnection) new URL(pageUrl(c)).openConnection();
             con.setConnectTimeout(15000);
             con.setReadTimeout(30000);
             String etag = sp.getString("etag", null);

@@ -65,9 +65,16 @@ final class Overlay {
                     .putExtra("title", n.title).putExtra("message", n.message).putExtra("seconds", n.seconds);
             byte[] img = small(n.image);
             if (img != null) i.putExtra("image", img);
+            // the home screen first; then the screensaver; then a pop-up of our own
             ctx.sendOrderedBroadcast(i, null, new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context c, Intent r) { if (getResultCode() != 1) showNow(n); }
+                public void onReceive(Context c, Intent r) {
+                    if (getResultCode() == 1) return;
+                    ctx.sendOrderedBroadcast(new Intent(i).setPackage("sa.urtv.screensaver"), null, new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context c2, Intent r2) { if (getResultCode() != 1) showNow(n); }
+                    }, main, 0, null, null);
+                }
             }, main, 0, null, null);
         });
     }

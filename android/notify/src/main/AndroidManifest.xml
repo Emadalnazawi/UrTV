@@ -14,6 +14,7 @@
 
     <queries>
         <package android:name="sa.urtv.home" />
+        <package android:name="sa.urtv.screensaver" />
     </queries>
 
     <uses-feature android:name="android.software.leanback" android:required="false" />

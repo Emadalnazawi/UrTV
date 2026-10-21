@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- «تنبيهات تلفزيونك» shows Home Assistant pop-ups in the card beside the clock (same signing key only);
+         declared here too, so it works without the home screen -->
+    <permission android:name="sa.urtv.home.permission.SHOW_NOTE" android:protectionLevel="signature" />
 
     <!-- the launcher (same signing key) reads the settings for its home-screen card -->
     <permission
