@@ -54,6 +54,8 @@ final class Showcase {
         String channelId;      // Shahid live: the channel (its card can play the stream)
         boolean vip;           // plays only in Shahid, with the subscription
         String start, end, left, next;   // live: the show's times, «باقي ٧ د», «التالي»
+        ThmanyahMatches.Match match;     // ثمانية: a league match, drawn as its own card
+        boolean startHere;               // the lens starts on this one (the match nearest to now)
     }
 
     // ---------------------------------------------------------------- what the user chose to see (TvSettings)
@@ -78,6 +80,7 @@ final class Showcase {
         List<Item> l = new ArrayList<>();
         if (set(m, OFF).contains(pkg)) return l;
         if (ShahidLive.PKG.equals(pkg) && liveOn(m)) l.addAll(ShahidLive.items(set(m, LIVE_HIDDEN)));
+        if (ThmanyahMatches.PKG.equals(pkg)) l.addAll(ThmanyahMatches.items());
         List<Item> d = data.get(pkg);
         if (d != null) l.addAll(d);
         return l;
@@ -145,7 +148,8 @@ final class Showcase {
             name.setText(it.title);
             name.setGravity(Gravity.CENTER);
             name.setPadding(m.dp(8), 0, m.dp(8), 0);
-            view.addView(name, new FrameLayout.LayoutParams(-1, -1));   // until the picture arrives, or if it doesn't
+            if (it.match == null) view.addView(name, new FrameLayout.LayoutParams(-1, -1));   // until the picture arrives, or if it doesn't
+            else matchCard(it.match);
             sharp = new ImageView(m);
             sharp.setScaleType(ImageView.ScaleType.CENTER_CROP);
             sharp.setAlpha(0f);
@@ -199,11 +203,119 @@ final class Showcase {
             });
         }
 
+        /**
+         * A match: each team on its own side, in its colour (taken from its crest), its crest large and soft
+         * behind its name, the two colours meeting in the middle; there the result or the kick-off and day,
+         * the ground at the bottom. One sign per state: a result alone is a finished game, a red dot by it a
+         * game on now, «مؤجلة» in its place a postponed one.
+         */
+        private void matchCard(ThmanyahMatches.Match mt) {
+            FrameLayout card = new FrameLayout(m);
+            GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                    new int[]{0xFF2A2A2A, 0xFF2A2A2A, 0xFF2A2A2A, 0xFF2A2A2A});
+            card.setBackground(bg);
+            int[] colours = {0xFF2A2A2A, 0xFF2A2A2A};   // away (left), home (right)
+            ImageView homeCrest = crest(card, true), awayCrest = crest(card, false);
+            TextView home = m.text(13, "medium", 0xFFFFFFFF), away = m.text(13, "medium", 0xFFFFFFFF);
+            for (TextView t : new TextView[]{home, away}) { t.setShadowLayer(m.dp(4), 0, m.dp(1), 0x99000000); t.setSingleLine(true); }
+            home.setText(mt.home);
+            away.setText(mt.away);
+            FrameLayout.LayoutParams hl = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.RIGHT);
+            hl.setMargins(0, m.dp(12), m.dp(12), 0);
+            card.addView(home, hl);
+            FrameLayout.LayoutParams al = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.LEFT);
+            al.setMargins(m.dp(12), m.dp(12), 0, 0);
+            card.addView(away, al);
+
+            LinearLayout mid = new LinearLayout(m);
+            mid.setOrientation(LinearLayout.VERTICAL);
+            mid.setGravity(Gravity.CENTER_HORIZONTAL);
+            LinearLayout scoreRow = new LinearLayout(m);
+            scoreRow.setOrientation(LinearLayout.HORIZONTAL);
+            scoreRow.setGravity(Gravity.CENTER_VERTICAL);
+            TextView big = m.text(mt.homeScore >= 0 ? 26 : 17, mt.homeScore >= 0 ? "display" : "medium", 0xFFFFFFFF);
+            big.setShadowLayer(m.dp(6), 0, m.dp(1), 0x99000000);
+            if (mt.postponed) big.setText("مؤجلة");
+            // the away score at the left, the home score at the right, as the teams sit
+            else if (mt.homeScore >= 0) big.setText(MainActivity.arabicDigits(mt.awayScore + " - " + mt.homeScore));
+            else big.setText(mt.time);
+            if (mt.live) {
+                View dot = new View(m);
+                GradientDrawable dd = new GradientDrawable();
+                dd.setShape(GradientDrawable.OVAL);
+                dd.setColor(0xFFE5484D);
+                dot.setBackground(dd);
+                LinearLayout.LayoutParams dl = new LinearLayout.LayoutParams(m.dp(8), m.dp(8));
+                dl.rightMargin = m.dp(6);
+                scoreRow.addView(dot, dl);
+            }
+            scoreRow.addView(big, new LinearLayout.LayoutParams(-2, -2));
+            mid.addView(scoreRow, new LinearLayout.LayoutParams(-2, -2));
+            // the day where it tells something: a coming game, or a result from another day than today
+            boolean today = android.text.format.DateUtils.isToday(mt.at);
+            if (!mt.postponed && !mt.live && (mt.homeScore < 0 || !today)) {
+                TextView day = m.text(10, "regular", 0xD9FFFFFF);
+                day.setText(mt.day);
+                day.setShadowLayer(m.dp(3), 0, 0, 0x99000000);
+                mid.addView(day, new LinearLayout.LayoutParams(-2, -2));
+            }
+            card.addView(mid, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
+            if (mt.venue != null) {
+                TextView venue = m.text(8, "regular", 0xCCFFFFFF);
+                venue.setText(mt.venue);
+                venue.setSingleLine(true);
+                venue.setShadowLayer(m.dp(3), 0, 0, 0x99000000);
+                FrameLayout.LayoutParams vl = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+                vl.bottomMargin = m.dp(8);
+                card.addView(venue, vl);
+            }
+            view.addView(card, new FrameLayout.LayoutParams(-1, -1));
+            String[] urls = {mt.awayBadge, mt.homeBadge};
+            ImageView[] crests = {awayCrest, homeCrest};
+            int[] left = {2};
+            for (int k = 0; k < 2; k++) {
+                final int side = k;
+                if (urls[k] == null) { if (--left[0] == 0) softFrom(card); continue; }
+                fetch(urls[k], null, h, h, bm -> {
+                    colours[side] = teamColour(bm);
+                    bg.setColors(new int[]{colours[0], colours[0], colours[1], colours[1]});
+                    pool.execute(() -> {
+                        Bitmap b = blur(Bitmap.createScaledBitmap(bm, 48, 48, true), 3);
+                        main.post(() -> {
+                            crests[side].setImageBitmap(b);
+                            if (--left[0] == 0) card.post(() -> softFrom(card));
+                        });
+                    });
+                });
+            }
+        }
+
+        private ImageView crest(FrameLayout card, boolean right) {
+            ImageView iv = new ImageView(m);
+            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            iv.setAlpha(0.5f);
+            int size = Math.round(h * 0.95f);
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(size, size, Gravity.CENTER_VERTICAL | (right ? Gravity.RIGHT : Gravity.LEFT));
+            if (right) lp.rightMargin = -size / 6; else lp.leftMargin = -size / 6;
+            card.addView(iv, lp);
+            return iv;
+        }
+
+        /** the soft copy of a drawn card (for beside the lens): the card itself, small and blurred */
+        private void softFrom(View card) {
+            if (card.getWidth() == 0) { card.post(() -> softFrom(card)); return; }
+            Bitmap b = Bitmap.createBitmap(Math.max(8, card.getWidth() / 8), Math.max(8, card.getHeight() / 8), Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(b);
+            c.scale(1f / 8, 1f / 8);
+            card.draw(c);
+            soft.setImageBitmap(blur(b, 2));
+        }
+
         /** sharp and bright in the lens or in the row; soft and dimmed beside the lens */
         void look(boolean softly, boolean animate) {
             long d = animate ? MOVE_MS : 0;
-            boolean pic = sharp.getDrawable() != null;
-            sharp.animate().alpha(pic && !softly ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
+            boolean pic = sharp.getDrawable() != null || item.match != null;
+            if (item.match == null) sharp.animate().alpha(pic && !softly ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
             soft.animate().alpha(softly && soft.getDrawable() != null ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
             dim.animate().alpha(softly ? 0.5f : 0f).setDuration(d).setInterpolator(EASE).start();
         }
@@ -346,9 +458,11 @@ final class Showcase {
         if (!force && System.currentTimeMillis() - loadedAt < FRESH_MS) return;
         loadedAt = System.currentTimeMillis();
         ContentResolver cr = m.getContentResolver();
-        boolean live = liveOn(m) && m.hasPackage(ShahidLive.PKG);
+        boolean live = liveOn(m) && m.hasPackage(ShahidLive.PKG), league = m.hasPackage(ThmanyahMatches.PKG);
+        Context app = m.getApplicationContext();
         pool.execute(() -> {
             if (live) ShahidLive.refresh();
+            if (league) ThmanyahMatches.refresh(app);
             Map<String, List<Item>> d = load(cr);
             main.post(() -> {
                 data = d;
@@ -454,7 +568,11 @@ final class Showcase {
         return false;
     }
 
-    int firstPosterId() { return posters.isEmpty() ? View.NO_ID : posters.get(0).view.getId(); }
+    int firstPosterId() {
+        if (posters.isEmpty()) return View.NO_ID;
+        for (Poster p : posters) if (p.item.startHere) return p.view.getId();
+        return posters.get(0).view.getId();
+    }
 
     /** The app's posters in a row under the header; false (and hidden) when it publishes nothing. */
     boolean show(String pkg) {
@@ -557,6 +675,7 @@ final class Showcase {
             Item it = posters.get(i).item;
             capGroup.setText(it.group);
             capTitle.setText(it.live ? it.title : it.detail);
+            capTitle.setVisibility(it.match != null ? View.GONE : View.VISIBLE);   // the card says it all
             timeBox.setVisibility(it.live ? View.VISIBLE : View.GONE);
             nextRow.setVisibility(it.live && it.next != null ? View.VISIBLE : View.GONE);
             if (it.live) {
@@ -567,6 +686,7 @@ final class Showcase {
             }
             group.setText(it.group);
             detail.setText(it.detail);
+            detail.setVisibility(it.detail == null || it.detail.isEmpty() ? View.GONE : View.VISIBLE);
             android.graphics.drawable.Drawable sd = posters.get(i).soft.getDrawable();
             Bitmap soft = sd instanceof android.graphics.drawable.BitmapDrawable ? ((android.graphics.drawable.BitmapDrawable) sd).getBitmap() : null;
             if (soft != null) {
@@ -664,6 +784,28 @@ final class Showcase {
         stage.setAlpha(sa);
         glass.setAlpha(ga);
         return blur(b, 4);
+    }
+
+    /** A team's colour from its crest: the commonest strong hue, deepened so white names read on it. */
+    static int teamColour(Bitmap bm) {
+        Bitmap s = Bitmap.createScaledBitmap(bm, 24, 24, true);
+        int[] count = new int[12];
+        float[][] sum = new float[12][3];
+        float[] hsv = new float[3];
+        for (int y = 0; y < 24; y++) for (int x = 0; x < 24; x++) {
+            int p = s.getPixel(x, y);
+            if ((p >>> 24) < 128) continue;
+            android.graphics.Color.colorToHSV(p, hsv);
+            if (hsv[1] < 0.35f || hsv[2] < 0.25f) continue;
+            int b = Math.min(11, (int) (hsv[0] / 30));
+            count[b]++;
+            sum[b][0] += hsv[0]; sum[b][1] += hsv[1]; sum[b][2] += hsv[2];
+        }
+        int best = -1;
+        for (int b = 0; b < 12; b++) if (count[b] > 8 && (best < 0 || count[b] > count[best])) best = b;
+        if (best < 0) return 0xFF3A3A3A;   // a black-and-white crest: a deep grey
+        float n = count[best];
+        return android.graphics.Color.HSVToColor(new float[]{sum[best][0] / n, Math.min(0.9f, sum[best][1] / n), Math.min(0.6f, sum[best][2] / n)});
     }
 
     /** A box blur, three passes each way: near enough to a lens blur on a small picture. */
