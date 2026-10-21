@@ -42,6 +42,7 @@ jobs:
       - name: Build APKs
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          URTV_VERSION_BASE: ${{ vars.URTV_VERSION_BASE }}
         run: gradle -p android assembleRelease --no-daemon
 
       - name: Rename
