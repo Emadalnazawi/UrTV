@@ -813,7 +813,8 @@ async function loadMatches(){
     }catch(e){}
     try{ const l = await fetchLast(id); answered++; if(l.length) RESULTS[id] = l; }catch(e){}
   }));
-  if(!answered && CONFIG.teamIds.length) return;    // offline: keep what is shown (the saved panels)
+  // offline or refused (the free key's limit): keep what is shown (the saved panels) and ask again soon
+  if(!answered && CONFIG.teamIds.length){ setTimeout(loadMatches, 3*60*1000); return; }
   MATCHES_LOADED = true;
   renderMatches();
   if(CONFIG.panel === 'matches') renderPanel(false);

@@ -572,10 +572,7 @@ final class Showcase {
             v.setTranslationY(m.dp(was ? 10 : 16));
             v.animate().alpha(1f).translationY(0).setStartDelay(was ? 40 : 120).setDuration(460).setInterpolator(EASE).start();
         }
-        backdrop.animate().cancel();
-        backdrop.animate().alpha(1f).setStartDelay(0).setDuration(600).setInterpolator(EASE).start();
-        setBackdrop(items.get(0).wide);
-        return true;
+        return true;   // the wallpaper stays as it is: no picture of the content behind the posters
     }
 
     void hide(boolean animate) {
@@ -636,8 +633,6 @@ final class Showcase {
         if (i != lensAt) lens(i);
         stopPreview();
         if (p.item.channelId != null) main.postDelayed(previewLater, 900);   // only where the focus stays
-        main.removeCallbacks(backdropLater);
-        main.postDelayed(backdropLater, 280);   // passing quickly over posters doesn't flash the backdrop
     }
 
     /** The lens on poster i (-1: back to the row). Entering it, the screen as it is goes soft behind. */
