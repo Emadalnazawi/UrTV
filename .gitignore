@@ -21,3 +21,6 @@ optimize/lists/mine.txt
 /hadith/
 /verses/
 /unsplash/
+
+# local logs (they name the TV, its IP and the apps)
+optimize/run-log*.txt
