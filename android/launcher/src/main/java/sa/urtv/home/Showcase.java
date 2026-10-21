@@ -118,6 +118,10 @@ final class Showcase {
     private List<Item> items = new ArrayList<>();
     private final List<Poster> posters = new ArrayList<>();
     private int lensAt = -1;   // the poster in the middle, -1 when the posters are a row
+    // ثمانية's matches don't use the lens: they stay in their row, which slides to the focused one
+    private int rowAt = -1;
+    private float rowShift;
+    private boolean rowToStart;
     private final Runnable backdropLater = this::backdropFromFocus;
 
     /** one poster: the sharp picture, a soft copy for when it is beside the lens, and a dimmer */
@@ -197,7 +201,7 @@ final class Showcase {
                 sharp.setImageBitmap(bm);
                 sharp.animate().alpha(soft.getAlpha() > 0 ? 0f : 1f).setDuration(260).start();
                 pool.execute(() -> {
-                    Bitmap b = blur(Bitmap.createScaledBitmap(bm, Math.max(8, bm.getWidth() / 8), Math.max(8, bm.getHeight() / 8), true), 3);
+                    Bitmap b = blur(Bitmap.createScaledBitmap(bm, Math.max(8, bm.getWidth() / 6), Math.max(8, bm.getHeight() / 6), true), 2);
                     main.post(() -> soft.setImageBitmap(b));
                 });
             });
@@ -211,11 +215,12 @@ final class Showcase {
          */
         private void matchCard(ThmanyahMatches.Match mt) {
             FrameLayout card = new FrameLayout(m);
-            GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-                    new int[]{0xFF2A2A2A, 0xFF2A2A2A, 0xFF2A2A2A, 0xFF2A2A2A});
-            card.setBackground(bg);
+            ImageView cloth = new ImageView(m);
+            cloth.setScaleType(ImageView.ScaleType.FIT_XY);
+            card.addView(cloth, new FrameLayout.LayoutParams(-1, -1));
             int[] colours = {0xFF2A2A2A, 0xFF2A2A2A};   // away (left), home (right)
-            ImageView homeCrest = crest(card, true), awayCrest = crest(card, false);
+            Bitmap[] crestPics = new Bitmap[2];
+            cloth.setImageBitmap(fabric(w, h, colours[0], colours[1], null, null));
             TextView home = m.text(13, "medium", 0xFFFFFFFF), away = m.text(13, "medium", 0xFFFFFFFF);
             for (TextView t : new TextView[]{home, away}) { t.setShadowLayer(m.dp(4), 0, m.dp(1), 0x99000000); t.setSingleLine(true); }
             home.setText(mt.home);
@@ -271,44 +276,20 @@ final class Showcase {
             }
             view.addView(card, new FrameLayout.LayoutParams(-1, -1));
             String[] urls = {mt.awayBadge, mt.homeBadge};
-            ImageView[] crests = {awayCrest, homeCrest};
             int[] left = {2};
+            Runnable weave = () -> pool.execute(() -> {
+                Bitmap b = fabric(w, h, colours[0], colours[1], crestPics[0], crestPics[1]);
+                main.post(() -> cloth.setImageBitmap(b));
+            });
             for (int k = 0; k < 2; k++) {
                 final int side = k;
-                if (urls[k] == null) { if (--left[0] == 0) softFrom(card); continue; }
-                fetch(urls[k], null, h, h, bm -> {
+                if (urls[k] == null) { if (--left[0] == 0) weave.run(); continue; }
+                fetch(urls[k], null, h * 2, h * 2, bm -> {
                     colours[side] = teamColour(bm);
-                    bg.setColors(new int[]{colours[0], colours[0], colours[1], colours[1]});
-                    pool.execute(() -> {
-                        Bitmap b = blur(Bitmap.createScaledBitmap(bm, 48, 48, true), 3);
-                        main.post(() -> {
-                            crests[side].setImageBitmap(b);
-                            if (--left[0] == 0) card.post(() -> softFrom(card));
-                        });
-                    });
+                    crestPics[side] = bm;
+                    if (--left[0] == 0) weave.run();
                 });
             }
-        }
-
-        private ImageView crest(FrameLayout card, boolean right) {
-            ImageView iv = new ImageView(m);
-            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            iv.setAlpha(0.5f);
-            int size = Math.round(h * 0.95f);
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(size, size, Gravity.CENTER_VERTICAL | (right ? Gravity.RIGHT : Gravity.LEFT));
-            if (right) lp.rightMargin = -size / 6; else lp.leftMargin = -size / 6;
-            card.addView(iv, lp);
-            return iv;
-        }
-
-        /** the soft copy of a drawn card (for beside the lens): the card itself, small and blurred */
-        private void softFrom(View card) {
-            if (card.getWidth() == 0) { card.post(() -> softFrom(card)); return; }
-            Bitmap b = Bitmap.createBitmap(Math.max(8, card.getWidth() / 8), Math.max(8, card.getHeight() / 8), Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(b);
-            c.scale(1f / 8, 1f / 8);
-            card.draw(c);
-            soft.setImageBitmap(blur(b, 2));
         }
 
         /** sharp and bright in the lens or in the row; soft and dimmed beside the lens */
@@ -317,7 +298,7 @@ final class Showcase {
             boolean pic = sharp.getDrawable() != null || item.match != null;
             if (item.match == null) sharp.animate().alpha(pic && !softly ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
             soft.animate().alpha(softly && soft.getDrawable() != null ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
-            dim.animate().alpha(softly ? 0.5f : 0f).setDuration(d).setInterpolator(EASE).start();
+            dim.animate().alpha(softly ? 0.4f : 0f).setDuration(d).setInterpolator(EASE).start();
         }
     }
 
@@ -578,6 +559,7 @@ final class Showcase {
     boolean show(String pkg) {
         if (!has(pkg)) { hide(true); return false; }
         if (lensAt >= 0) lens(-1);
+        if (rowAt >= 0) { rowAt = -1; place(true); }
         if (pkg.equals(shownPkg)) return true;
         boolean was = shownPkg != null;
         shownPkg = pkg;
@@ -622,6 +604,9 @@ final class Showcase {
         for (Poster p : posters) stage.removeView(p.view);
         posters.clear();
         lensAt = -1;
+        rowAt = -1;
+        rowShift = 0;
+        rowToStart = true;
         int h = m.dp(118);
         for (Item it : list) {
             Poster p = new Poster(it, h);
@@ -647,6 +632,7 @@ final class Showcase {
 
     private void focused(Poster p) {
         int i = posters.indexOf(p);
+        if (p.item.match != null) { rowAt = i; place(true); return; }
         if (i != lensAt) lens(i);
         stopPreview();
         if (p.item.channelId != null) main.postDelayed(previewLater, 900);   // only where the focus stays
@@ -704,14 +690,30 @@ final class Showcase {
         int sw = m.getResources().getDisplayMetrics().widthPixels, sh = m.getResources().getDisplayMetrics().heightPixels;
         long d = animate ? MOVE_MS : 0;
         if (lensAt < 0) {
-            int x = sw - m.dp(48), y = m.dp(168), gap = m.dp(24);
-            for (Poster p : posters) {
-                x -= p.w;
-                move(p.view, x, y, 1f, d);
+            int y = m.dp(168), gap = m.dp(24), edgeR = sw - m.dp(48), edgeL = m.dp(48);
+            int[] xs = new int[posters.size()];
+            int x = edgeR;
+            for (int j = 0; j < posters.size(); j++) { x -= posters.get(j).w; xs[j] = x; x -= gap; }
+            // the row starts on the item marked to start (today's matches) at its right end; the focused one
+            // stays inside the screen, the row sliding as little as it can
+            if (rowToStart) {
+                rowToStart = false;
+                for (int j = 0; j < posters.size(); j++)
+                    if (posters.get(j).item.startHere) rowShift = edgeR - (xs[j] + posters.get(j).w);
+            }
+            if (rowAt >= 0) {
+                Poster f = posters.get(rowAt);
+                float l = xs[rowAt] + rowShift, r = l + f.w;
+                if (r > edgeR) rowShift -= r - edgeR;
+                if (l < edgeL) rowShift += edgeL - l;
+            }
+            for (int j = 0; j < posters.size(); j++) {
+                Poster p = posters.get(j);
+                boolean on = j == rowAt;
+                move(p.view, xs[j] + rowShift, y, on ? 1.06f : 1f, d);
                 p.look(false, animate);
-                p.ring.animate().alpha(0f).setDuration(160).start();
-                p.view.setTranslationZ(0);
-                x -= gap;
+                p.ring.animate().alpha(on ? 1f : 0f).setDuration(160).start();
+                p.view.setTranslationZ(on ? m.dp(10) : 0);
             }
             caption.animate().alpha(0f).setDuration(200).start();
             for (Poster p : posters) if (p.barTrack != null) { p.barTrack.animate().alpha(1f).start(); p.barDone.animate().alpha(1f).start(); }
@@ -783,7 +785,67 @@ final class Showcase {
         root.draw(c);
         stage.setAlpha(sa);
         glass.setAlpha(ga);
-        return blur(b, 4);
+        return blur(b, 2);   // a little soft, not lost
+    }
+
+    /**
+     * The card's cloth: the two team colours meeting in the middle, a fine weave of threads over them, each
+     * crest pressed into the cloth on its own side (tone on tone, as on a jersey), and a soft shade where the
+     * text sits (names at the top, the result in the middle, the ground at the bottom) so it always reads.
+     */
+    static Bitmap fabric(int w, int h, int away, int home, Bitmap awayCrest, Bitmap homeCrest) {
+        Bitmap b = Bitmap.createBitmap(Math.max(1, w), Math.max(1, h), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        android.graphics.Paint p = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG | android.graphics.Paint.FILTER_BITMAP_FLAG);
+        p.setShader(new android.graphics.LinearGradient(0, 0, w, 0, new int[]{away, away, home, home},
+                new float[]{0f, 0.38f, 0.62f, 1f}, android.graphics.Shader.TileMode.CLAMP));
+        c.drawRect(0, 0, w, h, p);
+        p.setShader(null);
+        // the crests, pressed in: a dark edge below, a light one above, the crest itself faint and colourless
+        Bitmap[] crests = {awayCrest, homeCrest};
+        for (int k = 0; k < 2; k++) {
+            if (crests[k] == null) continue;
+            float size = h * 1.25f, cx = k == 0 ? h * 0.32f : w - h * 0.32f, cy = h * 0.55f;
+            android.graphics.RectF r = new android.graphics.RectF(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2);
+            android.graphics.ColorMatrix gray = new android.graphics.ColorMatrix();
+            gray.setSaturation(0f);
+            android.graphics.Paint cp = new android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG);
+            cp.setColorFilter(new android.graphics.PorterDuffColorFilter(0xFF000000, android.graphics.PorterDuff.Mode.SRC_IN));
+            cp.setAlpha(38);
+            r.offset(2, 2);
+            c.drawBitmap(crests[k], null, r, cp);
+            cp.setColorFilter(new android.graphics.PorterDuffColorFilter(0xFFFFFFFF, android.graphics.PorterDuff.Mode.SRC_IN));
+            cp.setAlpha(26);
+            r.offset(-4, -4);
+            c.drawBitmap(crests[k], null, r, cp);
+            cp.setColorFilter(new android.graphics.ColorMatrixColorFilter(gray));
+            cp.setAlpha(46);
+            r.offset(2, 2);
+            c.drawBitmap(crests[k], null, r, cp);
+        }
+        // the weave: threads one way and the other, alternately lit and shaded, and a little grain
+        android.graphics.Paint t = new android.graphics.Paint();
+        t.setStrokeWidth(1f);
+        for (int y = 0; y < h; y += 3) {
+            t.setColor((y / 3) % 2 == 0 ? 0x12FFFFFF : 0x16000000);
+            c.drawLine(0, y, w, y, t);
+        }
+        for (int x = 0; x < w; x += 3) {
+            t.setColor((x / 3) % 2 == 0 ? 0x0CFFFFFF : 0x10000000);
+            c.drawLine(x, 0, x, h, t);
+        }
+        java.util.Random rnd = new java.util.Random(w * 31L + away * 7L + home);
+        for (int i = 0; i < w * h / 10; i++) {
+            t.setColor(rnd.nextBoolean() ? 0x0DFFFFFF : 0x12000000);
+            c.drawPoint(rnd.nextInt(w), rnd.nextInt(h), t);
+        }
+        // shade under the text
+        p.setShader(new android.graphics.LinearGradient(0, 0, 0, h, new int[]{0x66000000, 0x14000000, 0x14000000, 0x5C000000},
+                new float[]{0f, 0.35f, 0.65f, 1f}, android.graphics.Shader.TileMode.CLAMP));
+        c.drawRect(0, 0, w, h, p);
+        p.setShader(new android.graphics.RadialGradient(w / 2f, h * 0.48f, h * 0.55f, 0x52000000, 0x00000000, android.graphics.Shader.TileMode.CLAMP));
+        c.drawRect(0, 0, w, h, p);
+        return b;
     }
 
     /** A team's colour from its crest: the commonest strong hue, deepened so white names read on it. */

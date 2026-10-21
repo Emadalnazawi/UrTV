@@ -107,11 +107,18 @@ final class ThmanyahMatches {
         return mt;
     }
 
-    /** the posters, worked out now; the lens starts on the match nearest to now */
+    /**
+     * The posters, worked out now. The row starts on today's first match; with none today, on the next day that
+     * has some; yesterday's and the rest of the week's are one press to the right.
+     */
     static synchronized List<Showcase.Item> items() {
         List<Showcase.Item> out = new ArrayList<>();
-        long now = System.currentTimeMillis(), best = Long.MAX_VALUE;
-        int start = 0;
+        Calendar midnight = Calendar.getInstance();
+        midnight.set(Calendar.HOUR_OF_DAY, 0);
+        midnight.set(Calendar.MINUTE, 0);
+        midnight.set(Calendar.SECOND, 0);
+        midnight.set(Calendar.MILLISECOND, 0);
+        int start = -1;
         for (Match mt : matches) {
             Showcase.Item it = new Showcase.Item();
             it.pkg = PKG;
@@ -120,11 +127,11 @@ final class ThmanyahMatches {
             it.group = LEAGUE;
             it.detail = "";
             it.aspect = 16 / 9f;
-            long d = mt.live ? 0 : Math.abs(mt.at - now);
-            if (d < best) { best = d; start = out.size(); }
+            if (start < 0 && mt.at >= midnight.getTimeInMillis()) start = out.size();   // sorted by time
             out.add(it);
         }
-        if (!out.isEmpty()) out.get(start).startHere = true;
+        if (start < 0) start = out.size() - 1;   // the week is over: its last match
+        if (start >= 0) out.get(start).startHere = true;
         return out;
     }
 
