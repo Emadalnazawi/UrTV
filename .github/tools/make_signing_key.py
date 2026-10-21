@@ -17,6 +17,7 @@ The builds sign with it from then on (CI refuses to build without it). TVs that 
 key need them installed again once (optimize/install.sh does that by itself; their settings start over).
 """
 import base64
+import os
 import datetime
 import secrets
 import shutil
@@ -31,7 +32,7 @@ from cryptography.hazmat.primitives.serialization import pkcs12
 from cryptography.x509.oid import NameOID
 
 ALIAS = b"urtv"   # android/*/build.gradle signs with this alias
-REPO = "tshi-dev/UrTV"
+REPO = os.environ.get("URTV_REPO", "tshi-dev/UrTV")   # a fork: URTV_REPO=you/UrTV
 
 
 def make(password):

@@ -83,6 +83,8 @@ public class MainActivity extends Activity {
 
     private HomeScrollView scroll;
     private LinearLayout content, dockRow;
+    // Arabic order: the dock and the grid start at the right, and focus starts on the rightmost app.
+    private boolean rtl;
     private FrameLayout hero;
     private LinearLayout grid;
     private View glow;
@@ -123,6 +125,7 @@ public class MainActivity extends Activity {
         liveTvPkg = getString(R.string.live_tv_package);
         inputPickerPkg = getString(R.string.input_picker_package);
         cols = getResources().getInteger(R.integer.columns);
+        rtl = getResources().getBoolean(R.bool.rtl_rows);
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -247,15 +250,19 @@ public class MainActivity extends Activity {
         bottom.setClipChildren(false);
         bottom.setClipToPadding(false);
         hero.addView(bottom, lp(-1, -2, Gravity.BOTTOM, dp(48), 0, dp(48), dp(30)));
+        if (rtl) bottom.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
         title = text(34, "sans-serif-light", Color.WHITE);
         title.setShadowLayer(dp(18), 0, 0, 0x66000000);
         title.setSingleLine(true);
         bottom.addView(title, new LinearLayout.LayoutParams(-2, -2));
-        ((LinearLayout.LayoutParams) title.getLayoutParams()).setMargins(dp(8), 0, 0, dp(14));
+        LinearLayout.LayoutParams tp = (LinearLayout.LayoutParams) title.getLayoutParams();
+        tp.setMargins(0, 0, 0, dp(14));
+        tp.setMarginStart(dp(8));
 
         dockRow = new LinearLayout(this);
         dockRow.setOrientation(LinearLayout.HORIZONTAL);
+        if (rtl) dockRow.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         dockRow.setGravity(Gravity.CENTER);
         dockRow.setClipChildren(false);
         dockRow.setClipToPadding(false);
@@ -270,7 +277,8 @@ public class MainActivity extends Activity {
         appsLabel = text(11, "sans-serif-medium", 0x99FFFFFF);
         appsLabel.setText("كل التطبيقات");
         appsLabel.setTextColor(GOLD);
-        content.addView(appsLabel, llp(-2, -2, dp(68), dp(8), 0, dp(18)));
+        content.addView(appsLabel, llp(-2, -2, dp(68), dp(8), dp(68), dp(18)));
+        if (rtl) ((LinearLayout.LayoutParams) appsLabel.getLayoutParams()).gravity = Gravity.RIGHT;
 
         grid = new LinearLayout(this);
         grid.setOrientation(LinearLayout.VERTICAL);
@@ -396,7 +404,8 @@ public class MainActivity extends Activity {
         for (int i = 0; i < dock.size(); i++) {
             View tile = tile(dock.get(i), true);
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1f);
-            p.setMargins(i == 0 ? 0 : dp(10), 0, i == dock.size() - 1 ? 0 : dp(10), 0);
+            p.setMarginStart(i == 0 ? 0 : dp(10));
+            p.setMarginEnd(i == dock.size() - 1 ? 0 : dp(10));
             dockRow.addView(tile, p);
         }
 
@@ -406,17 +415,20 @@ public class MainActivity extends Activity {
                 row = new LinearLayout(this);
                 row.setClipChildren(false);
                 row.setClipToPadding(false);
+                if (rtl) row.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
                 grid.addView(row, llp(-1, -2, 0, 0, 0, dp(26)));
             }
             View tile = tile(rest.get(i), false);
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1f);
-            p.setMargins(i % cols == 0 ? 0 : dp(10), 0, i % cols == cols - 1 ? 0 : dp(10), 0);
+            p.setMarginStart(i % cols == 0 ? 0 : dp(10));
+            p.setMarginEnd(i % cols == cols - 1 ? 0 : dp(10));
             row.addView(tile, p);
         }
         // Pad the last row so tiles keep their width.
         if (row != null) for (int i = rest.size() % cols; i != 0 && i < cols; i++) {
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, 1, 1f);
-            p.setMargins(dp(10), 0, i == cols - 1 ? 0 : dp(10), 0);
+            p.setMarginStart(dp(10));
+            p.setMarginEnd(i == cols - 1 ? 0 : dp(10));
             row.addView(new View(this), p);
         }
         appsLabel.setVisibility(rest.isEmpty() ? View.GONE : View.VISIBLE);
@@ -529,8 +541,10 @@ public class MainActivity extends Activity {
         for (int i = 0; i < d; i++) {
             View c = dockCards.get(i);
             c.setNextFocusUpId(topId);
-            c.setNextFocusLeftId(i == 0 ? c.getId() : dockCards.get(i - 1).getId());
-            c.setNextFocusRightId(i == d - 1 ? c.getId() : dockCards.get(i + 1).getId());
+            int prev = i == 0 ? c.getId() : dockCards.get(i - 1).getId();
+            int next = i == d - 1 ? c.getId() : dockCards.get(i + 1).getId();
+            c.setNextFocusLeftId(rtl ? next : prev);
+            c.setNextFocusRightId(rtl ? prev : next);
             c.setNextFocusDownId(g > 0 ? gridCards.get(Math.min(i, g - 1)).getId() : c.getId());
         }
         int lastRow = (g - 1) / cols;
@@ -542,8 +556,10 @@ public class MainActivity extends Activity {
                     : gridCards.get(j - cols).getId());
             c.setNextFocusDownId(j + cols < g ? gridCards.get(j + cols).getId()
                     : r < lastRow ? gridCards.get(g - 1).getId() : c.getId());
-            c.setNextFocusLeftId(col == 0 ? c.getId() : gridCards.get(j - 1).getId());
-            c.setNextFocusRightId(col == cols - 1 || j == g - 1 ? c.getId() : gridCards.get(j + 1).getId());
+            int prev = col == 0 ? c.getId() : gridCards.get(j - 1).getId();
+            int next = col == cols - 1 || j == g - 1 ? c.getId() : gridCards.get(j + 1).getId();
+            c.setNextFocusLeftId(rtl ? next : prev);
+            c.setNextFocusRightId(rtl ? prev : next);
         }
     }
 
