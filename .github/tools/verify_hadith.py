@@ -7,8 +7,9 @@ the six books from github.com/fawazahmed0/hadith-api, and every book and hadith 
 recorded. A hadith found in none of them must not be shown.
 
 For the four Sunan the scholars' grades of each narration (Al-Albani and others, as the API's English editions
-carry them, matched by hadith number) are read too; a narration graded weak is not picked when another holds the
-words, and the grades are kept in the report.
+carry them, matched by hadith number) are read too, and kept in the report. A Sunan narration is accepted only
+when Al-Albani grades it Sahih, Hasan or Hasan Sahih (albani_accepts); one he grades weak in any form, or does
+not grade, is not picked when another holds the words, and is dropped by apply_hadith_report.py when none does.
 
 For each found hadith the full narration is kept too, exactly as the book has it (chain of narrators and all):
 one whose isnad is at most ISNAD_MAX_WORDS words (a very long chain is not picked when a shorter one exists), in
@@ -29,15 +30,15 @@ URL = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/{}.min.json
 ISNAD_MAX_WORDS = 35   # the words before the Prophet's first quoted words; src/build.py has the same limit
 GRADED = {"ara-abudawud": "eng-abudawud", "ara-tirmidhi": "eng-tirmidhi", "ara-nasai": "eng-nasai",
           "ara-ibnmajah": "eng-ibnmajah"}   # Bukhari and Muslim are sahih by their own standard
-WEAK = re.compile(r"da.?if|weak|munkar|mawdu|fabricat|shadh|mudtarib", re.I)
+ALBANI_OK = {"sahih", "hasan", "hasan sahih"}   # src/build.py has the same rule
 
 
-def weak_grades(grades):
-    """True if a scholar grades it weak; Al-Albani's grade decides when the scholars differ."""
-    if not grades:
-        return False
-    albani = [g for g in grades if "albani" in g.get("name", "").lower()]
-    return any(WEAK.search(g.get("grade", "")) for g in (albani or grades))
+def albani_accepts(book, grades):
+    """Bukhari and Muslim: yes. The four Sunan: only if Al-Albani grades the narration Sahih, Hasan or Hasan Sahih."""
+    if book in ("صحيح البخاري", "صحيح مسلم"):
+        return True
+    albani = [g.get("grade", "") for g in grades or [] if "albani" in g.get("name", "").lower()]
+    return bool(albani) and all(" ".join(re.sub(r"[^a-z ]", " ", a.lower()).split()) in ALBANI_OK for a in albani)
 
 
 def norm(s):
@@ -87,7 +88,7 @@ def main():
             isnad = lambda t: len(t.split('"')[0].split())
             order = list(BOOKS)
             ed, n = min(((f["edition"], f["number"]) for f in found), key=lambda e: (
-                weak_grades(grade_of(*e)), isnad(raw[e[0]][e[1]]["text"]) > ISNAD_MAX_WORDS, order.index(e[0]),
+                not albani_accepts(BOOKS[e[0]], grade_of(*e)), isnad(raw[e[0]][e[1]]["text"]) > ISNAD_MAX_WORDS, order.index(e[0]),
                 not graded(raw[e[0]][e[1]]["text"]), len(raw[e[0]][e[1]]["text"])))
             src = raw[ed][n]
             full = {"book": BOOKS[ed], "number": n, "arabicnumber": src.get("arabicnumber"),

@@ -13,7 +13,7 @@ lists=(optimize/lists/tcl-safe.txt optimize/lists/tcl-optional.txt)
 [ -f optimize/lists/mine.txt ] && lists+=(optimize/lists/mine.txt)
 optimize/restore.sh "${lists[@]}" > /dev/null
 stock=no
-for try in 1 2 3 4; do   # a cold stock home can take a while to come up
+for _ in 1 2 3 4; do   # a cold stock home can take a while to come up
   sleep 6
   if tv "dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity'" | grep -qE 'launcherx|tvlauncher'; then
     stock=yes; break
@@ -30,6 +30,18 @@ optimize/keep.sh || true   # a TV optimized before may have voice, mirroring or 
 echo "2/4 The TV's own screensaver…"
 printf '%s\n' "settings delete secure screensaver_components" "settings delete secure screensaver_default_component" \
   | tv --batch > /dev/null
+# install.sh switched screensaver_enabled on; backup.sh saved the values from before (null: it was never set)
+if [ -f optimize/run/backup.txt ]; then
+  vals=$(tr -d '\r' < optimize/run/backup.txt | awk '/^== /{s=($2=="screensaver")} s&&!/^==/{print}')
+  { read -r _; read -r enabled; read -r timeout; } <<< "$vals"
+  for kv in "secure screensaver_enabled ${enabled:-}" "system screen_off_timeout ${timeout:-}"; do
+    read -r ns key val <<< "$kv"
+    [ -n "$val" ] || continue
+    if [ "$val" = null ]; then echo "settings delete $ns $key"; else echo "settings put $ns $key $val"; fi
+  done | tv --batch > /dev/null
+else
+  echo "   (no optimize/run/backup.txt: screensaver_enabled and screen_off_timeout left as they are)"
+fi
 
 echo "3/4 Removing our apps (old and new names; missing ones are skipped)…"
 for p in sa.urtv.home sa.urtv.screensaver sa.yourtv.home sa.yourtv.screensaver com.abdullah.tvhome com.abdullah.tvsaver; do

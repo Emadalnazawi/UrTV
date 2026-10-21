@@ -34,6 +34,10 @@
         <package android:name="com.tcl.tv" />
         <package android:name="com.tcl.suspension" />
         <package android:name="sa.urtv.screensaver" />
+        <!-- the stock Google homes (Dock.GOOGLE_HOMES): so getPackageInfo sees a disabled one on Android 11+ -->
+        <package android:name="com.google.android.apps.tv.launcherx" />
+        <package android:name="com.google.android.tvlauncher" />
+        <package android:name="com.google.android.leanbacklauncher" />
     </queries>
 
     <application
@@ -78,6 +82,9 @@
                 <action android:name="sa.urtv.home.LIST_APPS" />
                 <action android:name="sa.urtv.home.SET_DOCK" />
                 <action android:name="sa.urtv.home.RESET_DOCK" />
+                <action android:name="sa.urtv.home.HIDDEN" />
+                <action android:name="sa.urtv.home.HIDE" />
+                <action android:name="sa.urtv.home.SHOW" />
             </intent-filter>
         </receiver>
     </application>

@@ -38,8 +38,9 @@ PAGE = "https://tshi-dev.github.io/UrTV/share/"
 def scrub(text):   # in case a note or an output carries something personal
     text = re.sub(r"\b\d{1,3}(\.\d{1,3}){3}(:\d+)?\b", "<ip>", text)
     text = re.sub(r"\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b", "<mac>", text)
-    text = re.sub(r"(?i)\b[A-Z]:[\\/]+Users[\\/]+[^\\/\s]+", "<home>", text)
-    text = re.sub(r"(?i)(/c)?/Users/[^/\s]+|/home/[^/\s]+", "<home>", text)
+    # the user folder may hold spaces ("Ann Lee"): it runs to the next separator or the end of the line
+    text = re.sub(r"(?i)\b[A-Z]:[\\/]+(Users|Documents and Settings)[\\/]+[^\\/\r\n]+", "<home>", text)
+    text = re.sub(r"(?i)(/c)?/Users/[^/\r\n]+|/home/[^/\r\n]+", "<home>", text)
     return text
 
 
@@ -129,8 +130,51 @@ def report_checks():
     lines = report.read_text(encoding="utf-8").splitlines()
     ok = sum(l.startswith("- ok:") for l in lines)
     bad = [l[2:] for l in lines if l.startswith("- !!")]
-    return [f"Protected features on: {ok}/{ok + len(bad)}", *bad,
-            *[l for l in lines if l.startswith(("Home:", "Screensaver:", "Versions:", "Extras:", "Optional picks"))]]
+    out = [f"Protected features on: {ok}/{ok + len(bad)}", *bad,
+           *[l for l in lines if l.startswith(("Home:", "Screensaver:", "Versions:", "Extras:", "Optional picks"))]]
+    return out + packages(lines)
+
+
+def packages(lines):   # what our lists turned off, what they left on, and what the home screen hides
+    state = {}   # (state, list) -> packages
+    for l in lines:
+        m = re.match(r"- pkg (off|on|absent): (\S+) \((\S+)\)", l)
+        if m:
+            state.setdefault((m.group(1), m.group(3)), []).append(m.group(2))
+    out = []
+    for lst in ("tcl-safe", "tcl-optional", "home-replaced"):
+        off, on = state.get(("off", lst), []), state.get(("on", lst), [])
+        absent = len(state.get(("absent", lst), []))
+        if off or on or absent:
+            out.append(f"{lst}: {len(off)} off, {len(on)} still on, {absent} not on this TV")
+            out += [f"  off: {', '.join(off)}"] if off else []
+            out += [f"  on: {', '.join(on)}"] if on else []
+    if state.get(("off", "keep")):
+        out.append(f"!! protected but off: {', '.join(state[('off', 'keep')])}")
+    out += hidden(lines)
+    return out
+
+
+def hidden(lines):   # the home screen's "package | reason" lines: the owner's own apps only as counts per reason
+    ours = {l.split()[0] for f in (Path(__file__).resolve().parent / "lists").glob("*.txt")
+            for l in f.read_text(encoding="utf-8").splitlines() if l.strip() and not l.lstrip().startswith("#")}
+    reasons, named = {}, []
+    for l in lines:
+        if not l.startswith("- home hides: "):
+            continue
+        pkg, _, why = l[len("- home hides: "):].partition(" | ")
+        if not why:
+            continue
+        if pkg.strip() in ours:
+            named.append(f"{pkg.strip()} ({why.strip()})")
+        else:
+            reasons[why.strip()] = reasons.get(why.strip(), 0) + 1
+    out = []
+    if reasons:
+        out.append("home hides: " + ", ".join(f"{n} {why}" for why, n in reasons.items()))
+    if named:
+        out.append("home hides, from our lists: " + ", ".join(named))
+    return out
 
 
 def main():
@@ -192,7 +236,7 @@ def qr(link):
     try:
         import segno
     except ImportError:
-        print("(no QR code: run optimize/setup.sh once to install segno)")
+        print("(no QR code: optimize/share.sh installs segno when it runs, and that did not work: no internet for pip?)")
         return False
     try:
         segno.make(link, error="l").save(str(QR), scale=6, border=4)

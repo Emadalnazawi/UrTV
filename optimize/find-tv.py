@@ -18,6 +18,10 @@ import socket
 import sys
 import urllib.request
 
+for _stream in (sys.stdout, sys.stderr):   # Windows writes pipes in its own code page: «…» came out as «�»
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace", newline="\n")
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOST_FILE = os.path.join(HERE, ".tv_host")
 

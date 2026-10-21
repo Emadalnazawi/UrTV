@@ -16,6 +16,7 @@ done
 
 pm enable "${STOCK%%/*}"
 pm enable com.google.android.tungsten.setupwraith
+cmd role add-role-holder --user 0 android.app.role.HOME "${STOCK%%/*}"
 cmd package set-home-activity --user 0 "$STOCK"
 am start -n "$STOCK"
 input keyevent KEYCODE_HOME

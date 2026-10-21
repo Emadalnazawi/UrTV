@@ -11,40 +11,80 @@
 
 <div dir="rtl">
 
-## ركّبه بمساعد الذكاء الاصطناعي
+## ركّبه في 3 خطوات
 
-1. **على التلفزيون:** الإعدادات ← النظام ← حول ← اضغط OK على **Build** سبع مرات، ثم من **خيارات المطوّر** شغّل
-   **USB debugging**.
-2. **على كمبيوتر في نفس الواي فاي:** افتح مساعد يشغّل الأوامر على جهازك، مثل **Codex** أو **Claude Code**، والصق:
+### ① التلفزيون
+الإعدادات ← حول ← اضغط OK على **Build** سبع مرات. بعدها روح إلى **خيارات المطوّر** ← شغّل **USB debugging**.
 
-   > ركّب تلفزيوني من https://github.com/tshi-dev/UrTV: انسخ المستودع واتبع `docs/SETUP-PROMPT.md` خطوة بخطوة. أنت على كمبيوتر متصل بنفس شبكة الواي فاي حقت التلفزيون.
+### ② كمبيوتر على نفس الواي فاي، وعليه واحد من هذي
 
-   في Codex اختر «Approve for me» للموافقات من القائمة تحت خانة الكتابة.
+| **Codex** (OpenAI) | **Claude Code** (Anthropic) |
+|---|---|
+| مجاني بحساب ChatGPT | يحتاج اشتراك Claude Pro (20$ بالشهر) |
+| حمّل تطبيق Codex | حمّل تطبيق Claude ← تبويب **Code** |
+| الموافقات: اختر **«Approve for me»** | الموافقات: **Allow** للمهمة كلها |
 
-يسألك عن مدينتك والأندية اللي تتابعها، وبعدها يكمل لحاله في حوالي 40 دقيقة.
+<sub>ويندوز: ركّب Git وPython أول (`winget install Git.Git Python.Python.3.12`). Gemini CLI مجاني وناس قالوا يشتغل؛ ما جرّبناه.</sub>
 
-**آمن:** ما يحذف أي تطبيق، وما يلمس AirPlay ولا Chromecast ولا الصوت، و`optimize/reset.sh` يرجّع التلفزيون مثل ما كان.
+### ③ الصق هذا
+
+> ركّب تلفزيوني من https://github.com/tshi-dev/UrTV: انسخ المستودع واتبع `docs/SETUP-PROMPT.md` خطوة بخطوة. أنت على كمبيوتر متصل بنفس شبكة الواي فاي حقت التلفزيون.
+
+#### وش يصير بعد اللصق؟
+يسألك عن **مدينتك** و**أنديتك**، والتلفزيون يسألك **Allow** مرة وحدة، وبعدها خلّه يشتغل: 40 دقيقة وكم إعادة تشغيل.
+
+#### بترجعه مثل ما كان؟
+نعم، بأي وقت: تطبيقاتنا تنحذف، واللي أطفأناه يرجع، وشاشة التلفزيون الأصلية ترجع.
+<sub>`optimize/reset.sh`</sub>
+
+#### نزلت نسخة جديدة؟
+حدّث التطبيقين وإعداداتك كلها باقية. الشاشة نفسها تتحدّث لحالها.
+<sub>`optimize/install.sh all`</sub>
+
+#### نزل تحديث للنظام وقفل تطبيقنا؟
+أعد الإعداد كله بأمر واحد، وإعداداتك باقية.
+<sub>`optimize/run.sh again`</sub>
 
 </div>
 
-## Set it up with your AI agent
+## Set it up in 3 steps
 
-1. **On the TV:** Settings → System → About → press OK on **Build** 7 times, then in **Developer options** turn on
-   **USB debugging**.
-2. **On a computer on the same Wi-Fi:** open an agent that runs commands on that computer, such as **Codex** or
-   **Claude Code**, and paste:
+### ① The TV
+Settings → About → press OK on **Build** 7 times. Then go to **Developer options** → turn on **USB debugging**.
 
-   > Set up my TV with https://github.com/tshi-dev/UrTV: clone it and follow `docs/SETUP-PROMPT.md` step by step. You are on a computer on the same Wi-Fi as the TV.
+### ② A computer on the same Wi-Fi, with one of these
 
-   In Codex, choose «Approve for me» for approvals in the menu under the chat box.
+| **Codex** (OpenAI) | **Claude Code** (Anthropic) |
+|---|---|
+| Free with a ChatGPT account | Needs Claude Pro ($20/month) |
+| Download the Codex app | Download the Claude app → **Code** tab |
+| Approvals: choose **«Approve for me»** | Approvals: **Allow** for the whole task |
 
-It asks for your city and the clubs you follow, then does the rest on its own in about 40 minutes.
+<sub>Windows: install Git and Python first (`winget install Git.Git Python.Python.3.12`). Gemini CLI is free and reported to work; not tested by us.</sub>
 
-**Safe:** nothing is uninstalled; AirPlay, Chromecast and voice are never touched; `optimize/reset.sh` puts the TV
-back as it came. The full prompt: [docs/SETUP-PROMPT.md](docs/SETUP-PROMPT.md).
+### ③ Paste this
 
-**Make your own:** to build a different screen or port it to another TV, give your agent this repo and
-[docs/RECREATE-PROMPT.md](docs/RECREATE-PROMPT.md) (the full design and behaviour spec).
+> Set up my TV with https://github.com/tshi-dev/UrTV: clone it and follow `docs/SETUP-PROMPT.md` step by step. You are on a computer on the same Wi-Fi as the TV.
+
+#### What happens after pasting?
+It asks your **city** and your **clubs**, the TV asks **Allow** once, then leave it: 40 minutes, a few restarts.
+
+#### Can I put it back as it was?
+Yes, anytime: our apps are removed, what we turned off comes back on, the TV's own screen returns.
+<sub>`optimize/reset.sh`</sub>
+
+#### A new version came out?
+Update both apps; all your settings stay. The screen itself updates on its own.
+<sub>`optimize/install.sh all`</sub>
+
+#### The TV updated its system and locked our app out?
+Redo the whole setup with one command, settings kept.
+<sub>`optimize/run.sh again`</sub>
+
+**Safe:** nothing is uninstalled; AirPlay, Chromecast and voice are never touched; a 5-minute safety switch puts the
+stock home back if ours doesn't come up. The apps are built and signed by GitHub Actions from this repo (version
+3.N = the build number). The full prompt: [docs/SETUP-PROMPT.md](docs/SETUP-PROMPT.md). To build a different
+screen: [docs/RECREATE-PROMPT.md](docs/RECREATE-PROMPT.md).
 
 ## What you get
 
@@ -67,9 +107,9 @@ Everything is scriptable over ADB, made for slow Wi-Fi (retries, resumable uploa
 | | |
 |---|---|
 | `optimize/find-tv.sh` | `--check`: can this terminal reach the home network at all (not from a cloud or sandbox) · then finds the TV (Windows, Mac, Linux) |
-| `optimize/run.sh` | the whole setup; run again after any failure to continue · `status` |
-| `optimize/saver.sh` | screensaver settings: `city`, `teams`, `find-team`, `card`, `home-card`, `update`, `show` |
-| `optimize/dock.sh` | favourites row: `apps`, `set`, `show`, `reset` |
+| `optimize/run.sh` | the whole setup; run again after any failure to continue · `status` · `again` after a TV system update (redo all, settings kept) |
+| `optimize/saver.sh` | screensaver settings: `show`, `cities`, `city`, `find-team`, `teams`, `card`, `home-card`, `genres`, `langs`, `minrating`, `update` |
+| `optimize/dock.sh` | favourites row: `show`, `apps`, `set`, `reset`; `hidden`, `hide PKG`, `show PKG` for apps left off the home screen |
 | `optimize/measure.sh` · `shot.sh` | memory before/after (restart + settle) · screenshots without navigating |
 | `optimize/keep.sh` | turn back on anything protected (AirPlay, casting, voice, updates…) that something turned off |
 | `optimize/reset.sh` | back to stock: lists re-enabled, stock home and screensaver back, our apps removed |
@@ -84,7 +124,7 @@ What we learned on real TCL sets, and what must stay on: [docs/OPTIMIZE.md](docs
 src/template.html     the screen (HTML/CSS/JS, no framework); edit this, then run src/build.py
 src/build.py          builds the two pages in dist/
 dist/urtv.html        stand-alone page, fonts and photos inlined: open in any browser (F = full screen), works offline
-dist/tv.html          light page the Android app loads (0.1 MB); the app serves fonts and photos from disk
+dist/tv.html          light page the Android app loads (0.3 MB); the app serves fonts and photos from disk
 android/app           the screensaver app (sa.urtv.screensaver): DreamService, settings, auto-update
 android/launcher      the home screen (sa.urtv.home)
 assets/               fonts, bundled photos, Arabic team names, verse and hadith texts
@@ -95,8 +135,9 @@ docs/                 the agent prompts (setup, recreate), what we learned on re
 tests/run.sh          every check: build, data, fonts, scripts, private data, flaky-ADB upload, the screen in a browser
 ```
 
-Every push builds both APKs in GitHub Actions and publishes them to the `apk-latest` release; `tests/run.sh` runs
-on every push too. Local Android build (needs the SDK): `python3 src/build.py && gradle -p android assembleRelease`
+A push to `master` builds both APKs in GitHub Actions and publishes them to `apk-latest` and a numbered `v3.N`
+release; a push to `next` publishes `apk-next` instead (a test build). `tests/run.sh` runs on `master`, `next`,
+`content` and pull requests. Local Android build (needs the SDK): `python3 src/build.py && gradle -p android assembleRelease`
 (signed with the debug key; the release key lives only in the repository's secrets).
 
 **Screen settings** come from the URL fragment (works on `file://` and in WebView):

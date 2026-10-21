@@ -5,7 +5,7 @@ name: Fetch verse texts
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [master, content]
     paths: ['.github/tools/fetch_verses.py']
 
 permissions:
@@ -23,6 +23,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout --orphan data-verses
           git rm -rfq --cached .
-          git add verses
+          git add -f verses   # the folder is in .gitignore for local runs
           git commit -qm "Verse texts from api.alquran.cloud"
           git push -f origin data-verses

@@ -14,10 +14,10 @@ Logs on failure: `adb logcat -d -t 300 | grep -iE "urtv|chromium|AndroidRuntime"
 |---|---|---|
 | S1 | On the TV: Settings → Device preferences → About → press Build 7× → Developer options → enable **USB/Network debugging**. Note the TV's IP. | Debugging on |
 | S2 | `adb connect <TV_IP>:5555` then `adb devices` | Device listed as `device` |
-| S3 | `curl -L -o urtv-screensaver.apk https://github.com/tshi-dev/UrTV/releases/download/apk-latest/urtv-screensaver.apk` | ~2–5 MB file |
+| S3 | `curl -L -o urtv-screensaver.apk https://github.com/tshi-dev/UrTV/releases/download/apk-latest/urtv-screensaver.apk` | ~2–5 MB file. To test the `next` branch, use the tag `apk-next` in the URL instead of `apk-latest` (with the scripts: `APK_TAG=apk-next optimize/install.sh saver`) |
 | S4 | `adb uninstall sa.yourtv.screensaver` and `adb uninstall com.abdullah.tvsaver` (ignore "not installed") | The pre-rename app is gone (it would show twice) |
 | S5 | `adb install urtv-screensaver.apk` | `Success` |
-| S6 | `adb shell dumpsys package sa.urtv.screensaver \| grep versionName` | `versionName=2.<number>` |
+| S6 | `adb shell dumpsys package sa.urtv.screensaver \| grep versionName` | `versionName=3.<number>` |
 
 ## 1. Settings screen
 
@@ -32,17 +32,17 @@ Navigate with the remote, or `adb shell input keyevent DPAD_DOWN|DPAD_UP|DPAD_CE
 | A4 | Region «منطقة الرياض» → pick «الخرج» | Dialog closes, row shows «المدينة: الخرج» |
 | A5 | المدينة → search → type `ابها` or `Abha` | Results list from the internet; pick one → row updates |
 | A6 | المدينة → search → type `zzzzqq` | Toast «لا توجد نتائج» |
-| A7 | الفرق المتابعة → «تصفح الدوريات…» → each league one by one | Each opens a list of clubs. **Record any league that shows «لا توجد نتائج»** |
-| A8 | الفرق المتابعة → «تصفح الدوريات…» → دوري روشن → pick Al-Nassr | Toast «جارٍ جلب الاسم بالعربية…», row shows «النصر» (Arabic) |
-| A9 | الفرق المتابعة → «بحث عن أي فريق أو منتخب…» → `Real Madrid` | Results; pick → row shows an Arabic name (e.g. «ريال مدريد») |
-| A10 | الفرق المتابعة → دوري يلو | Al-Zulfi is in the list (the free API lists only 10 clubs; it is added) |
+| A7 | الفرق المتابعة → «تصفح الدوريات…» → each league one by one, and «المنتخبات» | Each opens at once, even offline, with every club of the last two seasons in Arabic (MLS: 30). **Record any league that is short or shows «لا توجد نتائج»** |
+| A8 | الفرق المتابعة → «تصفح الدوريات…» → دوري روشن → pick «النصر» | Toast «تمت متابعة النصر» right away (no network needed), row shows «النصر» |
+| A9 | الفرق المتابعة → «بحث عن أي فريق أو منتخب…» → `Real Madrid`, then `الاهلي`, `العربي`, `atletico` | Results at once: «ريال مدريد»; the Saudi «الأهلي» first, then «الأهلي المصري»; the Saudi «العربي» before «العربي القطري»; «أتلتيكو مدريد». Pick one → row shows its Arabic name |
+| A10 | الفرق المتابعة → دوري يلو | Every club of the league, «الزلفي» among them |
 | A11 | التصنيفات → tick دراما + كوميديا → حفظ | Row lists both |
 | A12 | اللغات → tick الإنجليزية → حفظ | Row shows it |
 | A13 | مسلسلات مختارة → «إضافة مسلسل» → `The Last of Us` → pick | Toast «تمت إضافة …», row lists the show (English title) |
 | A14 | مسلسلات مختارة → untick it → حفظ | Removed |
 | A15 | أقل تقييم → 8 | Row shows 8 |
 | A16 | التحديث التلقائي → press | Toggles يعمل/متوقف; set back to يعمل |
-| A17 | تحقق من التحديث الآن | Toast «تم التحديث» or «الصفحة محدثة» (not «لا يوجد اتصال») |
+| A17 | تحديث الشاشة الآن | Toast «تم التحديث» or «الصفحة محدثة» (not «لا يوجد اتصال») |
 | A18 | إعدادات شاشة التوقف في التلفاز | TV screensaver settings open |
 | A19 | Force-close and reopen: `adb shell am force-stop sa.urtv.screensaver` then A1 | All choices from A4–A15 kept |
 
@@ -58,7 +58,7 @@ Open: «معاينة الشاشة» row, or `adb shell am start -n sa.urtv.scree
 | B4 | Top right | Hijri date (with هـ) over Gregorian date (Gregorian month name, e.g. أكتوبر) |
 | B5 | Top left (no boxes) | Temperature ° + condition word (or «غبار» in gold); city · high/low; gold line from the left edge; تاسي / S&P 500 / بيتكوين each with ▲ green or ▼ red (or no arrow — never a dash) |
 | B6 | Markets accuracy | Compare arrows with today's TASI, S&P 500 and BTC 24h direction on any finance site |
-| B7 | هذا الأسبوع | Up to 5 shows matching A11–A15 filters, with season/episode, rating, weekday. Changes page every 25 s |
+| B7 | هذا الأسبوع (set «بجانب الساعة» to المسلسلات first: the default card is the verse card) | Up to 5 shows matching A11–A15 filters, with season/episode, rating, weekday. Changes page every 25 s |
 | B7b | Settings → بجانب الساعة → each option, then preview | مواقيت الصلاة: 6 rows, next prayer gold, past ones dim · طقس الأيام القادمة: اليوم, غداً, then weekdays with condition and high/low · مباريات فرقك: every followed team's games this week in time order · آية أو حديث اليوم: a verse with surah and ayah, or a hadith with its source; no empty boxes · لا شيء: no card |
 | B8 | الصلاة القادمة | Next prayer name + time + «بعد …». Compare with https://www.ummulqura.org.sa or the Aladhan site for the chosen city: within 1–2 min |
 | B9 | رمضان panel | «رمضان ١٤٤٨», day count, start date. (In Ramadan: الإفطار/الإمساك instead) |
@@ -135,7 +135,22 @@ Use the TV's clock or wait for the real moment; take a screenshot at each.
 | L6 | `optimize/dock.sh set com.not.installed` | `error: none of these apps are on this TV's home screen`; row unchanged |
 | L7 | `optimize/dock.sh reset` | Row back to the defaults |
 | L4 | Open any app with the card on, then `adb shell top -n 1 \| grep urtv.home` | Launcher idle while the app is in front (card paused) |
-| L10 | An app with only a phone launcher activity (an OEM store or settings app, Aptoide): `adb shell cmd package query-activities -a android.intent.action.MAIN -c android.intent.category.LAUNCHER` lists it, the LEANBACK_LAUNCHER query doesn't | It is in the grid once, opens with OK, and can be added to the favourites; TV apps are not listed twice; the stock home and its setup app are not in the grid |
+| L11 | An app with only a phone launcher activity (an OEM store or settings app, Aptoide): `adb shell cmd package query-activities -a android.intent.action.MAIN -c android.intent.category.LAUNCHER` lists it, the LEANBACK_LAUNCHER query doesn't | It is in the grid once, opens with OK, and can be added to the favourites; TV apps are not listed twice; the stock home and its setup app are not in the grid |
+
+## 10. Command-line tools (agents; run in the UrTV folder, after `optimize/run.sh`)
+
+| ID | Action | Expected |
+|---|---|---|
+| T1 | `optimize/dock.sh hidden` | One `package \| reason` line per app the home screen leaves out, or «nothing left out» |
+| T2 | `optimize/dock.sh hide <pkg of an app in the grid>`, look at the home screen, then `optimize/dock.sh show <pkg>` | `hidden: <pkg>` and the app leaves the grid; `shown: <pkg>` and it is back |
+| T3 | `optimize/check-home.sh` | «OK: Home opens تلفزيونك»; if no app can be opened: a `!!` line and exit 1 |
+| T4 | `optimize/share.sh --agent "tester" "test note"` | «Sent to the author», or a QR code opens; `optimize/run/share.md` holds no IP address and no user folder (`grep` for the TV's IP and your user name prints nothing) |
+| T5 | `optimize/saver.sh find-team الأهلي` | The Saudi club first, then «الأهلي المصري»; each line `id:Name \| league` |
+| T6 | `optimize/saver.sh minrating 7`, then `optimize/saver.sh show` | `saved`; `show` lists `minrating: 7` |
+| T7 | `optimize/selftest.sh` | `OK upload`, `OK Arabic`, then the screensaver and the app counts; no `FAILED` |
+| T8 | `optimize/venv/bin/python -I optimize/random-clubs.py 8 1` | `seed: 1` and 8 names; the same on every run |
+| T9 | `optimize/reset.sh`, then `optimize/venv/bin/python -I optimize/tv.py pm list packages sa.urtv` and `optimize/venv/bin/python -I optimize/tv.py settings get secure screensaver_enabled` | The package list is empty; `screensaver_enabled` is the value in `optimize/run-*/backup.txt` (under «== screensaver»: the components line, then this one; `null` means unset) |
+| T10 | Put a `!!` line in `optimize/run/report.md` and run `optimize/run.sh` | It ends with «Done, with problems:» and that line, exit code 1; no «All steps done» |
 
 ---
 

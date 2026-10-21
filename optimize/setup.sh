@@ -18,9 +18,16 @@ if ! venv/bin/python -m pip install -q --no-cache-dir -r requirements.txt; then
   echo "   error, allow this terminal network access (pypi.org), then run optimize/setup.sh again."
   exit 1
 fi
-if ! venv/bin/python -c "import adb_shell" 2>/dev/null; then   # pip said yes: make sure tv.py will really start
-  echo "!! The ADB package is still missing from optimize/venv. Delete the folder optimize/venv, then run"
-  echo "   optimize/setup.sh again."
+# pip said yes: make sure tv.py will really start (keygen loads cryptography's DLL, which plain adb_shell doesn't)
+if ! err=$(venv/bin/python -c "import adb_shell.adb_device, adb_shell.auth.keygen, adb_shell.auth.sign_pythonrsa" 2>&1); then
+  echo "$err" | tail -1
+  if grep -qi "too long" <<< "$err"; then
+    echo "!! This folder's path is too long for Windows (over 260 characters inside optimize/venv). Clone UrTV into"
+    echo "   a short folder, such as C:\UrTV: git clone -c core.longpaths=true https://github.com/tshi-dev/UrTV C:/UrTV"
+  else
+    echo "!! The ADB package doesn't load from optimize/venv. Delete the folder optimize/venv, then run"
+    echo "   optimize/setup.sh again."
+  fi
   exit 1
 fi
 echo "✓ Python ADB client in optimize/venv"

@@ -104,7 +104,9 @@ me exactly what was refused. Don't port the scripts to PowerShell or look for an
 `winget install -e --id Python.Python.3.12 --accept-source-agreements --accept-package-agreements`. Then run the
 same command again: the scripts find the new Python without a new terminal. Don't stop and hand me the install.
 ```
-git clone https://github.com/tshi-dev/UrTV; cd UrTV && git pull     # always the latest
+git clone https://github.com/tshi-dev/UrTV     # on Windows into a short folder such as C:/UrTV (a deep one breaks Python)
+cd UrTV
+git pull                               # always the latest (a command of its own, not joined with the others)
 optimize/find-tv.sh --check            # Windows: always through Git Bash (below), never plain `python`
 ```
 - `OK: this terminal can reach the home network` → go on with step 1.
@@ -128,6 +130,8 @@ yet»), delete the folder and clone again.
   and remember progress. **If a command fails, run the same command again.** Don't write your own adb loops,
   probes or test scripts to find out why: the `!!` line and the table below say what to do.
 - One command at a time: never run two scripts against the TV at once, or in the background while you run another.
+- If the TV had a system update since the setup (Home back on the TV's own screen, apps it had off back on):
+  `optimize/run.sh again` redoes every step; the apps' settings stay.
 - Long commands (`run.sh`, `measure.sh`, `--reboot`) can be silent for 5 minutes. Give them a long timeout (40
   minutes for `run.sh`). If your tool kills one anyway, nothing is lost: run the same command again, it continues.
 - Never send `reboot` as a shell command. Restart only with `optimize/venv/bin/python -I optimize/tv.py --reboot`.
@@ -152,11 +156,14 @@ Lines starting with `!!` are the scripts telling you to stop and act. These are 
 | `0xC0000022` or `NtCreateDirectoryObject` starting Git Bash (Codex) | Codex's sandbox can't start Git Bash | run it outside the sandbox (step 0, «Codex on Windows») |
 | `you cannot ask for escalated permissions`, `rejected by policy` (Codex) | Codex's approvals are not on «Approve for me» | message 1 again, wait for «تم», then the same command |
 | `ModuleNotFoundError: No module named 'adb_shell'`, or `!! The Python packages aren't in optimize/venv` | `optimize/setup.sh` didn't finish (often pip had no network) | `optimize/setup.sh` again until it ends with «✓ Python ADB client»; its `!!` line says what is wrong. Then the same command; don't stop for this |
+| `!! This folder's path is too long for Windows`, `Filename too long`, or `DLL load failed … too long` | the UrTV folder sits too deep for Windows | clone it again into a short folder: `git clone -c core.longpaths=true https://github.com/tshi-dev/UrTV C:/UrTV`, and carry on there |
 | `!! No working Python 3 here`, or `python` opens the Microsoft Store | Python not installed, or only Windows' Store shortcut | ask me once, install it yourself (`winget install -e --id Python.Python.3.12 --accept-source-agreements --accept-package-agreements`), then the same command again in Git Bash |
 | `(connection problem: …; retrying in 5s)` | Wi-Fi ADB dropped for a moment | nothing, it retries by itself |
 | `resuming upload at 40%` | an earlier upload was cut off | nothing, it continues and checks the file |
 | no output for several minutes | a restart, or the 3-minute settle before measuring | wait; don't interrupt |
 | the first connection hangs for up to 2 minutes | the TV is showing «Allow USB debugging?» | ask me to press Allow and tick «Always allow» |
+| `--probe` silent for 5 minutes and the TV shows no «Allow USB debugging?» | the first connection to a TCL sometimes just hangs | stop it and run the same command again: the second time it connects at once |
+| `reset.sh`: `mv: cannot move 'optimize/run' … Permission denied` (Windows) | something holds a file open inside `optimize/run` (a log you write there, an editor, an image viewer) | close it, never write your own logs into `optimize/run`; the same command again (the apps are already removed, it carries on) |
 | `!! This terminal cannot reach the home network` | your commands run in a cloud, sandbox or virtual machine | stop, tell me (step 0) |
 | `Don't know your TV's IP` | `find-tv.sh` was not run or found nothing | `optimize/find-tv.sh`, or ask me for the IP (TV: Settings → Network → the Wi-Fi) and save it: `echo <ip> > optimize/.tv_host` |
 | `No TV with ADB open` | debugging off, TV asleep, or the computer is on another (guest) Wi-Fi | ask me to check all three, then `optimize/find-tv.sh` again |
@@ -170,6 +177,9 @@ Lines starting with `!!` are the scripts telling you to stop and act. These are 
 | `Unknown package` or `not installed` while disabling | that package is not on this model | nothing, normal |
 | `An older … signed with another key is installed` | an older build of our app | nothing, it reinstalls; redo step 4 for that app |
 | `!! Install of … failed` | usually storage, or a very old Android | stop and show me |
+| `!! Could not download …` (install.sh) | no such build at that tag, or no internet on this computer | check `APK_TAG` (unset = the latest) and the releases page https://github.com/tshi-dev/UrTV/releases, and that the computer is online; then the same command |
+| `!! GitHub rate limit, try later` (install.sh extras) | GitHub allows only a few anonymous requests an hour | wait a few minutes, then `optimize/run.sh` again (it redoes the extras step) |
+| `Done, with problems:` and `optimize/run.sh` exits 1 | every step ran, but `report.md` has `!!` lines (printed under it) | read them, fix what each says (this table), then `optimize/run.sh` again: only the report step is redone |
 | `!! The safety switch put the stock home back` | ADB was slower than the 5-minute switch | nothing is broken: the same command again |
 | `!! Home did not open the new launcher` | slow ADB, or firmware that pins its own home | leave the TV 5 minutes; `optimize/run.sh` once more; if again, `SKIP_LAUNCHER=1 optimize/run.sh` |
 | the TV has no home at all (black screen, Home does nothing) | our home app is gone while the stock home is off | `optimize/restore.sh` (no list: only the home screen), then `optimize/install.sh launcher`; more in `docs/OPTIMIZE.md`, «Home screen problems» |
@@ -177,7 +187,7 @@ Lines starting with `!!` are the scripts telling you to stop and act. These are 
 | `!! still off` (keep.sh) | a protected feature would not turn back on | **stop**, show me; don't continue |
 | the TV's own screensaver screenshot is black | Android hides it from screenshots | expected; ours can be shot |
 | our screensaver shot has no weather or matches yet | data still loading | `optimize/saver.sh update`, wait a minute, shoot again |
-| `find-team` finds nothing | the club isn't in our Arabic list, or TheSportsDB spells it differently | once with the English name (it tries «Al-», «FC» and the like itself) |
+| `find-team` finds nothing | a spelling our list doesn't have, or a club outside the app's leagues | once with the English name; or `optimize/saver.sh find-team --list <league word>` (e.g. `Saudi`, `Premier`) and pick it from there |
 | `screensaver: preview` (shot.sh), or «not measured» for a screensaver | this Android won't start the screensaver from ADB (some Android 14 sets) | expected: the shot is our app's preview of the same page; don't look for other ways to start it |
 | `optimize/run.sh status` has no «protected features» step | an old copy of this repo | `git pull`, then `optimize/run.sh` |
 
@@ -199,7 +209,7 @@ out, tell me again and run it once more.
 > تتركني، أكمّل لحالي حوالي ٤٠ دقيقة.
 Tell me the model and Android version. Look at `optimize/run/shots/my-apps.png` and write down the first **6 apps**
 of my apps / favourites row, left to right, by name: they become the favourites of the new home screen in step 4.
-Only then, if this TV was set up with these tools before (also older versions, whose apps are `sa.yourtv.*` or `com.abdullah.*`),
+Only then, if this TV was set up with these tools before (also an older version of it),
 run `optimize/reset.sh` so we start like new.
 
 ## 2. Before you run it: how to undo
@@ -230,12 +240,22 @@ itself) and tell me. Some TCL firmware keeps its own home: then `SKIP_LAUNCHER=1
 optimize/saver.sh cities                          # find my city, then: optimize/saver.sh city <name>   (not listed: city <name> <lat> <lon>)
 optimize/saver.sh find-team <club as I wrote it>  # Arabic is fine (الهلال): one call per club, Saudi clubs first;
                                                   # then: optimize/saver.sh teams <id:Name> <id:Name> ...  (my order)
-optimize/saver.sh card <verse|shows|prayers|forecast|matches|none>        # beside the clock (verse unless I said otherwise)
+optimize/saver.sh card <one of: verse, shows, prayers, forecast, matches, none>   # beside the clock (verse unless I said otherwise)
 optimize/saver.sh home-card none                  # home screen: no card
 optimize/dock.sh apps                             # match my 6 apps to packages, then: optimize/dock.sh set <pkg> ... (in that order)
+optimize/dock.sh hidden                           # apps the home screen leaves out, and why
 optimize/saver.sh update
-optimize/saver.sh show ; optimize/dock.sh show    # read it back to me
+optimize/saver.sh show                            # read both back to me
+optimize/dock.sh show
 ```
+The home screen lists what the TV's own home listed: next to a Google home only TV apps, so the maker's helpers
+stay out. Change that only by these rules: `optimize/dock.sh show <pkg>` for an app it left out that is one of
+mine (on the step 1 screenshot) or that I asked for; `optimize/dock.sh hide <pkg>` for an app it shows that is in
+`optimize/lists/tcl-safe.txt` or `tcl-optional.txt`; never hide one in `keep.txt`. Any other you are unsure about:
+list it for me in step 7 instead of choosing.
+
+Take every id from `find-team`'s output, which comes from our list of every club in the app's leagues and the
+national teams; never guess one. If it gives several, pick the one I meant (a Saudi club before a namesake abroad).
 If I said «لا شي» to clubs, skip `find-team` and `teams`. `optimize/saver.sh` without arguments lists every option.
 
 ## 5. Check (5 minutes)
@@ -247,7 +267,7 @@ optimize/shot.sh screensaver
 Look at both screenshots (in `optimize/run/shots/`) and describe them to me. Then check Home from inside an app
 yourself (I may have left): open one, press Home, and the new home must be in front:
 ```
-optimize/check-home.sh          # opens YouTube, presses Home; or: optimize/check-home.sh <another app of mine>
+optimize/check-home.sh          # opens YouTube (else my first favourite), presses Home; or: optimize/check-home.sh <another app of mine>
 ```
 
 ## 6. Before you tell me it's done
@@ -287,6 +307,9 @@ plain lines, with no names, addresses or paths:
 ```
 optimize/share.sh --agent "<you and your model>" --owner "<my words, or leave it out>" "<your notes>"
 ```
+This is the one command here that needs quotes: the agent name and the notes are several words (no apostrophes
+in them). On Windows, inside the Git Bash `-lc "…"` string use single quotes for each:
+`-lc "cd <this folder> && optimize/share.sh --agent '<you and your model>' --owner '<my words>' '<your notes>'"`.
 It sends the summary to the author by itself (anonymously, no account) and prints `Sent to the author`: show me the
 text and tell me it went. If it couldn't send it, it opens a QR code on this computer's screen instead
 (`optimize/run/share-qr.png`; if it didn't open, open it for me): tell me to scan it with my phone's camera, and the

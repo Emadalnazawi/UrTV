@@ -19,7 +19,9 @@ which sits high on these sets from I/O wait even when idle.
 ## Running it
 
 `optimize/run.sh` does the whole setup in order and remembers each finished step: over slow or dropping ADB just
-run it again. Results go to `optimize/run/` (before/after table in `summary.md`, `report.md`). `optimize/reset.sh`
+run it again. It ends with «Done, with problems:» and exit code 1 when `report.md` has `!!` lines (fix them, run it again:
+only the report is redone), and it starts from the first step when the TV (its serial) is not the one of the last run.
+Results go to `optimize/run/` (before/after table in `summary.md`, `report.md`). `optimize/reset.sh`
 puts a TV back as it came, including older versions of these apps. The ADB client (`optimize/tv.py`) retries and
 reconnects by itself, uploads APKs in verified pieces that resume after a drop, and restarts the TV only through
 `tv.py --reboot` (sent once, so a retry can never restart it twice).

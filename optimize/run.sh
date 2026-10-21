@@ -3,6 +3,8 @@
 # any failure just run it again and it carries on where it stopped.
 #   optimize/run.sh            do the next steps
 #   optimize/run.sh status     what is done
+#   optimize/run.sh again      redo every step on the same TV, as after a TV system update put things back
+#                              (the apps' settings stay: installing over keeps them)
 #   SKIP_LAUNCHER=1 optimize/run.sh   keep the TV's own home screen (firmware that won't let another app be Home)
 #   SKIP_EXTRAS=1 optimize/run.sh     without TV Bro and SmartTube
 # Before: optimize/setup.sh and optimize/find-tv.sh. Optional packages the household gave up go in
@@ -35,6 +37,11 @@ title() {
   esac
 }
 
+if [ "${1:-}" = again ]; then   # a TV system update can re-enable what we turned off and take Home back
+  rm -f "$RUN"/.done-* "$RUN/steps.log"
+  echo "Marks cleared: every step runs again (the backup from the first run is kept)."
+  shift
+fi
 if [ "${1:-}" = status ]; then
   for s in "${STEPS[@]}"; do printf '%s %s\n' "$([ -f "$RUN/.done-$s" ] && echo '✓' || echo '·')" "$(title "$s")"; done
   if [ -f "$RUN/report.md" ]; then   # the report's !! lines, so nobody has to grep it by hand
@@ -74,6 +81,21 @@ report() {
   local picks
   picks=$(grep -cvE '^\s*(#|$)' optimize/lists/mine.txt 2>/dev/null || true)
   echo "Optional picks (lists/mine.txt): ${picks:-0}"
+  echo
+  echo "Packages from our lists (off: disabled, on: still on, absent: not on this TV):"
+  local disabled installed l pkg state
+  disabled=$(tv "pm list packages -d" | tr -d '\r')
+  installed=$(tv "pm list packages" | tr -d '\r')
+  for l in tcl-safe tcl-optional keep home-replaced; do
+    for pkg in $(grep -vE '^\s*(#|$)' "optimize/lists/$l.txt" | awk '{print $1}'); do
+      if grep -qx "package:$pkg" <<< "$disabled"; then state=off
+      elif grep -qx "package:$pkg" <<< "$installed"; then state=on
+      else state=absent; fi
+      echo "- pkg $state: $pkg ($l)"
+    done
+  done
+  echo "Left off the home screen:"
+  optimize/dock.sh hidden 2> /dev/null | sed 's/^/- home hides: /' || true
   echo "Undo everything: optimize/reset.sh"
 }
 
@@ -103,6 +125,15 @@ do_step() {
   esac
 }
 
+# The .done-* marks belong to one TV: a different one (its serial, else its address) starts from the top.
+tv_id=$(tv "getprop ro.serialno" 2> /dev/null | tr -d '\r\n ' || true)
+[ -n "$tv_id" ] || tv_id="${TV_HOST:-$(cat optimize/.tv_host 2> /dev/null || true)}"
+if [ -n "$tv_id" ] && [ "$(cat "$RUN/.tv" 2> /dev/null || true)" != "$tv_id" ]; then
+  [ -f "$RUN/.tv" ] && echo "A different TV than the last run: starting from the first step."
+  rm -f "$RUN"/.done-* "$RUN/steps.log"
+  echo "$tv_id" > "$RUN/.tv"
+fi
+
 # when each step started, ended or stopped: optimize/share.sh turns it into how long each took
 stamp() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$RUN/steps.log"; }
 trap 'rc=$?; [ "$rc" -eq 0 ] || stamp "stopped ${current:-?} (exit $rc)"' EXIT
@@ -116,5 +147,13 @@ for s in "${STEPS[@]}"; do
   touch "$RUN/.done-$s"
   stamp "done $s"
 done
+if grep -q '!!' "$RUN/report.md"; then
+  current=report-check   # the stop below is no step's fault
+  echo
+  echo "Done, with problems:"
+  grep '!!' "$RUN/report.md"
+  rm -f "$RUN/.done-report"   # the next run writes the report again, so a fixed problem stops showing
+  exit 1
+fi
 echo
 echo "All steps done. Next: settings (optimize/saver.sh), favourites (optimize/dock.sh), photos (optimize/shot.sh)."

@@ -8,9 +8,6 @@ android {
 
     defaultConfig {
         applicationId 'sa.urtv.screensaver'
-        // where the page updates from every 6 hours (Updater): a fork points it at its own branch,
-        // URTV_PAGE_REPO=https://raw.githubusercontent.com/you/UrTV/branch/
-        resValue 'string', 'page_repo', System.getenv('URTV_PAGE_REPO') ?: 'https://raw.githubusercontent.com/tshi-dev/UrTV/master/'
         minSdk 21
         targetSdk 34
         // CI passes its run number so every build installs over the previous one; 3.x since the new signing key,
@@ -19,6 +16,14 @@ android {
         // builds can replace the original ones on a TV
         versionCode(((System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int) + ((System.getenv('URTV_VERSION_BASE') ?: '0') as int))
         versionName "3.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
+        // the branch the page, fonts and photos are fetched from: CI passes the one it builds, a local build follows master
+        buildConfigField "String", "BRANCH", "\"${System.getenv('URTV_BRANCH') ?: 'master'}\""
+        // and from which repository: a fork builds with URTV_REPO=you/UrTV
+        buildConfigField "String", "REPO", "\"${System.getenv('URTV_REPO') ?: 'tshi-dev/UrTV'}\""
+    }
+
+    buildFeatures {
+        buildConfig true   // off by default since AGP 8
     }
 
     signingConfigs {
@@ -43,7 +48,7 @@ android {
 
     // the page is built by ../../src/build.py into dist/
     sourceSets {
-        main { assets.srcDirs = ['../../dist', '../../assets/shared', '../launcher/src/main/assets', '../../assets'] }   // page, teams-ar.json, Thmanyah fonts, backgrounds/
+        main { assets.srcDirs = ['../../dist', '../launcher/src/main/assets', '../../assets'] }   // page, Thmanyah fonts, backgrounds/, shared/ (the club lists)
     }
 
     compileOptions {

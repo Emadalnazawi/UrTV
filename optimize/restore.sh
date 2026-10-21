@@ -14,6 +14,9 @@ STOCK_LAUNCHER="${STOCK_LAUNCHER:-com.google.android.apps.tv.launcherx/.home.Hom
   echo "pm enable com.google.android.apps.tv.launcherx"
   echo "pm enable com.google.android.tvlauncher"
   echo "pm enable ${STOCK_LAUNCHER%%/*}"
+  # Google TV's home can come back without its notification access (seen on other TVs); give it back
+  echo "cmd notification allow_listener com.google.android.apps.tv.launcherx/.coreservices.notificationlistener.TvNotificationListenerService"
+  echo "cmd role add-role-holder --user 0 android.app.role.HOME ${STOCK_LAUNCHER%%/*}"
   echo "cmd package set-home-activity --user 0 $STOCK_LAUNCHER"
   echo "input keyevent KEYCODE_HOME"
 } | "$PY" -I optimize/tv.py --batch

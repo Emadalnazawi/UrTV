@@ -82,7 +82,11 @@ public class SaverReceiver extends BroadcastReceiver {
                 String[] kv = part.split(":", 2);
                 if (!kv[0].matches("\\d+")) return "error: teams are id:EnglishName, e.g. 136013:Al-Hilal";
                 String en = kv.length > 1 ? kv[1].trim() : "";
-                String ar = en.isEmpty() ? "#" + kv[0] : Arabic.team(c, en);
+                // the bundled list knows the club by id (its Arabic name as the screen shows it); a club outside
+                // the list gets the name made from its English one
+                TeamSearch.Team known = Teams.byId(c, kv[0]);
+                String ar = known != null && !known.ar.isEmpty() ? known.ar
+                    : en.isEmpty() ? "#" + kv[0] : Arabic.team(c, en);
                 teams.add(kv[0] + "|" + ar.replace("|", " ").replace(";", " "));
             }
             if (teams.size() > Prefs.MAX_TEAMS) return "error: at most " + Prefs.MAX_TEAMS + " teams";

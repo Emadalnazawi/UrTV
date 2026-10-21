@@ -15,3 +15,9 @@ optimize/lists/mine.txt
 *.p12
 *.jks
 *.keystore
+
+# written when the CI tools in .github/tools are run locally (the workflows push these to data-* branches)
+/teams/
+/hadith/
+/verses/
+/unsplash/
