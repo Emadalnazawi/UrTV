@@ -75,8 +75,41 @@ public class DockReceiver extends BroadcastReceiver {
                 setResultData((hide ? "hidden: " : "shown: ") + String.join(",", pkgs));
                 return;
             }
+            case "sa.urtv.home.EPG":
+                setResultData(epg(c));
+                return;
             default:
                 setResultData("error: unknown action " + action);
         }
+    }
+
+    /** What the apps publish to the TV's program database (channels, their programs, «watch next»), per app. */
+    private static String epg(Context c) {
+        StringBuilder b = new StringBuilder();
+        String[][] tables = {
+            {"channel", "package_name", "display_name"},
+            {"preview_program", "package_name", "title"},
+            {"watch_next_program", "package_name", "title"},
+            {"program", "package_name", "title"},
+        };
+        for (String[] t : tables) {
+            b.append("== ").append(t[0]).append('\n');
+            try (android.database.Cursor cur = c.getContentResolver().query(
+                    android.net.Uri.parse("content://android.media.tv/" + t[0]), new String[]{t[1], t[2]}, null, null, null)) {
+                if (cur == null) { b.append("  (null)\n"); continue; }
+                java.util.Map<String, java.util.List<String>> by = new java.util.TreeMap<>();
+                while (cur.moveToNext()) {
+                    String p = cur.getString(0), n = cur.getString(1);
+                    if (!by.containsKey(p)) by.put(p, new java.util.ArrayList<>());
+                    if (by.get(p).size() < 6) by.get(p).add(n);
+                }
+                b.append("  rows: ").append(cur.getCount()).append('\n');
+                for (java.util.Map.Entry<String, java.util.List<String>> e : by.entrySet())
+                    b.append("  ").append(e.getKey()).append(": ").append(String.join(" | ", e.getValue())).append('\n');
+            } catch (RuntimeException e) {
+                b.append("  error: ").append(e).append('\n');
+            }
+        }
+        return b.toString().trim();
     }
 }

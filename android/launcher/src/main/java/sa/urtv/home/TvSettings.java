@@ -184,7 +184,14 @@ public class TvSettings extends Activity {
                 bg.setColor(has ? 0x26DCB86F : (idx == section ? 0x12FFFFFF : 0));
                 bg.setStroke(dp(1), has ? 0xCCDCB86F : 0);
                 t.setTextColor(has ? TEXT : 0xCCF6EEDC);
-                if (has && idx != section && !swapping) showSection(idx, true);
+                if (has && !swapping) {
+                    // passing quickly over sections builds only the one the focus stops on
+                    main.removeCallbacks(pendingSection);
+                    if (idx != section) {
+                        pendingSection = () -> { pendingSection = null; showSection(idx, true); };
+                        main.postDelayed(pendingSection, 140);
+                    }
+                }
             });
             r.setOnClickListener(v -> focusMiddle());
             r.setOnKeyListener((v, code, e) -> {
@@ -818,7 +825,10 @@ public class TvSettings extends Activity {
         return false;
     }
 
+    private Runnable pendingSection;
+
     private void focusMiddle() {
+        if (pendingSection != null) { main.removeCallbacks(pendingSection); pendingSection.run(); }
         if (stack.isEmpty()) return;
         ((Page) stack.get(stack.size() - 1).getTag()).focusFirst();
     }
@@ -838,7 +848,12 @@ public class TvSettings extends Activity {
         Get<Page> rebuild;
 
         Page(String title) {
-            view = new ScrollView(TvSettings.this);
+            view = new ScrollView(TvSettings.this) {
+                // the page scrolls only through keepVisible: Android's own scroll to the focused row and ours
+                // fought when the remote was pressed fast, so rows jumped
+                @Override
+                protected int computeScrollDeltaToGetChildRectOnScreen(android.graphics.Rect r) { return 0; }
+            };
             view.setVerticalScrollBarEnabled(false);
             view.setTag(this);
             view.setSmoothScrollingEnabled(true);
@@ -853,7 +868,11 @@ public class TvSettings extends Activity {
             list.addView(t, lp);
         }
 
-        void add(View v) { list.addView(v, new LinearLayout.LayoutParams(-1, -2)); }
+        void add(View v) {
+            // a row keeps its own margins (the gap between rows)
+            ViewGroup.LayoutParams lp = v.getLayoutParams();
+            list.addView(v, lp instanceof LinearLayout.LayoutParams ? lp : new LinearLayout.LayoutParams(-1, -2));
+        }
 
         void header(String s) {
             TextView t = text(s, 13, medium, GOLD);
@@ -1091,7 +1110,7 @@ public class TvSettings extends Activity {
                 focusables.add(r);
             }
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-            lp.bottomMargin = dp(focusable ? 4 : 0);
+            lp.bottomMargin = dp(focusable ? 8 : 0);
             r.setLayoutParams(lp);
             link();
             return r;
@@ -1104,7 +1123,7 @@ public class TvSettings extends Activity {
             int target = Math.max(0, y - view.getHeight() / 3);
             if (focusables.indexOf(v) <= 1) target = 0;
             final int to = target;
-            view.post(() -> view.smoothScrollTo(0, to));   // after the ScrollView's own scroll to the focused row
+            view.smoothScrollTo(0, to);
         }
 
         private void hint(View r, String label, String hint) {
