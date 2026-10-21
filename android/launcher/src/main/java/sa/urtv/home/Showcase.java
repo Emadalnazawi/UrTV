@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Outline;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -14,12 +15,10 @@ import android.os.Looper;
 import android.util.LruCache;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,6 +39,11 @@ import java.util.concurrent.Executors;
  * first, then the app's own rows (Shahid's series, stc tv's picks…), as posters you can open straight away.
  * The data is the TV's program database (TvContract: watch_next_program, preview_program), readable with
  * READ_TV_LISTINGS; an app that publishes nothing keeps the normal home screen.
+ *
+ * Two looks. On the favourite: the posters in a row under the header. Up on a poster («the lens»): that poster
+ * grows by half to the middle of the screen and everything else goes soft behind it, as through a lens wide
+ * open; Left brings the next one to the middle and this one slides to the right. Android 11 has no live blur,
+ * so the soft parts are pictures blurred once: the screen as it was, and a small copy of each poster.
  */
 final class Showcase {
     static final class Item {
@@ -51,6 +55,8 @@ final class Showcase {
     private static final Interpolator EASE = new PathInterpolator(0.32f, 0.72f, 0f, 1f);
     private static final int MAX_ITEMS = 12;
     private static final long FRESH_MS = 2 * 60 * 1000;
+    private static final long MOVE_MS = 560;
+    private static final float LENS = 1.5f;
 
     private final MainActivity m;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -58,22 +64,107 @@ final class Showcase {
     private final LruCache<String, Bitmap> images = new LruCache<String, Bitmap>(24 * 1024 * 1024) {
         @Override protected int sizeOf(String k, Bitmap b) { return b.getByteCount(); }
     };
-    private final LinearLayout panel, row;
-    private final HorizontalScrollView rowScroll;
-    private final TextView group, detail;
-    private final FrameLayout backdrop;
+    private final FrameLayout hero, backdrop;
     private final ImageView[] backs = new ImageView[2];
     private int backFront = 0;
     private String backUrl;
 
+    // row labels (over the row) and the lens caption (under the poster in the middle)
+    private final LinearLayout labels, caption;
+    private final TextView group, detail, capGroup, capTitle;
+    // the soft screen behind the lens, and the stage the posters move on
+    private final FrameLayout glass, stage;
+    private final ImageView glassShot, glassTint;
+
     private volatile Map<String, List<Item>> data = new HashMap<>();
     private long loadedAt;
     private String shownPkg;
-    private final List<View> posters = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
+    private final List<Poster> posters = new ArrayList<>();
+    private int lensAt = -1;   // the poster in the middle, -1 when the posters are a row
     private final Runnable backdropLater = this::backdropFromFocus;
 
-    Showcase(MainActivity m, FrameLayout hero, FrameLayout.LayoutParams where, FrameLayout backdrop) {
+    /** one poster: the sharp picture, a soft copy for when it is beside the lens, and a dimmer */
+    private final class Poster {
+        final FrameLayout view;
+        final ImageView sharp, soft;
+        final View dim, ring;
+        final Item item;
+        final int w, h;
+
+        Poster(Item it, int h) {
+            item = it;
+            this.h = h;
+            w = Math.round(h * it.aspect);
+            view = new FrameLayout(m);
+            view.setId(View.generateViewId());
+            view.setFocusable(true);
+            view.setClickable(true);
+            view.setClipToOutline(true);
+            view.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View v, Outline o) { o.setRoundRect(0, 0, v.getWidth(), v.getHeight(), m.dp(8)); }
+            });
+            GradientDrawable bg = new GradientDrawable();
+            bg.setColor(0xFF22252B);
+            view.setBackground(bg);
+            TextView name = m.text(12, "medium", 0xFFFFFDF6);
+            name.setText(it.title);
+            name.setGravity(Gravity.CENTER);
+            name.setPadding(m.dp(8), 0, m.dp(8), 0);
+            view.addView(name, new FrameLayout.LayoutParams(-1, -1));   // until the picture arrives, or if it doesn't
+            sharp = new ImageView(m);
+            sharp.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            sharp.setAlpha(0f);
+            view.addView(sharp, new FrameLayout.LayoutParams(-1, -1));
+            soft = new ImageView(m);
+            soft.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            soft.setAlpha(0f);
+            view.addView(soft, new FrameLayout.LayoutParams(-1, -1));
+            dim = new View(m);
+            dim.setBackgroundColor(0xFF000000);
+            dim.setAlpha(0f);
+            view.addView(dim, new FrameLayout.LayoutParams(-1, -1));
+            if (it.progress >= 0) {
+                View track = new View(m);
+                track.setBackgroundColor(0x66000000);
+                view.addView(track, new FrameLayout.LayoutParams(-1, m.dp(4), Gravity.BOTTOM));
+                View done = new View(m);
+                done.setBackgroundColor(MainActivity.GOLD);
+                view.addView(done, new FrameLayout.LayoutParams(w * it.progress / 100, m.dp(4), Gravity.BOTTOM | Gravity.RIGHT));
+            }
+            GradientDrawable rd = new GradientDrawable();
+            rd.setCornerRadius(m.dp(8));
+            rd.setStroke(m.dp(2), 0xE6FFFFFF);
+            ring = new View(m);
+            ring.setBackground(rd);
+            ring.setAlpha(0f);
+            view.addView(ring, new FrameLayout.LayoutParams(-1, -1));
+            view.setPivotX(w / 2f);
+            view.setPivotY(h / 2f);
+            view.setOnClickListener(v -> m.openItem(it));
+            if (it.poster != null) fetch(it.poster, w, h, bm -> {
+                sharp.setImageBitmap(bm);
+                sharp.animate().alpha(soft.getAlpha() > 0 ? 0f : 1f).setDuration(260).start();
+                pool.execute(() -> {
+                    Bitmap b = blur(Bitmap.createScaledBitmap(bm, Math.max(8, bm.getWidth() / 8), Math.max(8, bm.getHeight() / 8), true), 3);
+                    main.post(() -> soft.setImageBitmap(b));
+                });
+            });
+        }
+
+        /** sharp and bright in the lens or in the row; soft and dimmed beside the lens */
+        void look(boolean softly, boolean animate) {
+            long d = animate ? MOVE_MS : 0;
+            boolean pic = sharp.getDrawable() != null;
+            sharp.animate().alpha(pic && !softly ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
+            soft.animate().alpha(softly && soft.getDrawable() != null ? 1f : 0f).setDuration(d).setInterpolator(EASE).start();
+            dim.animate().alpha(softly ? 0.5f : 0f).setDuration(d).setInterpolator(EASE).start();
+        }
+    }
+
+    Showcase(MainActivity m, FrameLayout hero, FrameLayout backdrop) {
         this.m = m;
+        this.hero = hero;
         this.backdrop = backdrop;
         backdrop.setBackgroundColor(0xFF000000);
         backdrop.setAlpha(0f);
@@ -85,44 +176,67 @@ final class Showcase {
             backs[i] = iv;
         }
 
-        panel = new LinearLayout(m);
-        panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setGravity(Gravity.RIGHT);
-        panel.setClipChildren(false);
-        panel.setClipToPadding(false);
-        panel.setAlpha(0f);
-        panel.setVisibility(View.GONE);
+        labels = new LinearLayout(m);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setGravity(Gravity.RIGHT);
+        labels.setAlpha(0f);
+        labels.setVisibility(View.GONE);
         group = m.text(13, "medium", MainActivity.GOLD);
         group.setGravity(Gravity.RIGHT);
         group.setSingleLine(true);
-        panel.addView(group, new LinearLayout.LayoutParams(-1, -2));
+        labels.addView(group, new LinearLayout.LayoutParams(-1, -2));
         detail = m.text(18, "medium", 0xFFFFFDF6);
         detail.setGravity(Gravity.RIGHT);
         detail.setSingleLine(true);
         detail.setEllipsize(android.text.TextUtils.TruncateAt.END);
         detail.setShadowLayer(m.dp(3), 0, m.dp(1), 0x80000000);
-        LinearLayout.LayoutParams dl = new LinearLayout.LayoutParams(-1, -2);
-        dl.bottomMargin = m.dp(12);
-        panel.addView(detail, dl);
+        labels.addView(detail, new LinearLayout.LayoutParams(-1, -2));
 
-        rowScroll = new HorizontalScrollView(m) {
-            // the row scrolls only through glideTo: Android's own jump to the focused poster made posters
-            // appear from nowhere at the screen's edge when the remote was pressed fast
-            @Override protected int computeScrollDeltaToGetChildRectOnScreen(android.graphics.Rect r) { return 0; }
-        };
-        rowScroll.setHorizontalScrollBarEnabled(false);
-        rowScroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        rowScroll.setClipChildren(false);
-        rowScroll.setClipToPadding(false);
-        rowScroll.setSmoothScrollingEnabled(true);
-        rowScroll.setPadding(m.dp(12), m.dp(10), m.dp(12), m.dp(12));
-        row = new LinearLayout(m);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setClipChildren(false);
-        row.setClipToPadding(false);
-        rowScroll.addView(row, new FrameLayout.LayoutParams(-2, -2));
-        panel.addView(rowScroll, new LinearLayout.LayoutParams(-1, -2));
-        hero.addView(panel, where);
+        glass = new FrameLayout(m);
+        glass.setAlpha(0f);
+        glass.setVisibility(View.GONE);
+        glassShot = new ImageView(m);
+        glassShot.setScaleType(ImageView.ScaleType.FIT_XY);
+        glass.addView(glassShot, new FrameLayout.LayoutParams(-1, -1));
+        glassTint = new ImageView(m);   // the poster in the middle, very soft, over the screen: its colour leads
+        glassTint.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        glassTint.setAlpha(0f);
+        glass.addView(glassTint, new FrameLayout.LayoutParams(-1, -1));
+        View shade = new View(m);
+        shade.setBackgroundColor(0x66000000);
+        glass.addView(shade, new FrameLayout.LayoutParams(-1, -1));
+
+        stage = new FrameLayout(m);
+        stage.setClipChildren(false);
+        stage.setClipToPadding(false);
+        stage.setVisibility(View.GONE);
+
+        caption = new LinearLayout(m);
+        caption.setOrientation(LinearLayout.VERTICAL);
+        caption.setGravity(Gravity.CENTER_HORIZONTAL);
+        caption.setAlpha(0f);
+        capGroup = m.text(14, "medium", MainActivity.GOLD);
+        capGroup.setGravity(Gravity.CENTER);
+        caption.addView(capGroup, new LinearLayout.LayoutParams(-1, -2));
+        capTitle = m.text(22, "medium", 0xFFFFFDF6);
+        capTitle.setGravity(Gravity.CENTER);
+        capTitle.setMaxLines(2);
+        capTitle.setLineSpacing(0, 1.1f);
+        capTitle.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        capTitle.setShadowLayer(m.dp(4), 0, m.dp(1), 0x99000000);
+        caption.addView(capTitle, new LinearLayout.LayoutParams(-1, -2));
+    }
+
+    /** Over everything else on the home screen, so the soft screen covers the clock, the bar and the favourites. */
+    void attach() {
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.RIGHT | Gravity.TOP);
+        lp.setMargins(m.dp(48), m.dp(104), m.dp(48), 0);
+        hero.addView(labels, lp);
+        hero.addView(glass, new FrameLayout.LayoutParams(-1, -1));
+        hero.addView(stage, new FrameLayout.LayoutParams(-1, -1));
+        FrameLayout.LayoutParams cp = new FrameLayout.LayoutParams(-1, -2);
+        cp.leftMargin = cp.rightMargin = m.dp(170);   // under the poster, not from edge to edge
+        stage.addView(caption, cp);
     }
 
     // ---------------------------------------------------------------- data
@@ -234,156 +348,242 @@ final class Showcase {
 
     boolean isShown() { return shownPkg != null; }
 
-    boolean owns(View v) { return posters.contains(v); }
+    boolean inLens() { return lensAt >= 0; }
 
-    int firstPosterId() { return posters.isEmpty() ? View.NO_ID : posters.get(0).getId(); }
+    boolean owns(View v) {
+        for (Poster p : posters) if (p.view == v) return true;
+        return false;
+    }
 
-    /** The app's posters in the top part; false (and hidden) when it publishes nothing. */
+    int firstPosterId() { return posters.isEmpty() ? View.NO_ID : posters.get(0).view.getId(); }
+
+    /** The app's posters in a row under the header; false (and hidden) when it publishes nothing. */
     boolean show(String pkg) {
         if (!has(pkg)) { hide(true); return false; }
+        if (lensAt >= 0) lens(-1);
         if (pkg.equals(shownPkg)) return true;
         boolean was = shownPkg != null;
         shownPkg = pkg;
         build(data.get(pkg));
-        panel.setVisibility(View.VISIBLE);
-        panel.animate().cancel();
-        if (was) {
-            // another app: the posters slide in again from a little lower
-            panel.setAlpha(0f);
-            panel.setTranslationY(m.dp(10));
-        } else if (panel.getAlpha() == 0f) {
-            panel.setTranslationY(m.dp(16));
+        labels.setVisibility(View.VISIBLE);
+        stage.setVisibility(View.VISIBLE);
+        for (View v : new View[]{labels, stage}) {
+            v.animate().cancel();
+            v.setAlpha(0f);
+            v.setTranslationY(m.dp(was ? 10 : 16));
+            v.animate().alpha(1f).translationY(0).setStartDelay(was ? 40 : 120).setDuration(460).setInterpolator(EASE).start();
         }
-        panel.animate().alpha(1f).translationY(0).setStartDelay(was ? 40 : 120).setDuration(460).setInterpolator(EASE).start();
         backdrop.animate().cancel();
         backdrop.animate().alpha(1f).setStartDelay(0).setDuration(600).setInterpolator(EASE).start();
-        List<Item> l = data.get(pkg);
-        setBackdrop(l.get(0).wide);
+        setBackdrop(items.get(0).wide);
         return true;
     }
 
     void hide(boolean animate) {
-        if (shownPkg == null && panel.getVisibility() == View.GONE) return;
+        if (shownPkg == null && stage.getVisibility() == View.GONE) return;
+        if (lensAt >= 0) lens(-1);
         shownPkg = null;
         main.removeCallbacks(backdropLater);
-        panel.animate().cancel();
-        backdrop.animate().cancel();
+        for (View v : new View[]{labels, stage, backdrop}) v.animate().cancel();
         if (!animate) {
-            panel.setAlpha(0f);
-            panel.setVisibility(View.GONE);
+            labels.setAlpha(0f);
+            labels.setVisibility(View.GONE);
+            stage.setVisibility(View.GONE);
             backdrop.setAlpha(0f);
             return;
         }
-        panel.animate().alpha(0f).translationY(m.dp(10)).setStartDelay(0).setDuration(260).setInterpolator(EASE)
-                .withEndAction(() -> { if (shownPkg == null) panel.setVisibility(View.GONE); }).start();
+        labels.animate().alpha(0f).translationY(m.dp(10)).setStartDelay(0).setDuration(260).setInterpolator(EASE)
+                .withEndAction(() -> { if (shownPkg == null) labels.setVisibility(View.GONE); }).start();
+        stage.animate().alpha(0f).translationY(m.dp(10)).setStartDelay(0).setDuration(260).setInterpolator(EASE)
+                .withEndAction(() -> { if (shownPkg == null) stage.setVisibility(View.GONE); }).start();
         backdrop.animate().alpha(0f).setStartDelay(0).setDuration(420).setInterpolator(EASE).start();
     }
 
-    /** the poster row of one app; MainActivity wires the remote's Up/Down to and from it */
-    private void build(List<Item> items) {
-        row.removeAllViews();
+    private void build(List<Item> list) {
+        items = list;
+        for (Poster p : posters) stage.removeView(p.view);
         posters.clear();
+        lensAt = -1;
         int h = m.dp(118);
-        // laid out right to left by hand (the app doesn't declare supportsRtl): the first item at the right end
-        for (int i = 0; i < items.size(); i++) {
-            Item it = items.get(i);
-            View p = poster(it, h);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Math.round(h * it.aspect), h);
-            lp.leftMargin = i == 0 ? 0 : m.dp(24);   // room for the focused poster to grow without covering its neighbours
-            row.addView(p, 0, lp);
+        for (Item it : list) {
+            Poster p = new Poster(it, h);
+            stage.addView(p.view, stage.getChildCount() - 1, new FrameLayout.LayoutParams(p.w, p.h, Gravity.LEFT | Gravity.TOP));
+            p.view.setOnFocusChangeListener((v, has) -> { if (has) focused(p); });
             posters.add(p);
         }
+        // the first item at the right end (the app doesn't declare supportsRtl, so Arabic order is by hand)
         for (int i = 0; i < posters.size(); i++) {
-            View p = posters.get(i);
-            p.setNextFocusRightId(i == 0 ? p.getId() : posters.get(i - 1).getId());
-            p.setNextFocusLeftId(i == posters.size() - 1 ? p.getId() : posters.get(i + 1).getId());
+            View v = posters.get(i).view;
+            v.setNextFocusRightId(i == 0 ? v.getId() : posters.get(i - 1).view.getId());
+            v.setNextFocusLeftId(i == posters.size() - 1 ? v.getId() : posters.get(i + 1).view.getId());
         }
-        Item first = items.get(0);
-        group.setText(first.group.isEmpty() ? "" : first.group);
-        detail.setText(first.detail);
-        rowScroll.post(() -> rowScroll.scrollTo(row.getWidth(), 0));   // start at the right end
+        group.setText(list.get(0).group);
+        detail.setText(list.get(0).detail);
+        place(false);
     }
 
-    private View poster(Item it, int h) {
-        FrameLayout f = new FrameLayout(m);
-        f.setId(View.generateViewId());
-        f.setFocusable(true);
-        f.setClickable(true);
-        f.setTag(it);
-        f.setClipToOutline(true);
-        f.setOutlineProvider(new ViewOutlineProvider() {
-            @Override public void getOutline(View v, Outline o) { o.setRoundRect(0, 0, v.getWidth(), v.getHeight(), m.dp(8)); }
-        });
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(0xFF22252B);
-        f.setBackground(bg);
+    /** Up from a poster goes to the top bar, Down back to the favourite they belong to. */
+    void wire(int up, int down) {
+        for (Poster p : posters) { p.view.setNextFocusUpId(up); p.view.setNextFocusDownId(down); }
+    }
 
-        TextView name = m.text(12, "medium", 0xFFFFFDF6);
-        name.setText(it.title);
-        name.setGravity(Gravity.CENTER);
-        name.setPadding(m.dp(8), 0, m.dp(8), 0);
-        f.addView(name, new FrameLayout.LayoutParams(-1, -1));   // until the picture arrives, or if it doesn't
+    private void focused(Poster p) {
+        int i = posters.indexOf(p);
+        if (i != lensAt) lens(i);
+        main.removeCallbacks(backdropLater);
+        main.postDelayed(backdropLater, 280);   // passing quickly over posters doesn't flash the backdrop
+    }
 
-        ImageView img = new ImageView(m);
-        img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        img.setAlpha(0f);
-        f.addView(img, new FrameLayout.LayoutParams(-1, -1));
-        loadInto(it.poster, img, Math.round(h * it.aspect), h);
-
-        if (it.progress >= 0) {
-            View track = new View(m);
-            track.setBackgroundColor(0x66000000);
-            f.addView(track, new FrameLayout.LayoutParams(-1, m.dp(4), Gravity.BOTTOM));
-            View done = new View(m);
-            done.setBackgroundColor(MainActivity.GOLD);
-            FrameLayout.LayoutParams dp = new FrameLayout.LayoutParams(0, m.dp(4), Gravity.BOTTOM | Gravity.RIGHT);
-            f.addView(done, dp);
-            f.post(() -> { dp.width = f.getWidth() * it.progress / 100; done.setLayoutParams(dp); });
+    /** The lens on poster i (-1: back to the row). Entering it, the screen as it is goes soft behind. */
+    void lens(int i) {
+        boolean entering = lensAt < 0 && i >= 0, leaving = lensAt >= 0 && i < 0;
+        lensAt = i;
+        if (entering) {
+            glassShot.setImageBitmap(snapshot());
+            glass.setVisibility(View.VISIBLE);
+            glass.animate().cancel();
+            glass.animate().alpha(1f).setDuration(420).setInterpolator(EASE).start();
+            labels.animate().alpha(0f).setDuration(200).start();
+        } else if (leaving) {
+            glass.animate().cancel();
+            glass.animate().alpha(0f).setDuration(360).setInterpolator(EASE)
+                    .withEndAction(() -> { if (lensAt < 0) glass.setVisibility(View.GONE); }).start();
+            labels.animate().alpha(1f).setDuration(300).start();
         }
-
-        GradientDrawable ring = new GradientDrawable();
-        ring.setCornerRadius(m.dp(8));
-        ring.setStroke(m.dp(2), 0xE6FFFFFF);
-        View shine = new View(m);
-        shine.setBackground(ring);
-        shine.setAlpha(0f);
-        f.addView(shine, new FrameLayout.LayoutParams(-1, -1));
-
-        f.setOnFocusChangeListener((v, has) -> {
-            v.animate().scaleX(has ? 1.06f : 1f).scaleY(has ? 1.06f : 1f).translationZ(has ? m.dp(10) : 0)
-                    .setDuration(has ? 300 : 200).setInterpolator(EASE).start();
-            shine.animate().alpha(has ? 1f : 0f).setDuration(160).start();
-            if (!has) return;
-            glideTo(v);
+        if (i >= 0) {
+            Item it = posters.get(i).item;
+            capGroup.setText(it.group);
+            capTitle.setText(it.detail);
             group.setText(it.group);
             detail.setText(it.detail);
-            main.removeCallbacks(backdropLater);
-            main.postDelayed(backdropLater, 280);   // passing quickly over posters doesn't flash the backdrop
-        });
-        f.setOnClickListener(v -> m.openItem(it));
-        return f;
+            android.graphics.drawable.Drawable sd = posters.get(i).soft.getDrawable();
+            Bitmap soft = sd instanceof android.graphics.drawable.BitmapDrawable ? ((android.graphics.drawable.BitmapDrawable) sd).getBitmap() : null;
+            if (soft != null) {
+                glassTint.setImageBitmap(soft);
+                glassTint.animate().cancel();
+                glassTint.setAlpha(0f);
+                glassTint.animate().alpha(0.55f).setDuration(MOVE_MS).setInterpolator(EASE).start();
+            }
+        }
+        place(true);
     }
 
-    private android.animation.ObjectAnimator glide;
+    /** Every poster to its place: a row under the header, or around the one in the middle of the screen. */
+    private void place(boolean animate) {
+        int sw = m.getResources().getDisplayMetrics().widthPixels, sh = m.getResources().getDisplayMetrics().heightPixels;
+        long d = animate ? MOVE_MS : 0;
+        if (lensAt < 0) {
+            int x = sw - m.dp(48), y = m.dp(168), gap = m.dp(24);
+            for (Poster p : posters) {
+                x -= p.w;
+                move(p.view, x, y, 1f, d);
+                p.look(false, animate);
+                p.ring.animate().alpha(0f).setDuration(160).start();
+                p.view.setTranslationZ(0);
+                x -= gap;
+            }
+            caption.animate().alpha(0f).setDuration(200).start();
+            return;
+        }
+        float cx = sw / 2f, cy = sh * 0.44f, gap = m.dp(44);
+        Poster f = posters.get(lensAt);
+        move(f.view, cx - f.w / 2f, cy - f.h / 2f, LENS, d);
+        f.look(false, animate);
+        f.ring.animate().alpha(1f).setDuration(200).start();
+        f.view.setTranslationZ(m.dp(16));
+        // to the right: the ones before it (Arabic order); to the left: the ones after it
+        float edge = cx + f.w * LENS / 2f;
+        for (int j = lensAt - 1; j >= 0; j--) {
+            Poster p = posters.get(j);
+            edge += gap;
+            move(p.view, edge, cy - p.h / 2f, 1f, d);
+            edge += p.w;
+            beside(p, animate);
+        }
+        edge = cx - f.w * LENS / 2f;
+        for (int j = lensAt + 1; j < posters.size(); j++) {
+            Poster p = posters.get(j);
+            edge -= gap + p.w;
+            move(p.view, edge, cy - p.h / 2f, 1f, d);
+            beside(p, animate);
+        }
+        FrameLayout.LayoutParams cl = (FrameLayout.LayoutParams) caption.getLayoutParams();
+        int top = Math.round(cy + f.h * LENS / 2f + m.dp(20));
+        if (cl.topMargin != top) { cl.topMargin = top; caption.setLayoutParams(cl); }
+        caption.animate().alpha(1f).setDuration(300).setStartDelay(120).start();
+    }
 
-    /** the focused poster fully in view, with the next one peeking, in one eased move (presses in a row merge) */
-    private void glideTo(View p) {
-        int pad = m.dp(56), w = rowScroll.getWidth(), x = rowScroll.getScrollX();
-        if (glide != null && glide.isRunning()) x = (Integer) glide.getAnimatedValue();
-        int left = p.getLeft() - pad, right = p.getRight() + pad - w;
-        int to = left < x ? left : right > x ? right : x;
-        to = Math.max(0, Math.min(to, row.getWidth() - w + rowScroll.getPaddingLeft() + rowScroll.getPaddingRight()));
-        if (glide != null) glide.cancel();
-        if (to == rowScroll.getScrollX()) return;
-        glide = android.animation.ObjectAnimator.ofInt(rowScroll, "scrollX", rowScroll.getScrollX(), to);
-        glide.setDuration(420);
-        glide.setInterpolator(EASE);
-        glide.start();
+    private void beside(Poster p, boolean animate) {
+        p.look(true, animate);
+        p.ring.animate().alpha(0f).setDuration(160).start();
+        p.view.setTranslationZ(0);
+    }
+
+    private void move(View v, float x, float y, float s, long d) {
+        v.animate().cancel();
+        if (d == 0) { v.setTranslationX(x); v.setTranslationY(y); v.setScaleX(s); v.setScaleY(s); return; }
+        v.animate().translationX(x).translationY(y).scaleX(s).scaleY(s).setDuration(d).setInterpolator(EASE).start();
+    }
+
+    /** The screen as it is now (without the posters), small and blurred: the glass behind the lens. */
+    private Bitmap snapshot() {
+        View root = m.getWindow().getDecorView();
+        int f = 6, w = Math.max(1, root.getWidth() / f), h = Math.max(1, root.getHeight() / f);
+        Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        c.scale(1f / f, 1f / f);
+        // left out by transparency, not visibility: hiding the stage would take the focus off the poster
+        float sa = stage.getAlpha(), ga = glass.getAlpha();
+        stage.setAlpha(0f);
+        glass.setAlpha(0f);
+        root.draw(c);
+        stage.setAlpha(sa);
+        glass.setAlpha(ga);
+        return blur(b, 4);
+    }
+
+    /** A box blur, three passes each way: near enough to a lens blur on a small picture. */
+    static Bitmap blur(Bitmap src, int r) {
+        Bitmap b = src.isMutable() && src.getConfig() == Bitmap.Config.ARGB_8888 ? src : src.copy(Bitmap.Config.ARGB_8888, true);
+        int w = b.getWidth(), h = b.getHeight();
+        int[] px = new int[w * h], tmp = new int[w * h];
+        b.getPixels(px, 0, w, 0, 0, w, h);
+        for (int pass = 0; pass < 3; pass++) {
+            boxH(px, tmp, w, h, r);
+            boxH(transpose(tmp, w, h, px), tmp, h, w, r);
+            transpose(tmp, h, w, px);
+        }
+        b.setPixels(px, 0, w, 0, 0, w, h);
+        return b;
+    }
+
+    private static int[] transpose(int[] in, int w, int h, int[] out) {
+        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) out[x * h + y] = in[y * w + x];
+        return out;
+    }
+
+    private static void boxH(int[] in, int[] out, int w, int h, int r) {
+        int div = 2 * r + 1;
+        for (int y = 0; y < h; y++) {
+            int a = 0, rr = 0, g = 0, bb = 0, row = y * w;
+            for (int k = -r; k <= r; k++) {
+                int p = in[row + Math.min(w - 1, Math.max(0, k))];
+                a += p >>> 24; rr += (p >> 16) & 255; g += (p >> 8) & 255; bb += p & 255;
+            }
+            for (int x = 0; x < w; x++) {
+                out[row + x] = ((a / div) << 24) | ((rr / div) << 16) | ((g / div) << 8) | (bb / div);
+                int pOut = in[row + Math.max(0, x - r)], pIn = in[row + Math.min(w - 1, x + r + 1)];
+                a += (pIn >>> 24) - (pOut >>> 24);
+                rr += ((pIn >> 16) & 255) - ((pOut >> 16) & 255);
+                g += ((pIn >> 8) & 255) - ((pOut >> 8) & 255);
+                bb += (pIn & 255) - (pOut & 255);
+            }
+        }
     }
 
     private void backdropFromFocus() {
         View f = m.getCurrentFocus();
-        if (f != null && owns(f)) setBackdrop(((Item) f.getTag()).wide);
+        for (Poster p : posters) if (p.view == f) setBackdrop(p.item.wide);
     }
 
     private void setBackdrop(String url) {
@@ -404,14 +604,6 @@ final class Showcase {
     // ---------------------------------------------------------------- pictures
 
     private interface Got { void got(Bitmap b); }
-
-    private void loadInto(String url, ImageView iv, int w, int h) {
-        if (url == null) return;
-        fetch(url, w, h, bm -> {
-            iv.setImageBitmap(bm);
-            iv.animate().alpha(1f).setDuration(260).start();
-        });
-    }
 
     private void fetch(String url, int w, int h, Got got) {
         String key = url + "@" + w;
@@ -441,7 +633,8 @@ final class Showcase {
             o.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
             int s = 1;
-            while (o.outWidth / (s * 2) >= w && o.outHeight / (s * 2) >= h) s *= 2;
+            // sharp enough for the lens (half as big again as in the row)
+            while (o.outWidth / (s * 2) >= w * LENS && o.outHeight / (s * 2) >= h * LENS) s *= 2;
             o = new BitmapFactory.Options();
             o.inSampleSize = s;
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
@@ -459,11 +652,6 @@ final class Showcase {
             if (o.size() > 8 * 1024 * 1024) throw new java.io.IOException("too large");
         }
         return o.toByteArray();
-    }
-
-    /** Up from a poster goes to the top bar, Down back to the favourite they belong to. */
-    void wire(int up, int down) {
-        for (View p : posters) { p.setNextFocusUpId(up); p.setNextFocusDownId(down); }
     }
 
     void destroy() { pool.shutdownNow(); }

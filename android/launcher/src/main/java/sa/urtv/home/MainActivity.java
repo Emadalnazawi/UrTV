@@ -232,12 +232,10 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         // Back with the posters up: they go, the clock comes back big; the next press of the remote shows them again
-        if (showcase.isShown()) {
-            View f = getCurrentFocus();
-            calm();
-            if (f != null && showcase.owns(f) && lastDockCard != null) lastDockCard.requestFocus();
-            return;
-        }
+        // one step at a time: from the lens back to the favourites (the row stays), then the posters go
+        View f = getCurrentFocus();
+        if (f != null && showcase.owns(f) && lastDockCard != null) { lastDockCard.requestFocus(); return; }
+        if (showcase.isShown()) { calm(); return; }
         // Home has nowhere to go back to; Back from the grid returns to the dock.
         if (scroll.getScrollY() > 0 && !dockCards.isEmpty()) dockCards.get(0).requestFocus();
     }
@@ -295,7 +293,7 @@ public class MainActivity extends Activity {
         // optional card under the pills, same size as beside the screensaver's clock
         homeCard = new HomeCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
         noteCard = new NoteCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
-        showcase = new Showcase(this, hero, lp(-1, -2, Gravity.RIGHT | Gravity.TOP, dp(36), dp(104), dp(36), 0), backdrop);
+        showcase = new Showcase(this, hero, backdrop);
 
         LinearLayout bottom = new LinearLayout(this);
         bottom.setOrientation(LinearLayout.VERTICAL);
@@ -336,6 +334,7 @@ public class MainActivity extends Activity {
         grid.setClipChildren(false);
         grid.setClipToPadding(false);
         content.addView(grid, llp(-1, -2, dp(68), 0, dp(68), dp(160)));
+        showcase.attach();   // last: the lens's soft screen goes over the header and the favourites
         return root;
     }
 

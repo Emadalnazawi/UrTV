@@ -76,7 +76,7 @@ public class DockReceiver extends BroadcastReceiver {
                 return;
             }
             case "sa.urtv.home.EPG":
-                setResultData(epg(c));
+                setResultData(epg(c) + "\n" + liveness(c));
                 return;
             default:
                 setResultData("error: unknown action " + action);
@@ -110,6 +110,27 @@ public class DockReceiver extends BroadcastReceiver {
                 b.append("  error: ").append(e).append('\n');
             }
         }
+        return b.toString().trim();
+    }
+
+    /** Per app: how many published items are live, and of which kinds (TvContract type codes). */
+    private static String liveness(Context c) {
+        StringBuilder b = new StringBuilder("== live/type\n");
+        try (android.database.Cursor cur = c.getContentResolver().query(android.net.Uri.parse("content://android.media.tv/preview_program"),
+                new String[]{"package_name", "live", "type"}, null, null, null)) {
+            java.util.Map<String, int[]> live = new java.util.TreeMap<>();
+            java.util.Map<String, java.util.Set<Integer>> types = new java.util.TreeMap<>();
+            while (cur != null && cur.moveToNext()) {
+                String p = cur.getString(0);
+                if (!live.containsKey(p)) { live.put(p, new int[2]); types.put(p, new java.util.TreeSet<>()); }
+                live.get(p)[0]++;
+                if (cur.getInt(1) == 1) live.get(p)[1]++;
+                types.get(p).add(cur.getInt(2));
+            }
+            for (String p : live.keySet())
+                b.append("  ").append(p).append(": ").append(live.get(p)[0]).append(" items, live ").append(live.get(p)[1])
+                        .append(", types ").append(types.get(p)).append('\n');
+        } catch (RuntimeException e) { b.append("  error: ").append(e).append('\n'); }
         return b.toString().trim();
     }
 }
