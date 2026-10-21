@@ -1,4 +1,4 @@
-name: Sync with the original UrTV
+name: Sync with the original UrTV (daily)
 
 # This fork's own branch (emad) = the original repository + this fork's changes. Every day it takes the
 # original's new commits, rebuilds the screen page (dist/tv.html, which the screensaver updates from) and
