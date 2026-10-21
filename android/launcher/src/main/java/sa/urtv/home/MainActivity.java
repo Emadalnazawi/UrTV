@@ -206,6 +206,7 @@ public class MainActivity extends Activity {
         unregisterReceiver(tick);
         if (inputsPopup != null) inputsPopup.dismiss();
         homeCard.pause();
+        showcase.stopPreview();
         unregisterReceiver(notes);
         noteCard.hide();
     }

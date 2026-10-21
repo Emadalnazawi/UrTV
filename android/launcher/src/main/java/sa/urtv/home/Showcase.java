@@ -50,7 +50,10 @@ final class Showcase {
         String pkg, title, detail, group, poster, wide, intent;
         float aspect = 16 / 9f;
         int progress = -1;   // percent watched («watch next»), or of the show on now (live)
-        boolean live;
+        boolean live;          // a live channel with its guide: the show on now
+        String channelId;      // Shahid live: the channel (its card can play the stream)
+        boolean vip;           // plays only in Shahid, with the subscription
+        String start, end, left, next;   // live: the show's times, «باقي ٧ د», «التالي»
     }
 
     // ---------------------------------------------------------------- what the user chose to see (TvSettings)
@@ -99,7 +102,9 @@ final class Showcase {
 
     // row labels (over the row) and the lens caption (under the poster in the middle)
     private final LinearLayout labels, caption;
-    private final TextView group, detail, capGroup, capTitle;
+    private final TextView group, detail, capGroup, capTitle, tStart, tLeft, tEnd, tNext;
+    private final LinearLayout timeBox, nextRow;
+    private final View barFill;
     // the soft screen behind the lens, and the stage the posters move on
     private final FrameLayout glass, stage;
     private final ImageView glassShot, glassTint;
@@ -117,6 +122,7 @@ final class Showcase {
         final FrameLayout view;
         final ImageView sharp, soft;
         final View dim, ring;
+        View barTrack, barDone;   // the card's own progress line (hidden in the lens: the bar under it says it)
         final Item item;
         final int w, h;
 
@@ -153,24 +159,25 @@ final class Showcase {
             dim.setAlpha(0f);
             view.addView(dim, new FrameLayout.LayoutParams(-1, -1));
             if (it.progress >= 0) {
-                View track = new View(m);
-                track.setBackgroundColor(0x66000000);
-                view.addView(track, new FrameLayout.LayoutParams(-1, m.dp(4), Gravity.BOTTOM));
-                View done = new View(m);
-                done.setBackgroundColor(MainActivity.GOLD);
-                view.addView(done, new FrameLayout.LayoutParams(w * it.progress / 100, m.dp(4), Gravity.BOTTOM | Gravity.RIGHT));
+                barTrack = new View(m);
+                barTrack.setBackgroundColor(0x66000000);
+                view.addView(barTrack, new FrameLayout.LayoutParams(-1, m.dp(4), Gravity.BOTTOM));
+                barDone = new View(m);
+                barDone.setBackgroundColor(MainActivity.GOLD);
+                view.addView(barDone, new FrameLayout.LayoutParams(w * it.progress / 100, m.dp(4), Gravity.BOTTOM | Gravity.RIGHT));
             }
             if (it.live) {
-                TextView badge = m.text(11, "medium", 0xFFFFFFFF);
-                badge.setText("مباشر");
-                badge.setPadding(m.dp(7), m.dp(1), m.dp(7), m.dp(2));
-                GradientDrawable bb = new GradientDrawable();
-                bb.setCornerRadius(m.dp(4));
-                bb.setColor(0xE6D93A3A);
-                badge.setBackground(bb);
-                FrameLayout.LayoutParams bl = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.RIGHT);
-                bl.setMargins(0, m.dp(6), m.dp(6), 0);
-                view.addView(badge, bl);
+                // the one sign that this is live: a red dot in the corner (no word, nothing by the name)
+                View dot = new View(m);
+                GradientDrawable dd = new GradientDrawable();
+                dd.setShape(GradientDrawable.OVAL);
+                dd.setColor(0xFFE5484D);
+                dd.setStroke(m.dp(2), 0x99000000);
+                dot.setBackground(dd);
+                // the left corner: channels put their own logo at the right
+                FrameLayout.LayoutParams dl = new FrameLayout.LayoutParams(m.dp(12), m.dp(12), Gravity.TOP | Gravity.LEFT);
+                dl.setMargins(m.dp(8), m.dp(8), 0, 0);
+                view.addView(dot, dl);
             }
             GradientDrawable rd = new GradientDrawable();
             rd.setCornerRadius(m.dp(8));
@@ -253,18 +260,73 @@ final class Showcase {
 
         caption = new LinearLayout(m);
         caption.setOrientation(LinearLayout.VERTICAL);
-        caption.setGravity(Gravity.CENTER_HORIZONTAL);
+        caption.setGravity(Gravity.RIGHT);
         caption.setAlpha(0f);
         capGroup = m.text(14, "medium", MainActivity.GOLD);
-        capGroup.setGravity(Gravity.CENTER);
+        capGroup.setGravity(Gravity.RIGHT);
         caption.addView(capGroup, new LinearLayout.LayoutParams(-1, -2));
         capTitle = m.text(22, "medium", 0xFFFFFDF6);
-        capTitle.setGravity(Gravity.CENTER);
+        capTitle.setGravity(Gravity.RIGHT);
         capTitle.setMaxLines(2);
         capTitle.setLineSpacing(0, 1.1f);
         capTitle.setEllipsize(android.text.TextUtils.TruncateAt.END);
         capTitle.setShadowLayer(m.dp(4), 0, m.dp(1), 0x99000000);
         caption.addView(capTitle, new LinearLayout.LayoutParams(-1, -2));
+
+        // a live show, always in the same order: its time bar (start at the right, end at the left, what is
+        // left in the middle), then «التالي»
+        timeBox = new LinearLayout(m);
+        timeBox.setOrientation(LinearLayout.VERTICAL);
+        FrameLayout bar = new FrameLayout(m);
+        View track = new View(m);
+        GradientDrawable tg = new GradientDrawable();
+        tg.setCornerRadius(m.dp(2));
+        tg.setColor(0x2EFFFFFF);
+        track.setBackground(tg);
+        bar.addView(track, new FrameLayout.LayoutParams(-1, -1));
+        barFill = new View(m);
+        GradientDrawable fg = new GradientDrawable();
+        fg.setCornerRadius(m.dp(2));
+        fg.setColor(MainActivity.GOLD);
+        barFill.setBackground(fg);
+        bar.addView(barFill, new FrameLayout.LayoutParams(0, -1, Gravity.RIGHT));
+        LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(-1, m.dp(4));
+        bl.topMargin = m.dp(10);
+        timeBox.addView(bar, bl);
+        LinearLayout times = new LinearLayout(m);
+        times.setOrientation(LinearLayout.HORIZONTAL);
+        tEnd = m.text(13, "regular", 0xFFB9B2A3);
+        tLeft = m.text(13, "medium", 0xFFF6EEDC);
+        tLeft.setGravity(Gravity.CENTER);
+        tStart = m.text(13, "regular", 0xFFB9B2A3);
+        times.addView(tEnd, new LinearLayout.LayoutParams(-2, -2));          // laid out left to right by hand
+        times.addView(tLeft, new LinearLayout.LayoutParams(0, -2, 1f));
+        times.addView(tStart, new LinearLayout.LayoutParams(-2, -2));
+        LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-1, -2);
+        tl.topMargin = m.dp(4);
+        timeBox.addView(times, tl);
+        caption.addView(timeBox, new LinearLayout.LayoutParams(-1, -2));
+        nextRow = new LinearLayout(m);
+        nextRow.setOrientation(LinearLayout.HORIZONTAL);
+        nextRow.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        tNext = m.text(14, "regular", 0xFFD8D1C2);
+        tNext.setSingleLine(true);
+        tNext.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        nextRow.addView(tNext, new LinearLayout.LayoutParams(0, -2, 1f));
+        tNext.setGravity(Gravity.RIGHT);
+        TextView tag = m.text(11, "medium", MainActivity.GOLD);
+        tag.setText("التالي");
+        tag.setPadding(m.dp(7), m.dp(1), m.dp(7), m.dp(2));
+        GradientDrawable tb = new GradientDrawable();
+        tb.setCornerRadius(m.dp(4));
+        tb.setColor(0x1FFFFFFF);
+        tag.setBackground(tb);
+        LinearLayout.LayoutParams tgl = new LinearLayout.LayoutParams(-2, -2);
+        tgl.leftMargin = m.dp(8);
+        nextRow.addView(tag, tgl);
+        LinearLayout.LayoutParams nl = new LinearLayout.LayoutParams(-1, -2);
+        nl.topMargin = m.dp(10);
+        caption.addView(nextRow, nl);
     }
 
     /** Over everything else on the home screen, so the soft screen covers the clock, the bar and the favourites. */
@@ -274,9 +336,7 @@ final class Showcase {
         hero.addView(labels, lp);
         hero.addView(glass, new FrameLayout.LayoutParams(-1, -1));
         hero.addView(stage, new FrameLayout.LayoutParams(-1, -1));
-        FrameLayout.LayoutParams cp = new FrameLayout.LayoutParams(-1, -2);
-        cp.leftMargin = cp.rightMargin = m.dp(170);   // under the poster, not from edge to edge
-        stage.addView(caption, cp);
+        stage.addView(caption, new FrameLayout.LayoutParams(m.dp(300), -2, Gravity.LEFT | Gravity.TOP));   // as wide as the poster in the lens (place)
     }
 
     // ---------------------------------------------------------------- data
@@ -419,6 +479,7 @@ final class Showcase {
     }
 
     void hide(boolean animate) {
+        stopPreview();
         if (shownPkg == null && stage.getVisibility() == View.GONE) return;
         if (lensAt >= 0) lens(-1);
         shownPkg = null;
@@ -469,12 +530,15 @@ final class Showcase {
     private void focused(Poster p) {
         int i = posters.indexOf(p);
         if (i != lensAt) lens(i);
+        stopPreview();
+        if (p.item.channelId != null) main.postDelayed(previewLater, 900);   // only where the focus stays
         main.removeCallbacks(backdropLater);
         main.postDelayed(backdropLater, 280);   // passing quickly over posters doesn't flash the backdrop
     }
 
     /** The lens on poster i (-1: back to the row). Entering it, the screen as it is goes soft behind. */
     void lens(int i) {
+        if (i < 0) stopPreview();
         boolean entering = lensAt < 0 && i >= 0, leaving = lensAt >= 0 && i < 0;
         lensAt = i;
         if (entering) {
@@ -492,7 +556,15 @@ final class Showcase {
         if (i >= 0) {
             Item it = posters.get(i).item;
             capGroup.setText(it.group);
-            capTitle.setText(it.detail);
+            capTitle.setText(it.live ? it.title : it.detail);
+            timeBox.setVisibility(it.live ? View.VISIBLE : View.GONE);
+            nextRow.setVisibility(it.live && it.next != null ? View.VISIBLE : View.GONE);
+            if (it.live) {
+                tStart.setText(it.start);
+                tEnd.setText(it.end);
+                tLeft.setText(it.left);
+                tNext.setText(it.next);
+            }
             group.setText(it.group);
             detail.setText(it.detail);
             android.graphics.drawable.Drawable sd = posters.get(i).soft.getDrawable();
@@ -522,6 +594,7 @@ final class Showcase {
                 x -= gap;
             }
             caption.animate().alpha(0f).setDuration(200).start();
+            for (Poster p : posters) if (p.barTrack != null) { p.barTrack.animate().alpha(1f).start(); p.barDone.animate().alpha(1f).start(); }
             return;
         }
         float cx = sw / 2f, cy = sh * 0.44f, gap = m.dp(44);
@@ -547,8 +620,20 @@ final class Showcase {
             beside(p, animate);
         }
         FrameLayout.LayoutParams cl = (FrameLayout.LayoutParams) caption.getLayoutParams();
-        int top = Math.round(cy + f.h * LENS / 2f + m.dp(20));
-        if (cl.topMargin != top) { cl.topMargin = top; caption.setLayoutParams(cl); }
+        int top = Math.round(cy + f.h * LENS / 2f + m.dp(20)), cw = Math.round(f.w * LENS), left = Math.round(cx - cw / 2f);
+        if (cl.topMargin != top || cl.width != cw || cl.leftMargin != left) {
+            cl.topMargin = top; cl.width = cw; cl.leftMargin = left;
+            caption.setLayoutParams(cl);
+        }
+        if (f.item.live) {
+            FrameLayout.LayoutParams fl = (FrameLayout.LayoutParams) barFill.getLayoutParams();
+            fl.width = cw * Math.max(0, f.item.progress) / 100;
+            barFill.setLayoutParams(fl);
+        }
+        for (Poster p : posters) {
+            float a = p == f ? 0f : 1f;
+            if (p.barTrack != null) { p.barTrack.animate().alpha(a).setDuration(200).start(); p.barDone.animate().alpha(a).setDuration(200).start(); }
+        }
         caption.animate().alpha(1f).setDuration(300).setStartDelay(120).start();
     }
 
@@ -696,7 +781,56 @@ final class Showcase {
         return o.toByteArray();
     }
 
-    void destroy() { pool.shutdownNow(); }
+    // ---------------------------------------------------------------- the live stream inside the card
+
+    private androidx.media3.exoplayer.ExoPlayer player;
+    private android.view.TextureView video;
+    private final Runnable previewLater = this::startPreview;
+
+    /** the channel in the lens plays inside its card, muted; OK still opens it in Shahid, with sound */
+    private void startPreview() {
+        if (lensAt < 0) return;
+        Poster p = posters.get(lensAt);
+        String id = p.item.channelId;
+        pool.execute(() -> {
+            String url = ShahidLive.stream(id);
+            if (url == null) return;
+            main.post(() -> { if (lensAt >= 0 && posters.get(lensAt) == p) play(p, url); });
+        });
+    }
+
+    private void play(Poster p, String url) {
+        stopPreview();
+        if (player == null) {
+            player = new androidx.media3.exoplayer.ExoPlayer.Builder(m).build();
+            player.setVolume(0f);
+            player.addListener(new androidx.media3.common.Player.Listener() {
+                @Override public void onRenderedFirstFrame() {
+                    if (video != null) video.animate().alpha(1f).setDuration(450).setInterpolator(EASE).start();
+                }
+            });
+        }
+        video = new android.view.TextureView(m);
+        video.setAlpha(0f);
+        p.view.addView(video, p.view.indexOfChild(p.dim), new FrameLayout.LayoutParams(-1, -1));   // under the dot and the ring
+        player.setVideoTextureView(video);
+        player.setMediaItem(androidx.media3.common.MediaItem.fromUri(url));
+        player.prepare();
+        player.play();
+    }
+
+    void stopPreview() {
+        main.removeCallbacks(previewLater);
+        if (player != null) { player.stop(); player.clearMediaItems(); if (video != null) player.clearVideoTextureView(video); }
+        if (video != null && video.getParent() != null) ((android.view.ViewGroup) video.getParent()).removeView(video);
+        video = null;
+    }
+
+    void destroy() {
+        stopPreview();
+        if (player != null) { player.release(); player = null; }
+        pool.shutdownNow();
+    }
 
     static Intent parse(Item it) {
         if (it.intent == null) return null;

@@ -26,13 +26,13 @@ import java.util.TimeZone;
 final class ShahidLive {
     static final String PKG = "net.mbc.shahidTV";
 
-    /** id, the name shown, in the order of the row; the government channels have no guide in Shahid */
+    /** id, the name shown, in the order of the row; "vip" plays only in Shahid with the subscription */
     static final String[][] CHANNELS = {
         {"387238", "MBC 1"}, {"400917", "MBC 2"}, {"387251", "MBC دراما"}, {"400921", "MBC أكشن"},
-        {"387290", "MBC مصر"}, {"387286", "العربية"}, {"946948", "الإخبارية"}, {"946938", "السعودية"},
+        {"387290", "MBC مصر", "vip"}, {"387286", "العربية"}, {"946948", "الإخبارية"}, {"946938", "السعودية"},
         {"946940", "SBC"}, {"946945", "ذكريات"}, {"999927", "السعودية الآن"}, {"49923857275647", "اقرأ"},
         {"946946", "القرآن الكريم"}, {"946942", "السنة النبوية"}, {"387296", "MBC دراما بلس"},
-        {"387293", "MBC مصر 2"}, {"49923122575716", "مصر دراما"}, {"387937", "MBC 5"}, {"400919", "MBC 4"},
+        {"387293", "MBC مصر 2", "vip"}, {"49923122575716", "مصر دراما"}, {"387937", "MBC 5", "vip"}, {"400919", "MBC 4"},
         {"409385", "MBC 3"}, {"409387", "MBC بوليود"}, {"400924", "MBC ماكس"},
     };
 
@@ -109,23 +109,27 @@ final class ShahidLive {
             }
             Showcase.Item it = new Showcase.Item();
             it.pkg = PKG;
-            it.group = "البث المباشر · " + c[1];
-            it.live = true;
+            it.channelId = c[0];
+            it.vip = c.length > 2;
+            it.group = "\u200F" + c[1];   // «MBC دراما» read right to left, not «دراما MBC»
             String channelPic = picture(pictures.get(c[0]), 640, 360);
             if (on != null) {
-                it.title = on.title;
-                long left = (on.to - now) / 60000;
-                it.detail = on.title + " · " + clock(on.from) + " – " + clock(on.to)
-                        + (left > 0 ? " · بقي " + minutes(left) : "")
-                        + (next != null ? "\nبعده: " + next.title + " " + clock(next.from) : "");
+                // a channel with its guide: the show on now, its times, how far along, what is next
+                it.live = true;
+                it.title = clean(on.title);
+                it.start = clock(on.from);
+                it.end = clock(on.to);
+                it.left = left((on.to - now) / 60000);
+                // RLM marks keep the order right to left when the title is in English («Robin Hood»)
+                if (next != null) it.next = "\u200F" + clean(next.title) + "\u200F · " + clock(next.from);
                 it.progress = (int) Math.min(100, (now - on.from) * 100 / Math.max(1, on.to - on.from));
                 String p = picture(on.poster, 640, 360);
                 it.poster = p != null ? p : channelPic;
             } else {
                 it.title = c[1];
-                it.detail = c[1] + " · بث مباشر";
                 it.poster = channelPic;
             }
+            it.detail = it.title;
             it.wide = channelPic != null ? channelPic : it.poster;
             it.aspect = 16 / 9f;
             it.intent = "intent://shahid.mbc.net/ar/livestream/channel/livechannel-" + c[0]
@@ -133,6 +137,41 @@ final class ShahidLive {
             out.add(it);
         }
         return out;
+    }
+
+    /** «عين سحرية  موسم 1 حلقة 12» → «عين سحرية · الحلقة ١٢» (the season only when it isn't the first) */
+    static String clean(String t) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(.*?)\\s*موسم\\s*(\\d+)\\s*حلقة\\s*(\\d+)\\s*$").matcher(t);
+        if (!m.find()) return t;
+        int season = Integer.parseInt(m.group(2));
+        return m.group(1).trim() + " · " + (season > 1 ? "الموسم " + MainActivity.arabicDigits(m.group(2)) + "، " : "")
+                + "الحلقة " + MainActivity.arabicDigits(m.group(3));
+    }
+
+    /** one way for every channel: «باقي ٧ د»، «باقي ١ س ٢٠ د» */
+    static String left(long min) {
+        if (min < 1) return "ينتهي الآن";
+        if (min < 60) return "باقي " + MainActivity.arabicDigits(String.valueOf(min)) + " د";
+        long h = min / 60, m = min % 60;
+        return "باقي " + MainActivity.arabicDigits(String.valueOf(h)) + " س" + (m > 0 ? " " + MainActivity.arabicDigits(String.valueOf(m)) + " د" : "");
+    }
+
+    private static final Map<String, String[]> streams = new HashMap<>();   // id → {url, fetched at}
+
+    /** A free channel's live stream (HLS, no DRM), for the muted preview in its card; null for VIP or on failure. */
+    static String stream(String id) {
+        synchronized (streams) {
+            String[] s = streams.get(id);
+            if (s != null && System.currentTimeMillis() - Long.parseLong(s[1]) < 10 * 60 * 1000) return s[0].isEmpty() ? null : s[0];
+        }
+        String found = "";
+        try {
+            JSONObject p = new JSONObject(get(API + "playout/new/url/" + id + "?outputParameter=vme&country=SA")).getJSONObject("playout");
+            // a protected stream (DRM) plays only in Shahid: its card keeps the picture
+            if (!p.optBoolean("drm")) found = p.optString("url", "");
+        } catch (Exception e) { return null; }
+        synchronized (streams) { streams.put(id, new String[]{found, String.valueOf(System.currentTimeMillis())}); }   // asked once per 10 minutes
+        return found.isEmpty() ? null : found;
     }
 
     /** «دقيقة واحدة»، «دقيقتان»، «٧ دقائق»، «٢٥ دقيقة» */

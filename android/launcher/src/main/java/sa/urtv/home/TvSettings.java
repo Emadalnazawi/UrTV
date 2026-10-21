@@ -673,7 +673,7 @@ public class TvSettings extends Activity {
         for (String pkg : Dock.shown(this, apps)) {
             Integer n = counts.get(pkg);
             boolean live = ShahidLive.PKG.equals(pkg);
-            if (n == null && !live) { p.info(apps.get(pkg), "ما ينشر محتوى"); continue; }
+            if (n == null && !live) continue;   // nothing to show: left out, not labelled
             String name = apps.containsKey(pkg) ? apps.get(pkg) : pkg;
             p.toggle(name, n == null ? "" : MainActivity.arabicDigits(String.valueOf(n)) + " عنوان", () -> !Showcase.set(this, Showcase.OFF).contains(pkg), on -> {
                 java.util.Set<String> o = Showcase.set(this, Showcase.OFF);

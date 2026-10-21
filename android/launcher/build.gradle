@@ -65,3 +65,9 @@ def copyWeb = tasks.register('copyWeb', Copy) {
     into "$buildDir/generated/web"
 }
 preBuild.dependsOn copyWeb
+
+dependencies {
+    // Shahid's free live channels play muted inside their card on the home screen (HLS, no DRM)
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.4.1'
+}
