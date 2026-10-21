@@ -1,0 +1,36 @@
+name: Sync with the original UrTV
+
+# This fork's own branch (emad) = the original repository + this fork's changes. Every day it takes the
+# original's new commits, rebuilds the screen page (dist/tv.html, which the screensaver updates from) and
+# pushes, so the TV gets both. A conflict stops it and GitHub sends an e-mail; nothing on the TV changes then.
+on:
+  schedule:
+    - cron: '17 1 * * *'   # 04:17 Riyadh
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.repository != 'tshi-dev/UrTV'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: emad
+          fetch-depth: 0
+      - name: Merge the original's master
+        run: |
+          git config user.name "UrTV sync"
+          git config user.email "actions@users.noreply.github.com"
+          git remote add upstream https://github.com/tshi-dev/UrTV.git
+          git fetch upstream master
+          git merge --no-edit upstream/master
+      - name: Rebuild the screen page
+        run: python3 src/build.py
+      - name: Push
+        run: |
+          git add dist
+          git diff --cached --quiet || git commit -m "Rebuild the screen page after syncing with the original"
+          git push origin emad
