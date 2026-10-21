@@ -21,7 +21,11 @@ final class Note {
     int mediaWidthPx = 640;   // PiPup's «width» is in screen pixels
 
     /** Home Assistant's «Notifications for Android TV / Fire TV»: multipart form fields and files. */
-    static Note fromForm(Map<String, String> f, Map<String, byte[]> files) {
+    static Note fromForm(Map<String, String> fields, Map<String, byte[]> files) {
+        // Home Assistant's integration sends every field as a file part; only the two pictures are files
+        Map<String, String> f = new java.util.HashMap<>(fields);
+        for (Map.Entry<String, byte[]> e : files.entrySet())
+            if (!e.getKey().startsWith("filename")) f.put(e.getKey(), new String(e.getValue(), java.nio.charset.StandardCharsets.UTF_8));
         Note n = new Note();
         n.title = f.getOrDefault("title", "");
         if ("Notification".equals(n.title)) n.title = "";   // the library's default title
@@ -36,7 +40,7 @@ final class Note {
         }
         // 1: 0% transparent … 5: 100%
         n.alpha = 1f - (clamp(parseInt(f.get("transparency"), 1), 1, 5) - 1) * 0.25f;
-        n.color = parseColor(f.get("color"), n.color);
+        n.color = parseColor(f.containsKey("bkgcolor") ? f.get("bkgcolor") : f.get("color"), n.color);
         n.icon = usable(files.get("filename"));
         n.image = usable(files.get("filename2"));
         return n;
