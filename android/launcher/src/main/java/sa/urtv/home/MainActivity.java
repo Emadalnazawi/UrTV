@@ -105,6 +105,15 @@ public class MainActivity extends Activity {
     private int packageSeq;
     private PopupWindow inputsPopup;
     private HomeCard homeCard;
+    // the focused favourite's own posters (what it publishes for the home screen) and the clock made small for them
+    private Showcase showcase;
+    private LinearLayout clockGroup;
+    private boolean compact;
+    // the clock stays big when the home screen opens (or comes back from the screensaver) until the remote moves
+    private boolean engaged;
+    private final BroadcastReceiver dreamEnded = new BroadcastReceiver() {
+        @Override public void onReceive(Context c, Intent i) { calm(); }
+    };
     // Home Assistant pop-ups from «تنبيهات تلفزيونك», shown in the card's place while Home is in front
     static final String SHOW_NOTE = "sa.urtv.home.SHOW_NOTE", NOTE_PERMISSION = "sa.urtv.home.permission.SHOW_NOTE";
     private NoteCard noteCard;
@@ -152,6 +161,16 @@ public class MainActivity extends Activity {
         pf.addDataScheme("package");
         registerReceiver(packages, pf);
         registerReceiver(dockChanged, new IntentFilter(Dock.CHANGED));
+        registerReceiver(dreamEnded, new IntentFilter(Intent.ACTION_DREAMING_STOPPED));
+        getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((was, now) -> focusMoved(now));
+        if (checkSelfPermission(LISTINGS) != PackageManager.PERMISSION_GRANTED) requestPermissions(new String[]{LISTINGS}, 1);
+    }
+
+    static final String LISTINGS = "android.permission.READ_TV_LISTINGS";
+
+    @Override
+    public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
+        showcase.refresh(true);
     }
 
     @Override
@@ -165,6 +184,8 @@ public class MainActivity extends Activity {
         updateClock();
         updateWifi();
         homeCard.refresh();
+        calm();
+        showcase.refresh(false);
         registerReceiver(notes, new IntentFilter(SHOW_NOTE), NOTE_PERMISSION, null);
         View last = lastFocusedId == View.NO_ID ? null : findViewById(lastFocusedId);
         if (last == null && !dockCards.isEmpty()) last = dockCards.get(0);
@@ -192,7 +213,9 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         unregisterReceiver(packages);
         unregisterReceiver(dockChanged);
+        unregisterReceiver(dreamEnded);
         homeCard.destroy();
+        showcase.destroy();
         super.onDestroy();
     }
 
@@ -222,6 +245,9 @@ public class MainActivity extends Activity {
         wallFront = wallpaperLayer();
         root.addView(wallBack, new FrameLayout.LayoutParams(-1, -1));
         root.addView(wallFront, new FrameLayout.LayoutParams(-1, -1));
+        // the focused app's picture, over the wallpaper and under the scrim
+        FrameLayout backdrop = new FrameLayout(this);
+        root.addView(backdrop, new FrameLayout.LayoutParams(-1, -1));
         // Scrim: darker at the top (clock, pills) and bottom (dock) so text stays readable.
         View scrim = new View(this);
         scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
@@ -261,6 +287,7 @@ public class MainActivity extends Activity {
         // optional card under the pills, same size as beside the screensaver's clock
         homeCard = new HomeCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
         noteCard = new NoteCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
+        showcase = new Showcase(this, hero, lp(-1, -2, Gravity.RIGHT | Gravity.TOP, dp(36), dp(104), dp(36), 0), backdrop);
 
         LinearLayout bottom = new LinearLayout(this);
         bottom.setOrientation(LinearLayout.VERTICAL);
@@ -309,6 +336,7 @@ public class MainActivity extends Activity {
         header.setClipChildren(false);
 
         LinearLayout left = new LinearLayout(this);
+        clockGroup = left;
         left.setOrientation(LinearLayout.VERTICAL);
         // Top right, stacked tight: greeting, clock, date. Gravity.RIGHT, not END: for Arabic text END is the left.
         greeting = text(15, "medium", GOLD);
@@ -838,7 +866,7 @@ public class MainActivity extends Activity {
         date.setText(arabicDigits(hijri.isEmpty() ? greg : hijri + "  ·  " + greg));
     }
 
-    private static String arabicDigits(String s) {
+    static String arabicDigits(String s) {
         StringBuilder b = new StringBuilder(s.length());
         for (char c : s.toCharArray()) b.append(c >= '0' && c <= '9' ? (char) ('٠' + (c - '0')) : c);
         return b.toString();
@@ -1065,6 +1093,61 @@ public class MainActivity extends Activity {
         return color;
     }
 
+    // ---------------------------------------------------------------- showcase
+
+    /** Focus landed somewhere: on a favourite that publishes posters, they take the top part and the clock shrinks. */
+    private void focusMoved(View now) {
+        if (now == null || showcase.owns(now)) return;
+        Object tag = now.getTag();
+        boolean onDock = tag instanceof App && dockCards.contains(now);
+        boolean shown = engaged && onDock && showcase.show(((App) tag).pkg);
+        if (!shown) showcase.hide(true);
+        setCompact(shown, true);
+        // Up from the favourites goes to the posters while they show, else to the top bar
+        int up = shown ? showcase.firstPosterId() : pills.get(0).getId();
+        for (View c : dockCards) c.setNextFocusUpId(up);
+        if (shown) {
+            int top = pills.get(0).getId(), back = now.getId();
+            showcase.wire(top, back);
+        }
+    }
+
+    /** the posters arrived: show them now if the focus already waits on that favourite */
+    void showcaseReady() {
+        if (!showcase.isShown()) focusMoved(getCurrentFocus());
+    }
+
+    /** Back to the home screen as it opens: the big clock, the card, no posters. */
+    private void calm() {
+        engaged = false;
+        showcase.hide(false);
+        setCompact(false, false);
+        if (!pills.isEmpty()) for (View c : dockCards) c.setNextFocusUpId(pills.get(0).getId());
+    }
+
+    private void setCompact(boolean on, boolean animate) {
+        if (on == compact) return;
+        compact = on;
+        clockGroup.setPivotX(clockGroup.getWidth());
+        clockGroup.setPivotY(0);
+        float s = on ? 0.5f : 1f, lift = on ? -greeting.getHeight() * 0.5f : 0f;
+        long d = animate ? 520 : 0;
+        clockGroup.animate().scaleX(s).scaleY(s).translationY(lift).setDuration(d).setInterpolator(EASE).start();
+        greeting.animate().alpha(on ? 0f : 1f).setDuration(animate ? 260 : 0).start();
+        date.animate().alpha(on ? 0f : 1f).setDuration(animate ? 260 : 0).start();
+        homeCard.dim(on);
+    }
+
+    /** A poster: straight into that episode or channel, else the app itself. */
+    void openItem(Showcase.Item it) {
+        Intent i = Showcase.parse(it);
+        if (i != null) {
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try { startActivity(i); return; } catch (RuntimeException ignored) { }
+        }
+        openPackage(it.pkg);
+    }
+
     // ---------------------------------------------------------------- entrance
 
     private void playEntrance() {
@@ -1129,7 +1212,7 @@ public class MainActivity extends Activity {
         return tf;
     }
 
-    private TextView text(float sp, String family, int color) {
+    TextView text(float sp, String family, int color) {
         TextView t = new TextView(this);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         t.setTypeface(font(family));
@@ -1137,7 +1220,7 @@ public class MainActivity extends Activity {
         return t;
     }
 
-    private int dp(float v) {
+    int dp(float v) {
         return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
@@ -1163,6 +1246,12 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
+        int k = e.getKeyCode();
+        if (!engaged && e.getAction() == KeyEvent.ACTION_DOWN && (k == KeyEvent.KEYCODE_DPAD_LEFT
+                || k == KeyEvent.KEYCODE_DPAD_RIGHT || k == KeyEvent.KEYCODE_DPAD_UP || k == KeyEvent.KEYCODE_DPAD_DOWN)) {
+            engaged = true;
+            handler.post(() -> focusMoved(getCurrentFocus()));   // a press at the row's end moves nothing
+        }
         // Menu key on the remote opens the Inputs dropdown.
         if (e.getKeyCode() == KeyEvent.KEYCODE_MENU && e.getAction() == KeyEvent.ACTION_UP && !pills.isEmpty()) {
             showInputs(pills.get(0));
