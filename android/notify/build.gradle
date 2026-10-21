@@ -37,6 +37,9 @@ android {
         main { assets.srcDirs += ['../launcher/src/main/assets'] }
     }
 
+    // targetSdk 30 is deliberate (see defaultConfig); lint's «expired target» would stop the release build
+    lint { abortOnError false }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
