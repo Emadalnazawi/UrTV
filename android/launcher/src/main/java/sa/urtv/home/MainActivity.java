@@ -250,19 +250,18 @@ public class MainActivity extends Activity {
         bottom.setClipChildren(false);
         bottom.setClipToPadding(false);
         hero.addView(bottom, lp(-1, -2, Gravity.BOTTOM, dp(48), 0, dp(48), dp(30)));
-        if (rtl) bottom.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
         title = text(34, "sans-serif-light", Color.WHITE);
         title.setShadowLayer(dp(18), 0, 0, 0x66000000);
         title.setSingleLine(true);
         bottom.addView(title, new LinearLayout.LayoutParams(-2, -2));
         LinearLayout.LayoutParams tp = (LinearLayout.LayoutParams) title.getLayoutParams();
-        tp.setMargins(0, 0, 0, dp(14));
-        tp.setMarginStart(dp(8));
+        // the app doesn't declare supportsRtl, so the Arabic order is laid out by hand (gravity, child order)
+        tp.setMargins(rtl ? 0 : dp(8), 0, rtl ? dp(8) : 0, dp(14));
+        if (rtl) tp.gravity = Gravity.RIGHT;
 
         dockRow = new LinearLayout(this);
         dockRow.setOrientation(LinearLayout.HORIZONTAL);
-        if (rtl) dockRow.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         dockRow.setGravity(Gravity.CENTER);
         dockRow.setClipChildren(false);
         dockRow.setClipToPadding(false);
@@ -404,9 +403,8 @@ public class MainActivity extends Activity {
         for (int i = 0; i < dock.size(); i++) {
             View tile = tile(dock.get(i), true);
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1f);
-            p.setMarginStart(i == 0 ? 0 : dp(10));
-            p.setMarginEnd(i == dock.size() - 1 ? 0 : dp(10));
-            dockRow.addView(tile, p);
+            edges(p, i == 0, i == dock.size() - 1);
+            dockRow.addView(tile, rtl ? 0 : -1, p);
         }
 
         LinearLayout row = null;
@@ -415,21 +413,18 @@ public class MainActivity extends Activity {
                 row = new LinearLayout(this);
                 row.setClipChildren(false);
                 row.setClipToPadding(false);
-                if (rtl) row.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
                 grid.addView(row, llp(-1, -2, 0, 0, 0, dp(26)));
             }
             View tile = tile(rest.get(i), false);
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1f);
-            p.setMarginStart(i % cols == 0 ? 0 : dp(10));
-            p.setMarginEnd(i % cols == cols - 1 ? 0 : dp(10));
-            row.addView(tile, p);
+            edges(p, i % cols == 0, i % cols == cols - 1);
+            row.addView(tile, rtl ? 0 : -1, p);
         }
         // Pad the last row so tiles keep their width.
         if (row != null) for (int i = rest.size() % cols; i != 0 && i < cols; i++) {
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, 1, 1f);
-            p.setMarginStart(dp(10));
-            p.setMarginEnd(i == cols - 1 ? 0 : dp(10));
-            row.addView(new View(this), p);
+            edges(p, false, i == cols - 1);
+            row.addView(new View(this), rtl ? 0 : -1, p);
         }
         appsLabel.setVisibility(rest.isEmpty() ? View.GONE : View.VISIBLE);
         wireFocus();
@@ -438,6 +433,12 @@ public class MainActivity extends Activity {
         View last = lastFocusedId == View.NO_ID ? null : findViewById(lastFocusedId);
         if (last != null) last.requestFocus();
         else if (!dockCards.isEmpty()) dockCards.get(0).requestFocus();
+    }
+
+    /** 10dp each side of a tile in a row, none at the row's first and last ends (the right end first when rtl). */
+    private void edges(LinearLayout.LayoutParams p, boolean first, boolean last) {
+        int start = first ? 0 : dp(10), end = last ? 0 : dp(10);
+        p.setMargins(rtl ? end : start, 0, rtl ? start : end, 0);
     }
 
     /** A 16:9 card with the app's banner; the name shows under it while focused. */
@@ -1002,7 +1003,7 @@ public class MainActivity extends Activity {
             t.setAlpha(0f);
             t.setTranslationY(dp(24));
             t.animate().alpha(1f).translationY(0).setInterpolator(new DecelerateInterpolator(2f))
-                    .setDuration(450).setStartDelay(160 + i * 60L).start();
+                    .setDuration(450).setStartDelay(160 + (rtl ? dockRow.getChildCount() - 1 - i : i) * 60L).start();
         }
     }
 
