@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UrTV Notifications</string>
+    <string name="running">Listening for notifications from Home Assistant</string>
+    <string name="status">Listening on %1$s\nHome Assistant (Notifications for Android TV): port %2$d\nPiPup format: port %3$d</string>
+    <string name="overlay_ok">Pop-ups allowed ✓</string>
+    <string name="overlay_missing">Pop-ups not allowed yet: optimize/install.sh notify allows them</string>
+    <string name="test_button">Send a test</string>
+    <string name="test_title">It works</string>
+    <string name="test_message">Notifications from Home Assistant will show here.</string>
+</resources>

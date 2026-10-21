@@ -3,6 +3,7 @@
 #   optimize/install.sh saver      شاشة تلفزيونك: install + make it the screensaver
 #   optimize/install.sh launcher   the home screen: install + make it the default Home
 #   optimize/install.sh all        both
+#   optimize/install.sh notify     تنبيهات تلفزيونك: Home Assistant pop-ups (ports 7676 and 7979) + allow it over other apps
 #   optimize/install.sh extras     two free apps from their own GitHub releases: TV Bro (a TV web browser,
 #                                  github.com/truefedex/tv-bro) and SmartTube (YouTube without ads,
 #                                  github.com/yuliskov/SmartTube), the build that fits the TV's processor
@@ -12,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
 REL=https://github.com/${URTV_REPO:-tshi-dev/UrTV}/releases/download/${APK_TAG:-apk-latest}   # APK_TAG=v3.N: that numbered build; a fork: URTV_REPO=you/UrTV
-what="${1:?usage: optimize/install.sh saver|launcher|all|extras}"
+what="${1:?usage: optimize/install.sh saver|launcher|all|extras|notify}"
 
 push_install() {   # $1 apk name, $2 package
   curl -fsSL -o "optimize/$1" "$REL/$1"
@@ -131,4 +132,14 @@ if [ "$what" = launcher ] || [ "$what" = all ]; then
     echo "   Some TCL firmware pins Home to the stock launcher; on those sets keep the stock home."
     exit 1
   fi
+fi
+
+if [ "$what" = notify ]; then
+  push_install urtv-notify.apk sa.urtv.notify
+  # pop-ups over other apps: Android TV has no settings screen for this, only appops
+  "$PY" -I optimize/tv.py "appops set sa.urtv.notify SYSTEM_ALERT_WINDOW allow"
+  "$PY" -I optimize/tv.py "am start -n sa.urtv.notify/.MainActivity" > /dev/null
+  sleep 3
+  "$PY" -I optimize/tv.py "input keyevent KEYCODE_HOME" > /dev/null
+  echo "تنبيهات تلفزيونك is listening. In Home Assistant: add «Notifications for Android TV / Fire TV» with this TV's IP."
 fi
