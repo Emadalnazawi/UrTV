@@ -219,6 +219,19 @@ for (const panel of ['prayers', 'verse', 'shows']) {
   await ctx.close();
 }
 
+// ---- #markets=0: the market row goes, the weather stays
+for (const m of ['1', '0']) {
+  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+  await ctx.route(/^https?:/, r => r.abort());
+  const p = await ctx.newPage();
+  await p.goto(page('tv.html') + '#markets=' + m);
+  await p.waitForTimeout(600);
+  const r = await p.evaluate(() => ({ mk: getComputedStyle(document.querySelector('.markets .mk')).display !== 'none',
+                                      wx: getComputedStyle(document.querySelector('.markets .wxline')).display !== 'none' }));
+  check(`markets=${m}: market row ${m === '1' ? 'shown' : 'hidden'}, weather shown`, r.mk === (m === '1') && r.wx, JSON.stringify(r));
+  await ctx.close();
+}
+
 await browser.close();
 console.log(failed ? `\n${failed} failed` : '\nall page tests passed');
 process.exit(failed ? 1 : 0);

@@ -346,6 +346,8 @@ const CONFIG = {
   // the card beside the clock: shows | prayers | forecast | matches | verse | none (#week=0 from older builds = none)
   panel: (p => ['shows','prayers','forecast','matches','verse','none'].includes(p) ? p : 'verse')
          (_Q.get('panel') || (_Q.get('week') === '0' ? 'none' : 'verse')),
+  // the market changes under the weather (تاسي، S&P 500، بيتكوين): #markets=0 hides them
+  markets: _Q.get('markets') !== '0',
   matchesPerPage: 2,
   matchPageMs: 15000,
   // minutes from adhan to iqama (Ministry of Islamic Affairs defaults); Friday Dhuhr has none
@@ -1296,7 +1298,9 @@ function boot(){
   loadPhotoIndex().then(() => applyBackground(true));
   setInterval(() => applyBackground(false), 60*1000);
   tickClock(); tickDates(); tickRamadan();
-  TICKERS.forEach(loadTicker);
+  // no markets: their row and the rule above it go, the weather stays
+  if(!CONFIG.markets) document.querySelectorAll('.markets .mk, .markets .rule.l').forEach(e => e.style.display = 'none');
+  else TICKERS.forEach(loadTicker);
   if(CONFIG.panel === 'none') document.querySelector('.week').style.display = 'none';
   else if(CONFIG.panel !== 'shows') renderPanel(false);   // its own data arrives with prayers, weather, matches
   loadPrayers(); loadMatches(); if(CONFIG.panel === 'shows') loadWeek(); loadWeather();
@@ -1309,7 +1313,7 @@ function boot(){
   setInterval(loadLive, 2*60000);
   setInterval(loadPrayers, 6*3600*1000);
   setInterval(loadMatches, 30*60*1000);
-  setInterval(()=>TICKERS.forEach(loadTicker), 15*60*1000);
+  if(CONFIG.markets) setInterval(()=>TICKERS.forEach(loadTicker), 15*60*1000);
   if(CONFIG.panel === 'shows') setInterval(loadWeek, 6*3600*1000);
   setInterval(loadWeather, 30*60*1000);
   setInterval(()=>{
