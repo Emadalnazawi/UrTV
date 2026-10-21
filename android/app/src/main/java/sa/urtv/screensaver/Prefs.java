@@ -121,9 +121,6 @@ final class Prefs {
     String minRating() { return sp.getString("minRating", "7"); }
     void setMinRating(String v) { sp.edit().putString("minRating", v).apply(); }
 
-    /** The market changes under the weather (تاسي، S&P 500، بيتكوين); on unless turned off. */
-    boolean markets() { return sp.getBoolean("markets", true); }
-    void setMarkets(boolean v) { sp.edit().putBoolean("markets", v).apply(); }
 
     boolean autoUpdate() { return sp.getBoolean("autoUpdate", true); }
     void setAutoUpdate(boolean v) { sp.edit().putBoolean("autoUpdate", v).apply(); }
@@ -156,8 +153,7 @@ final class Prefs {
             + "&genres=" + Uri.encode(join(list("genres"), ","))
             + "&langs=" + Uri.encode(join(list("langs"), ","))
             + "&shows=" + join(ids, ",")
-            + "&minrating=" + minRating()
-            + "&markets=" + (markets() ? "1" : "0");
+            + "&minrating=" + minRating();
     }
 
     /** The card on the launcher's home screen: one of PANELS, off ("none") until the user picks one. */

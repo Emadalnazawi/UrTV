@@ -111,10 +111,6 @@ public class SettingsActivity extends Activity {
             R.drawable.ic_star, new Runnable() { public void run() { pickRating(); } });
         }
 
-        header("أعلى الشاشة");
-        row("الأسواق", prefs.markets() ? "تظهر: تاسي، S&P 500، بيتكوين" : "مخفية", R.drawable.ic_eye, new Runnable() { public void run() {
-            prefs.setMarkets(!prefs.markets()); render(); } });
-
         header("التطبيق");
         row("التحديث التلقائي للصفحة", prefs.autoUpdate() ? "يعمل · كل ٦ ساعات" : "متوقف", R.drawable.ic_sync, new Runnable() { public void run() {
             prefs.setAutoUpdate(!prefs.autoUpdate()); render(); } });

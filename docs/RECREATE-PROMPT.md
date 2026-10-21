@@ -13,11 +13,9 @@ Build ONE self-contained HTML file (no build step, no external JS libraries) tha
 One grid with three rows — `grid-template-rows: auto 1fr auto`, stage padding `3.1vh 3.6vw 5.4vh`, row gap `1.5vh`.
 
 **Top row — two ends, nothing in between:**
-- Left: weather and markets set as type, mirroring the date block on the right — no boxes, no pills.
+- Left: the weather set as type, mirroring the date block on the right — no boxes, no pills.
   - Big line (same size as the Hijri date): the temperature `٣٤°` in the display font, then a short Arabic condition word (`صافي`, `غائم جزئياً`…; `غبار` in gold when PM10 is high).
   - Small line (same size as the Gregorian date): the city `·` high / low `٣٧° / ٢٤°`.
-  - A short gold hairline starting at the left screen edge and fading toward the middle.
-  - Under it, one quiet line: `تاسي ▼ · S&P 500 ▲ · بيتكوين ▲` — the name plus ONE direction marker only, `▲` `#79D6A0`, `▼` `#EE8B70`. No price, no percentage. If a quote cannot be loaded, hide its marker (never a dash, never a hard-coded direction).
 - Right: Hijri date (large, sand `#F6EFE0`) over the Gregorian date (smaller, muted `#C6BBA4`), then a short gold hairline starting at the right screen edge and fading toward the middle.
 
 **Middle row — card left, clock centred in the space between the card and the right edge:**
@@ -59,13 +57,6 @@ All three are built identically — small gold label, big value, small sub-line 
   `Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{timeZone:'Asia/Riyadh',month:'numeric'})` until the month equals 9.
   Cache the answer per calendar day — that 400-day search must not run once per second.
 - **Hijri date** — `Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{timeZone:'Asia/Riyadh',weekday:'long',day:'numeric',month:'long',year:'numeric'})`, strip a trailing `هـ` before appending your own. The Ramadan panel's year must also be derived, never a literal `١٤٤٨`.
-- **Markets** — Yahoo chart API:
-  `https://query1.finance.yahoo.com/v8/finance/chart/{^TASI.SR|^GSPC}?interval=1d&range=5d`
-  Compare `regularMarketPrice` with the previous close; only the sign matters. Refresh every 15 minutes.
-  Yahoo sends no CORS headers, so a browser cannot call it directly: try it once, and on failure fetch the same URL through `https://api.allorigins.win/get?url=<encoded>` and `JSON.parse(response.contents)`. If both fail, hide the arrow. Allow up to ~30 seconds on first load.
-  Bitcoin uses CoinGecko instead (it does send CORS headers):
-  `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`
-  Mind the spelling: the query parameter is `include_24hr_change` but the response key is `usd_24h_change` (no `r`) — accept both.
 - **Weather** — Open-Meteo:
   `https://api.open-meteo.com/v1/forecast?latitude=24.7136&longitude=46.6753&current=temperature_2m,weather_code&timezone=Asia/Riyadh`
   Map the WMO `weather_code` to a short Arabic phrase. Refresh every 30 minutes.

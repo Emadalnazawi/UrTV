@@ -124,6 +124,7 @@ public class TvSettings extends Activity {
         root.setTranslationX(dp(40));
         root.animate().alpha(1f).translationX(0).setDuration(380).setInterpolator(EASE).start();
 
+        showPreview(false);   // made now, in the background, so the screensaver section shows it at once
         loadSaver(() -> { if (section == SECTION_SAVER) refreshTop(); });
         showSection(0, false);
         sectionViews.get(0).requestFocus();
@@ -220,8 +221,9 @@ public class TvSettings extends Activity {
         previewBox.setClipChildren(true);
         previewBox.setBackground(rounded(0xFF000000, 10));
         previewBox.setClipToOutline(true);
-        previewBox.setVisibility(View.GONE);
-        col.addView(previewBox, new LinearLayout.LayoutParams(dp(220), dp(124)));
+        // always laid out (a hidden WebView draws nothing, so the page would still be blank when shown):
+        // outside the screensaver section it is only 0 tall
+        col.addView(previewBox, new LinearLayout.LayoutParams(dp(220), 0));
         noteTitle = text("", 15, medium, GOLD);
         LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(-1, -2);
         tp.topMargin = dp(14);
@@ -413,8 +415,6 @@ public class TvSettings extends Activity {
         if (saver.isEmpty()) { p.info("…", "جارٍ القراءة"); return; }
         p.choice("جنب الساعة", PANEL_NAMES, PANEL_VALUES, () -> saver.get("panel"), v -> setSaver("panel", v));
         p.choice("بطاقة الشاشة الرئيسية", PANEL_NAMES, PANEL_VALUES, () -> saver.get("home_panel"), v -> setSaver("home_panel", v));
-        p.toggle("الأسواق", "تاسي، S&P 500، بيتكوين تحت الطقس", () -> !"off".equals(saver.get("markets")),
-                on -> setSaver("markets", on ? "on" : "off"));
         p.link("المدينة", cityName(), "لمواقيت الصلاة والطقس", () -> pushPage(cityPage(), true));
         p.link("الفرق المتابعة", teamsLabel(), "ابحث عن أي فريق أو منتخب", () -> pushPage(teamsPage(), true));
         p.link("معاينة بملء الشاشة", "", "", () -> open(new Intent().setClassName(SAVER, SAVER + ".MainActivity")));
@@ -731,8 +731,7 @@ public class TvSettings extends Activity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void showPreview(boolean on) {
-        previewBox.setVisibility(on ? View.VISIBLE : View.GONE);
-        if (!on) { if (preview != null) { previewBox.removeAllViews(); preview.destroy(); preview = null; } return; }
+        // the page is made and loaded once, as the screen opens: on the screensaver section it is already there
         if (preview == null) {
             preview = new WebView(this);
             preview.setFocusable(false);
@@ -750,8 +749,16 @@ public class TvSettings extends Activity {
             preview.setScaleX(scale);
             preview.setScaleY(scale);
             previewBox.addView(preview);
+            reloadPreview();
         }
-        reloadPreview();
+        ViewGroup.LayoutParams lp = previewBox.getLayoutParams();
+        int h = on ? dp(124) : 0;
+        if (lp.height == h) return;
+        lp.height = h;
+        previewBox.setLayoutParams(lp);
+        previewBox.animate().cancel();
+        previewBox.setAlpha(on ? 0f : 1f);
+        if (on) previewBox.animate().alpha(1f).setDuration(260).setInterpolator(EASE).start();
     }
 
     private void reloadPreview() {
@@ -775,7 +782,7 @@ public class TvSettings extends Activity {
         middle.addView(p.view, new FrameLayout.LayoutParams(-1, -1));
         if (animate) {
             p.view.setAlpha(0f);
-            p.view.setTranslationX(-dp(24));
+            p.view.setTranslationX(dp(24));   // from the right: Arabic reads right to left
             p.view.animate().alpha(1f).translationX(0).setDuration(300).setInterpolator(EASE).start();
         }
         // focus moves to the new page before the old one hides, so it never falls back to the first section
@@ -930,11 +937,16 @@ public class TvSettings extends Activity {
             swBox.addView(knob, new FrameLayout.LayoutParams(dp(14), dp(14), Gravity.CENTER_VERTICAL | Gravity.LEFT));
             r.addView(swBox, new LinearLayout.LayoutParams(dp(40), dp(24)));
             r.addView(text(label, 14, medium, TEXT), new LinearLayout.LayoutParams(0, -2, 1f));
+            boolean[] painted = {false};
             Runnable paint = () -> {
                 boolean on = Boolean.TRUE.equals(get.get());
                 track.setColor(on ? GOLD : 0xFF3A443F);
                 ((GradientDrawable) knob.getBackground()).setColor(on ? 0xFF0B1512 : 0xFF8B9590);
-                knob.animate().translationX(on ? dp(5) : dp(21)).setDuration(220).setInterpolator(EASE).start();
+                float x = on ? dp(5) : dp(21);
+                // a page built again (after any change) shows the switch where it is, without sliding it
+                if (!painted[0]) knob.setTranslationX(x);
+                else knob.animate().translationX(x).setDuration(220).setInterpolator(EASE).start();
+                painted[0] = true;
             };
             paint.run();
             refreshers.add(paint);
@@ -990,7 +1002,7 @@ public class TvSettings extends Activity {
             View fill = new View(TvSettings.this);
             fill.setBackground(rounded(GOLD, 3));
             bar.addView(track, new FrameLayout.LayoutParams(dp(160), dp(6), Gravity.CENTER_VERTICAL));
-            FrameLayout.LayoutParams fp = new FrameLayout.LayoutParams(0, dp(6), Gravity.CENTER_VERTICAL | Gravity.LEFT);   // fills from the left like every TV: Right is louder
+            FrameLayout.LayoutParams fp = new FrameLayout.LayoutParams(0, dp(6), Gravity.CENTER_VERTICAL | Gravity.RIGHT);   // fills from the right, as Arabic reads: Left is louder
             bar.addView(fill, fp);
             TextView num = text("", 13, regular, SUB);
             r.addView(num, new LinearLayout.LayoutParams(dp(40), -2));
@@ -1006,13 +1018,13 @@ public class TvSettings extends Activity {
             refreshers.add(paint);
             r.setOnKeyListener((v, code, e) -> {
                 if (e.getAction() != KeyEvent.ACTION_DOWN) return false;
-                int d = code == KeyEvent.KEYCODE_DPAD_LEFT ? -1 : code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : 0;
+                int d = code == KeyEvent.KEYCODE_DPAD_LEFT ? 1 : code == KeyEvent.KEYCODE_DPAD_RIGHT ? -1 : 0;
                 if (d == 0) return false;
                 set.set(Math.max(0, Math.min(max, get.get() + d)));
                 paint.run();
                 return true;
             });
-            hint(r, label, "يمين يرفع الصوت، ويسار ينزّله");
+            hint(r, label, "يسار يرفع الصوت، ويمين ينزّله");
             add(r);
         }
 

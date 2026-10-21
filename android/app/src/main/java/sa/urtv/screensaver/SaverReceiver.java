@@ -94,8 +94,6 @@ public class SaverReceiver extends BroadcastReceiver {
         String panel = i.getStringExtra("panel"), home = i.getStringExtra("home_panel");
         if (panel != null && !isPanel(panel)) return "error: panel is one of " + panels();
         if (home != null && !isPanel(home)) return "error: home_panel is one of " + panels();
-        String markets = i.getStringExtra("markets");
-        if (markets != null && !markets.matches("on|off")) return "error: markets is on or off";
         String rating = i.getStringExtra("minrating");
         if (rating != null && !Arrays.asList(Prefs.MIN_RATINGS).contains(rating))
             return "error: minrating is one of " + Prefs.join(Arrays.asList(Prefs.MIN_RATINGS), " ");
@@ -109,7 +107,6 @@ public class SaverReceiver extends BroadcastReceiver {
         if (panel != null) p.setPanel(panel);
         if (home != null) p.setHomePanel(home);
         if (rating != null) p.setMinRating(rating);
-        if (markets != null) p.setMarkets("on".equals(markets));
         if (genres != null) p.setList("genres", genres);
         if (langs != null) p.setList("langs", langs);
         return "saved\n" + describe(p);
@@ -121,7 +118,7 @@ public class SaverReceiver extends BroadcastReceiver {
             + "\nteams: " + Prefs.join(p.teams(), ", ")
             + "\npanel: " + p.panel() + "\nhome_panel: " + p.homePanel()
             + "\nminrating: " + p.minRating()
-            + "\nmarkets: " + (p.markets() ? "on" : "off")
+
             + "\ngenres: " + Prefs.join(p.list("genres"), ",") + "\nlangs: " + Prefs.join(p.list("langs"), ",")
             + "\nautoupdate: " + p.autoUpdate();
     }

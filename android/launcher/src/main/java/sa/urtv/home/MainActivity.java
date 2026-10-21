@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
     private Showcase showcase;
     private LinearLayout clockGroup;
     private boolean compact;
+    private View lastDockCard;
     // the clock stays big when the home screen opens (or comes back from the screensaver) until the remote moves
     private boolean engaged;
     private final BroadcastReceiver dreamEnded = new BroadcastReceiver() {
@@ -230,6 +231,13 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        // Back with the posters up: they go, the clock comes back big; the next press of the remote shows them again
+        if (showcase.isShown()) {
+            View f = getCurrentFocus();
+            calm();
+            if (f != null && showcase.owns(f) && lastDockCard != null) lastDockCard.requestFocus();
+            return;
+        }
         // Home has nowhere to go back to; Back from the grid returns to the dock.
         if (scroll.getScrollY() > 0 && !dockCards.isEmpty()) dockCards.get(0).requestFocus();
     }
@@ -1100,6 +1108,7 @@ public class MainActivity extends Activity {
         if (now == null || showcase.owns(now)) return;
         Object tag = now.getTag();
         boolean onDock = tag instanceof App && dockCards.contains(now);
+        if (onDock) lastDockCard = now;
         boolean shown = engaged && onDock && showcase.show(((App) tag).pkg);
         if (!shown) showcase.hide(true);
         setCompact(shown, true);

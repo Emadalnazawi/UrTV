@@ -56,8 +56,7 @@ Open: «معاينة الشاشة» row, or `adb shell am start -n sa.urtv.scree
 | B2 | Clock | 12-hour Arabic digits, no two digits touching (e.g. ٤٨), gold colon, small gold ص/م at the **upper left**; centred between the card and the right edge; matches the real Riyadh time |
 | B3 | Under clock | «بتوقيت <chosen city>» |
 | B4 | Top right | Hijri date (with هـ) over Gregorian date (Gregorian month name, e.g. أكتوبر) |
-| B5 | Top left (no boxes) | Temperature ° + condition word (or «غبار» in gold); city · high/low; gold line from the left edge; تاسي / S&P 500 / بيتكوين each with ▲ green or ▼ red (or no arrow — never a dash) |
-| B6 | Markets accuracy | Compare arrows with today's TASI, S&P 500 and BTC 24h direction on any finance site |
+| B5 | Top left (no boxes) | Temperature ° + condition word (or «غبار» in gold); city · high/low |
 | B7 | هذا الأسبوع (set «بجانب الساعة» to المسلسلات first: the default card is the verse card) | Up to 5 shows matching A11–A15 filters, with season/episode, rating, weekday. Changes page every 25 s |
 | B7b | Settings → بجانب الساعة → each option, then preview | مواقيت الصلاة: 6 rows, next prayer gold, past ones dim · طقس الأيام القادمة: اليوم, غداً, then weekdays with condition and high/low · مباريات فرقك: every followed team's games this week in time order · آية أو حديث اليوم: a verse with surah and ayah, or a hadith with its source; no empty boxes · لا شيء: no card |
 | B8 | الصلاة القادمة | Next prayer name + time + «بعد …». Compare with https://www.ummulqura.org.sa or the Aladhan site for the chosen city: within 1–2 min |
@@ -95,7 +94,7 @@ Use the TV's clock or wait for the real moment; take a screenshot at each.
 
 | ID | Action | Expected |
 |---|---|---|
-| E1 | Disconnect the TV from Wi-Fi/Ethernet, open preview | Clock, both dates, prayer countdown (computed on device), Ramadan panel all shown. Markets arrows hidden, no dash; weather shows only the city; no error text |
+| E1 | Disconnect the TV from Wi-Fi/Ethernet, open preview | Clock, both dates, prayer countdown (computed on device), Ramadan panel all shown. weather shows only the city; no error text |
 | E2 | Reconnect, wait 2 min, reopen | Live data returns |
 
 ## 6. Auto-update

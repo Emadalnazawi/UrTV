@@ -160,7 +160,7 @@ for (const panel of ['prayers', 'verse', 'shows']) {
   await ctx.close();
 }
 
-// ---- offline start: weather, market arrows and the match row stay as they were last time
+// ---- offline start: the weather and the match row stay as they were last time
 {
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
   await ctx.route(/^https?:/, r => r.abort());
@@ -171,7 +171,6 @@ for (const panel of ['prayers', 'verse', 'shows']) {
     document.getElementById('wx-temp').textContent = '٣٨°';
     document.getElementById('wx-desc').textContent = 'غبار';
     document.getElementById('wx-desc').classList.add('dust');
-    paintDir(TICKERS[0], true);
     document.getElementById('match-row').innerHTML = '<div class="saved-match">SAVED</div>';
     saveSnap();
   });
@@ -180,9 +179,8 @@ for (const panel of ['prayers', 'verse', 'shows']) {
   const r = await p.evaluate(() => ({
     temp: document.getElementById('wx-temp').textContent,
     dust: document.getElementById('wx-desc').classList.contains('dust'),
-    arrow: document.getElementById('tasi-chg').textContent,
     row: document.getElementById('match-row').textContent.trim() }));
-  check('offline start: weather, arrow and match row kept', r.temp === '٣٨°' && r.dust && r.arrow === '▲' && r.row === 'SAVED', JSON.stringify(r));
+  check('offline start: weather and match row kept', r.temp === '٣٨°' && r.dust && r.row === 'SAVED', JSON.stringify(r));
   await ctx.close();
 }
 
@@ -216,19 +214,6 @@ for (const panel of ['prayers', 'verse', 'shows']) {
   await p.evaluate(`KEPT['136013'] = [${game('g1', 27, [2, 1], 'FT')}]; renderMatches();`);
   t = await slot();
   check('a day later: score gone, next fixture shown', !t.includes('٢ - ١') && t.includes('×'), t);
-  await ctx.close();
-}
-
-// ---- #markets=0: the market row goes, the weather stays
-for (const m of ['1', '0']) {
-  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
-  await ctx.route(/^https?:/, r => r.abort());
-  const p = await ctx.newPage();
-  await p.goto(page('tv.html') + '#markets=' + m);
-  await p.waitForTimeout(600);
-  const r = await p.evaluate(() => ({ mk: getComputedStyle(document.querySelector('.markets .mk')).display !== 'none',
-                                      wx: getComputedStyle(document.querySelector('.markets .wxline')).display !== 'none' }));
-  check(`markets=${m}: market row ${m === '1' ? 'shown' : 'hidden'}, weather shown`, r.mk === (m === '1') && r.wx, JSON.stringify(r));
   await ctx.close();
 }
 

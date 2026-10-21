@@ -105,7 +105,11 @@ final class Showcase {
         dl.bottomMargin = m.dp(12);
         panel.addView(detail, dl);
 
-        rowScroll = new HorizontalScrollView(m);
+        rowScroll = new HorizontalScrollView(m) {
+            // the row scrolls only through glideTo: Android's own jump to the focused poster made posters
+            // appear from nowhere at the screen's edge when the remote was pressed fast
+            @Override protected int computeScrollDeltaToGetChildRectOnScreen(android.graphics.Rect r) { return 0; }
+        };
         rowScroll.setHorizontalScrollBarEnabled(false);
         rowScroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
         rowScroll.setClipChildren(false);
@@ -285,7 +289,7 @@ final class Showcase {
             Item it = items.get(i);
             View p = poster(it, h);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Math.round(h * it.aspect), h);
-            lp.leftMargin = i == 0 ? 0 : m.dp(14);
+            lp.leftMargin = i == 0 ? 0 : m.dp(24);   // room for the focused poster to grow without covering its neighbours
             row.addView(p, 0, lp);
             posters.add(p);
         }
@@ -346,10 +350,11 @@ final class Showcase {
         f.addView(shine, new FrameLayout.LayoutParams(-1, -1));
 
         f.setOnFocusChangeListener((v, has) -> {
-            v.animate().scaleX(has ? 1.08f : 1f).scaleY(has ? 1.08f : 1f).translationZ(has ? m.dp(10) : 0)
+            v.animate().scaleX(has ? 1.06f : 1f).scaleY(has ? 1.06f : 1f).translationZ(has ? m.dp(10) : 0)
                     .setDuration(has ? 300 : 200).setInterpolator(EASE).start();
             shine.animate().alpha(has ? 1f : 0f).setDuration(160).start();
             if (!has) return;
+            glideTo(v);
             group.setText(it.group);
             detail.setText(it.detail);
             main.removeCallbacks(backdropLater);
@@ -357,6 +362,23 @@ final class Showcase {
         });
         f.setOnClickListener(v -> m.openItem(it));
         return f;
+    }
+
+    private android.animation.ObjectAnimator glide;
+
+    /** the focused poster fully in view, with the next one peeking, in one eased move (presses in a row merge) */
+    private void glideTo(View p) {
+        int pad = m.dp(56), w = rowScroll.getWidth(), x = rowScroll.getScrollX();
+        if (glide != null && glide.isRunning()) x = (Integer) glide.getAnimatedValue();
+        int left = p.getLeft() - pad, right = p.getRight() + pad - w;
+        int to = left < x ? left : right > x ? right : x;
+        to = Math.max(0, Math.min(to, row.getWidth() - w + rowScroll.getPaddingLeft() + rowScroll.getPaddingRight()));
+        if (glide != null) glide.cancel();
+        if (to == rowScroll.getScrollX()) return;
+        glide = android.animation.ObjectAnimator.ofInt(rowScroll, "scrollX", rowScroll.getScrollX(), to);
+        glide.setDuration(420);
+        glide.setInterpolator(EASE);
+        glide.start();
     }
 
     private void backdropFromFocus() {
