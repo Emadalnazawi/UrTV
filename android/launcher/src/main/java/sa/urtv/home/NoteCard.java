@@ -35,6 +35,7 @@ final class NoteCard {
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Runnable hide = this::hide;
     private View shown;
+    private Runnable after;
     private Typeface regular, medium;
 
     NoteCard(Activity activity, ViewGroup parent, FrameLayout.LayoutParams params) {
@@ -47,8 +48,11 @@ final class NoteCard {
         } catch (RuntimeException e) { regular = Typeface.DEFAULT; medium = Typeface.DEFAULT_BOLD; }
     }
 
-    void show(String title, String message, byte[] image, int seconds) {
-        hide();
+    /** {@code after} runs once the card has gone (the home card comes back then). */
+    void show(String title, String message, byte[] image, int seconds, Runnable after) {
+        boolean replacing = shown != null;
+        hide(false);
+        this.after = after;
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(22), dp(16), dp(22), dp(16));
@@ -103,20 +107,33 @@ final class NoteCard {
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(params);
         lp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+        // in: a soft drop and settle; a new note over an old one only cross-fades
         card.setAlpha(0f);
-        card.setTranslationY(-dp(12));
+        card.setTranslationY(replacing ? 0 : -dp(14));
+        card.setScaleX(replacing ? 1f : 0.97f);
+        card.setScaleY(replacing ? 1f : 0.97f);
+        card.setPivotY(0);
         parent.addView(card, lp);
-        card.animate().alpha(1f).translationY(0).setDuration(320).start();
+        card.animate().alpha(1f).translationY(0).scaleX(1f).scaleY(1f)
+                .setStartDelay(replacing ? 0 : 120).setDuration(420)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator(2.2f)).start();
         shown = card;
         main.postDelayed(hide, Math.max(3, Math.min(600, seconds)) * 1000L);
     }
 
-    void hide() {
+    void hide() { hide(true); }
+
+    private void hide(boolean restore) {
         main.removeCallbacks(hide);
         if (shown == null) return;
         View v = shown;
         shown = null;
-        v.animate().alpha(0f).setDuration(250).withEndAction(() -> parent.removeView(v)).start();
+        Runnable a = after;
+        after = null;
+        v.animate().alpha(0f).translationY(-dp(8)).setStartDelay(0).setDuration(260)
+                .setInterpolator(new android.view.animation.AccelerateInterpolator(1.4f))
+                .withEndAction(() -> parent.removeView(v)).start();
+        if (restore && a != null) main.postDelayed(a, 140);
     }
 
     private TextView text(String s, float sp, Typeface tf, int color) {

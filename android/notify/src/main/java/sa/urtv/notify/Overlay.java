@@ -43,10 +43,17 @@ final class Overlay {
     private ExoPlayer player;
     private final Runnable hide = this::hide;
     private Typeface regular, medium;
+    // a soft two-note chime with each pop-up (res/raw/chime.wav, made for this app), at a third of the TV's volume
+    private final android.media.SoundPool sounds = new android.media.SoundPool.Builder().setMaxStreams(1)
+            .setAudioAttributes(new android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build()).build();
+    private int chime;
 
     Overlay(Context c) {
         ctx = c.getApplicationContext();
         wm = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
+        chime = sounds.load(ctx, R.raw.chime, 1);
         try {
             regular = Typeface.createFromAsset(ctx.getAssets(), "fonts/Thmanyah-Regular.otf");
             medium = Typeface.createFromAsset(ctx.getAssets(), "fonts/Thmanyah-Medium.otf");
@@ -60,6 +67,7 @@ final class Overlay {
      */
     void show(Note n) {
         main.post(() -> {
+            if (n.sound) sounds.play(chime, 0.35f, 0.35f, 1, 0, 1f);
             if (n.videoUrl != null) { showNow(n); return; }
             Intent i = new Intent("sa.urtv.home.SHOW_NOTE").setPackage("sa.urtv.home")
                     .putExtra("title", n.title).putExtra("message", n.message).putExtra("seconds", n.seconds);

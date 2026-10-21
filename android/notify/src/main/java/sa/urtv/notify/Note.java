@@ -19,6 +19,7 @@ final class Note {
     byte[] icon, image;
     String imageUrl, videoUrl;
     int mediaWidthPx = 640;   // PiPup's «width» is in screen pixels
+    boolean sound = true;     // the chime; a form field or JSON «sound»: false turns it off
 
     /** Home Assistant's «Notifications for Android TV / Fire TV»: multipart form fields and files. */
     static Note fromForm(Map<String, String> fields, Map<String, byte[]> files) {
@@ -43,6 +44,7 @@ final class Note {
         n.color = parseColor(f.containsKey("bkgcolor") ? f.get("bkgcolor") : f.get("color"), n.color);
         n.icon = usable(files.get("filename"));
         n.image = usable(files.get("filename2"));
+        n.sound = !"false".equalsIgnoreCase(f.getOrDefault("sound", "true").trim());
         return n;
     }
 
@@ -56,6 +58,7 @@ final class Note {
         int[] map = {TOP_RIGHT, TOP_LEFT, BOTTOM_RIGHT, BOTTOM_LEFT, CENTER};
         n.position = map[clamp(j.optInt("position", 0), 0, 4)];
         n.color = parseColor(j.optString("backgroundColor", null), n.color);
+        n.sound = j.optBoolean("sound", true);
         JSONObject media = j.optJSONObject("media");
         if (media != null) {
             JSONObject v = media.optJSONObject("video"), i = media.optJSONObject("image");

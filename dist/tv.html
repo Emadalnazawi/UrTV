@@ -105,6 +105,8 @@
   }
   .week li:last-child{border-bottom:none}
   /* a Home Assistant pop-up from «تنبيهات تلفزيونك» in the card's place (urtvNote) */
+  .week{transition:opacity .3s ease, transform .3s cubic-bezier(.2,.7,.2,1)}
+  .week.swap{opacity:0;transform:translateY(-10px) scale(.985)}
   .week.note li{white-space:normal}
   .week.note li.nt{font-weight:500;font-size:clamp(16px,1.4vw,26px);color:#FFFCF2}
   .week.note li.nm{color:#C9BFA6}
@@ -991,23 +993,42 @@ const PANEL_TITLE = {shows:'هذا الأسبوع', prayers:'مواقيت الي
 let noteUntil = 0, noteTimer = null;
 window.urtvNote = function(title, message, image, seconds){
   const box = document.querySelector('.week'), ul = document.getElementById('week-list'), hd = document.getElementById('week-hd');
-  const p = riyadhParts();
-  hd.textContent = `تنبيه · ${fmt12(p.h, p.mi)}`;
-  box.querySelectorAll('img.note-img').forEach(i => i.remove());
-  ul.classList.remove('flip');
-  ul.innerHTML = (title ? `<li class="nt">${esc(title)}</li>` : '') + (message ? `<li class="nm">${esc(message)}</li>` : '');
-  if(image) ul.insertAdjacentHTML('afterend', `<img class="note-img" src="${image}" alt="">`);
-  box.classList.add('note');
-  box.style.display = '';
-  noteUntil = Date.now() + (seconds || 15) * 1000;
+  const ms = (seconds || 15) * 1000, wasHidden = getComputedStyle(box).display === 'none';
+  noteUntil = Date.now() + ms;
   clearTimeout(noteTimer);
+  // out (or in from nothing when the panel is off), swap the content, back in: never a jump
+  swapWeek(box, wasHidden, () => {
+    const p = riyadhParts();
+    box.querySelectorAll('img.note-img').forEach(i => i.remove());
+    hd.textContent = `تنبيه · ${fmt12(p.h, p.mi)}`;
+    ul.classList.remove('flip');
+    ul.innerHTML = (title ? `<li class="nt">${esc(title)}</li>` : '') + (message ? `<li class="nm">${esc(message)}</li>` : '');
+    if(image) ul.insertAdjacentHTML('afterend', `<img class="note-img" src="${image}" alt="">`);
+    box.classList.add('note');
+  });
   noteTimer = setTimeout(() => {
     noteUntil = 0;
-    box.classList.remove('note');
-    box.querySelectorAll('img.note-img').forEach(i => i.remove());
-    if(CONFIG.panel === 'none') box.style.display = 'none'; else renderPanel(false);
-  }, (seconds || 15) * 1000);
+    if(CONFIG.panel === 'none'){
+      box.classList.add('swap');
+      setTimeout(() => { box.style.display = 'none'; box.classList.remove('note', 'swap'); box.querySelectorAll('img.note-img').forEach(i => i.remove()); }, 320);
+      return;
+    }
+    swapWeek(box, false, () => {
+      box.classList.remove('note');
+      box.querySelectorAll('img.note-img').forEach(i => i.remove());
+      renderPanel(false);
+    });
+  }, ms);
 };
+function swapWeek(box, fromHidden, fill){
+  if(fromHidden){
+    box.classList.add('swap'); box.style.display = ''; fill();
+    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.remove('swap')));
+    return;
+  }
+  box.classList.add('swap');
+  setTimeout(() => { fill(); requestAnimationFrame(() => box.classList.remove('swap')); }, 300);
+}
 
 function renderPanel(animate){
   if(Date.now() < noteUntil) return;   // a pop-up is showing; it redraws the panel when it ends

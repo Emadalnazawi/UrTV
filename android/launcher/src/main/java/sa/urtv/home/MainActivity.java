@@ -96,7 +96,8 @@ public class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable rotateWallpaper = this::nextWallpaper;
     static final long WALLPAPER_INTERVAL_MS = 10 * 60 * 1000;
-    private TextView greeting, clock, ampm, date, title, wifiPill, appsLabel;
+    private TextView greeting, clock, ampm, date, title, appsLabel;
+    private Pill wifiPill;
     private int glowColor = 0xFF3A3A3A;
     private ValueAnimator glowAnim;
     private int lastFocusedId = View.NO_ID;
@@ -110,8 +111,9 @@ public class MainActivity extends Activity {
     private final BroadcastReceiver notes = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent i) {
+            homeCard.dim(true);   // the card under it fades out while the note settles in its place
             noteCard.show(i.getStringExtra("title"), i.getStringExtra("message"), i.getByteArrayExtra("image"),
-                    i.getIntExtra("seconds", 10));
+                    i.getIntExtra("seconds", 10), () -> homeCard.dim(false));
             if (isOrderedBroadcast()) setResultCode(1);   // shown here: «تنبيهات تلفزيونك» skips its own pop-up
         }
     };
@@ -334,16 +336,16 @@ public class MainActivity extends Activity {
         LinearLayout right = new LinearLayout(this);
         right.setGravity(Gravity.CENTER_VERTICAL);
         right.setClipChildren(false);
-        TextView saver = pill("شاشة التوقف", R.drawable.ic_screensaver);
+        Pill saver = pill("شاشة التوقف", R.drawable.ic_screensaver);
         saver.setOnClickListener(v -> openPackage(SAVER_PKG));
-        TextView inputs = pill("المصادر", R.drawable.ic_input);
+        Pill inputs = pill("المصادر", R.drawable.ic_input);
         inputs.setOnClickListener(v -> showInputs(v));
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
         wifiPill.setOnClickListener(v -> launch(new Intent(Settings.ACTION_WIFI_SETTINGS)));
-        TextView settings = pill("الإعدادات", R.drawable.ic_settings);
+        Pill settings = pill("الإعدادات", R.drawable.ic_settings);
         settings.setOnClickListener(v -> launch(new Intent(Settings.ACTION_SETTINGS)));
-        for (TextView p : isInstalled(SAVER_PKG) ? new TextView[]{inputs, wifiPill, settings, saver}
-                                                  : new TextView[]{inputs, wifiPill, settings}) {
+        for (Pill p : isInstalled(SAVER_PKG) ? new Pill[]{inputs, wifiPill, settings, saver}
+                                             : new Pill[]{inputs, wifiPill, settings}) {
             right.addView(p, llp(-2, dp(30), dp(10), 0, 0, 0));
             pills.add(p);
         }
@@ -351,34 +353,87 @@ public class MainActivity extends Activity {
         return header;
     }
 
-    /** Pill button: label with a Material icon on its right (Arabic reading order), tinted with the text. */
-    private TextView pill(String label, int icon) {
-        TextView p = text(12, "sans-serif-medium", 0xE6FFFFFF);
-        p.setText(label);
-        p.setGravity(Gravity.CENTER);
-        android.graphics.drawable.Drawable ic = getDrawable(icon).mutate();
-        ic.setBounds(0, 0, dp(16), dp(16));
-        ic.setTint(0xE6FFFFFF);
-        p.setCompoundDrawables(null, null, ic, null);
-        p.setCompoundDrawablePadding(dp(8));
-        p.setPadding(dp(14), 0, dp(14), 0);
-        p.setFocusable(true);
-        p.setId(View.generateViewId());
-        GradientDrawable bg = new GradientDrawable();
-        bg.setCornerRadius(dp(15));
-        bg.setColor(0x66000000);
-        bg.setStroke(dp(1), 0x33FFFFFF);
-        p.setBackground(bg);
-        p.setOnFocusChangeListener((v, has) -> {
+    /**
+     * Pill button: just its Material icon until it has focus; then its label opens beside the icon, growing to
+     * the left as Arabic is read (the label is right-aligned, so it shows from its first letter on).
+     */
+    final class Pill extends LinearLayout {
+        final TextView label;
+        final android.widget.ImageView icon;
+        private final GradientDrawable bg = new GradientDrawable();
+        private ValueAnimator open;
+
+        Pill(String text, int iconRes) {
+            super(MainActivity.this);
+            setOrientation(HORIZONTAL);
+            setGravity(Gravity.CENTER_VERTICAL);
+            setPadding(dp(8), 0, dp(8), 0);
+            setFocusable(true);
+            setId(View.generateViewId());
+            label = text(12, "sans-serif-medium", 0xFF111111);
+            label.setText(text);
+            label.setSingleLine(true);
+            label.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+            label.setPadding(dp(4), 0, dp(8), 0);
+            label.setAlpha(0f);
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(0, -1);
+            llp.rightMargin = dp(2);
+            addView(label, llp);
+            icon = new android.widget.ImageView(MainActivity.this);
+            android.graphics.drawable.Drawable ic = getDrawable(iconRes).mutate();
+            ic.setTint(0xE6FFFFFF);
+            icon.setImageDrawable(ic);
+            addView(icon, new LinearLayout.LayoutParams(dp(16), dp(16)));
+            bg.setCornerRadius(dp(15));
+            bg.setColor(0x66000000);
+            bg.setStroke(dp(1), 0x33FFFFFF);
+            setBackground(bg);
+            setOnFocusChangeListener((v, has) -> focus(has));
+        }
+
+        void setLabel(String s) {
+            label.setText(s);
+            if (hasFocus()) expand(true);
+        }
+
+        private void focus(boolean has) {
             bg.setColor(has ? 0xF2FFFFFF : 0x66000000);
-            ((TextView) v).setTextColor(has ? 0xFF111111 : 0xE6FFFFFF);
-            ic.setTint(has ? 0xFF111111 : 0xE6FFFFFF);
-            v.animate().scaleX(has ? 1.08f : 1f).scaleY(has ? 1.08f : 1f)
-                    .setInterpolator(new OvershootInterpolator(2f)).setDuration(220).start();
-            if (has) { lastFocusedId = v.getId(); scroll.smoothScrollTo(0, 0); fadeGlow(1f); }
-        });
-        return p;
+            icon.getDrawable().setTint(has ? 0xFF111111 : 0xE6FFFFFF);
+            animate().scaleX(has ? 1.06f : 1f).scaleY(has ? 1.06f : 1f)
+                    .setInterpolator(new DecelerateInterpolator()).setDuration(180).start();
+            expand(has);
+            if (has) {
+                lastFocusedId = getId();
+                scroll.smoothScrollTo(0, 0);
+                fadeGlow(1f);
+                title.animate().alpha(0f).translationX(dp(12)).setDuration(180).start();   // no app is chosen up here
+            }
+        }
+
+        /** Label width 0 ↔ its text, fast and eased; the text fades in once there is room for it. */
+        private void expand(boolean on) {
+            if (open != null) open.cancel();
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) label.getLayoutParams();
+            int from = lp.width, to = 0;
+            if (on) {
+                label.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                to = label.getMeasuredWidth() + dp(10);   // and a little air before the icon
+            }
+            int target = to;
+            open = ValueAnimator.ofInt(from, target);
+            open.setDuration(on ? 220 : 160);
+            open.setInterpolator(new DecelerateInterpolator(1.6f));
+            open.addUpdateListener(a -> {
+                lp.width = (int) a.getAnimatedValue();
+                label.setLayoutParams(lp);
+                float f = target == 0 ? lp.width / (float) Math.max(1, from) : lp.width / (float) target;
+                label.setAlpha(on ? Math.max(0f, (f - 0.35f) / 0.65f) : f * f);
+            });
+            open.start();
+        }
     }
+
+    private Pill pill(String label, int icon) { return new Pill(label, icon); }
 
     // ---------------------------------------------------------------- apps
 
@@ -524,7 +579,7 @@ public class MainActivity extends Activity {
             lastFocusedId = v.getId();
             if (inDock) {
                 title.setText(app.label);
-                title.animate().alpha(1f).setDuration(200).start();
+                title.animate().alpha(1f).translationX(0).setDuration(200).start();
                 animateGlow(app.color);
                 fadeGlow(1f);
                 scroll.smoothScrollTo(0, 0);
@@ -799,7 +854,7 @@ public class MainActivity extends Activity {
                 if (s != null && !s.contains("unknown ssid") && !s.replace("\"", "").isEmpty()) name = s.replace("\"", "");
             }
         } catch (SecurityException ignored) { }
-        wifiPill.setText(name);
+        wifiPill.setLabel(name);
     }
 
     // ---------------------------------------------------------------- glow

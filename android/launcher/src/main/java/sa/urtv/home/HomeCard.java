@@ -51,6 +51,14 @@ final class HomeCard {
         if (web != null) { web.onPause(); web.pauseTimers(); }
     }
 
+    /** Steps aside (fades) while a Home Assistant pop-up has its place, and comes back after. */
+    void dim(boolean away) {
+        if (web != null) web.animate().alpha(away ? 0f : 1f).translationY(away ? dp(8) : 0)
+                .setDuration(away ? 220 : 380).setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
+    }
+
+    private int dp(int v) { return Math.round(v * activity.getResources().getDisplayMetrics().density); }
+
     void destroy() {
         if (web == null) return;
         parent.removeView(web);
