@@ -21,7 +21,7 @@ final class Sounds {
     private static SoundPool pool;
     private static int move, ok, back, edge, open;
     private static final Handler main = new Handler(Looper.getMainLooper());
-    private static final float LEVEL = 0.6f;   // all of them 40% quieter than first made
+    private static final float LEVEL = 0.3f;   // the sounds themselves, quiet against the TV: half of the last level
 
     static void init(Context c) {
         if (pool != null) return;
