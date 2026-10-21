@@ -1,6 +1,8 @@
 package sa.urtv.notify;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -51,8 +53,36 @@ final class Overlay {
         } catch (RuntimeException e) { regular = Typeface.DEFAULT; medium = Typeface.DEFAULT_BOLD; }
     }
 
-    /** Safe from any thread. */
-    void show(Note n) { main.post(() -> showNow(n)); }
+    /**
+     * Safe from any thread. While «تلفزيونك» (the home screen) is in front it shows text and pictures in its
+     * own card style; it answers the ordered broadcast with 1. Otherwise (an app, the screensaver), or for
+     * video, the pop-up goes over the screen here.
+     */
+    void show(Note n) {
+        main.post(() -> {
+            if (n.videoUrl != null) { showNow(n); return; }
+            Intent i = new Intent("sa.urtv.home.SHOW_NOTE").setPackage("sa.urtv.home")
+                    .putExtra("title", n.title).putExtra("message", n.message).putExtra("seconds", n.seconds);
+            byte[] img = small(n.image);
+            if (img != null) i.putExtra("image", img);
+            ctx.sendOrderedBroadcast(i, null, new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context c, Intent r) { if (getResultCode() != 1) showNow(n); }
+            }, main, 0, null, null);
+        });
+    }
+
+    /** A picture small enough for a broadcast (they cap near 1 MB): JPEG, at most 960 px wide. */
+    private static byte[] small(byte[] b) {
+        if (b == null) return null;
+        if (b.length < 300_000) return b;
+        Bitmap bm = BitmapFactory.decodeByteArray(b, 0, b.length);
+        if (bm == null) return null;
+        if (bm.getWidth() > 960) bm = Bitmap.createScaledBitmap(bm, 960, bm.getHeight() * 960 / bm.getWidth(), true);
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 80, out);
+        return out.size() < 700_000 ? out.toByteArray() : null;
+    }
 
     private void showNow(Note n) {
         hide();
