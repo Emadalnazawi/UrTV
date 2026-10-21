@@ -10,6 +10,9 @@
     <!-- the optional home-screen card reads the screensaver's settings (signature permission, same key) -->
     <uses-permission android:name="sa.urtv.screensaver.READ_CONFIG" />
 
+    <!-- «تنبيهات تلفزيونك» shows Home Assistant pop-ups in the home card's place (same signing key only) -->
+    <permission android:name="sa.urtv.home.permission.SHOW_NOTE" android:protectionLevel="signature" />
+
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 

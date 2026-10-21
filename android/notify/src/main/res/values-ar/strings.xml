@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تنبيهات تلفزيونك</string>
+    <string name="running">ينتظر التنبيهات من Home Assistant</string>
+    <string name="status">يستقبل على %1$s\nHome Assistant (Notifications for Android TV): المنفذ %2$d\nصيغة PiPup: المنفذ %3$d</string>
+    <string name="overlay_ok">الظهور فوق التطبيقات مسموح ✓</string>
+    <string name="overlay_missing">الظهور فوق التطبيقات غير مسموح بعد: optimize/install.sh notify يسمح له</string>
+    <string name="test_button">أرسل تنبيه تجريبي</string>
+    <string name="test_title">تمام، يشتغل</string>
+    <string name="test_message">تنبيهات Home Assistant بتطلع هنا.</string>
+    <string name="port_busy">المنفذ %1$d يستخدمه تطبيق ثاني (غالباً «Notifications for Android TV» من المتجر): احذفه وأعد تشغيل التلفزيون</string>
+</resources>

@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'sa.urtv.notify'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'sa.urtv.notify'
+        minSdk 26
+        targetSdk 30   // the same as the other two apps: no foreground-service types or notification permission to ask for
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int)
+        versionName "3.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
+    }
+
+    signingConfigs {
+        if (System.getenv('ANDROID_KEYSTORE')) {
+            release {
+                storeFile file(System.getenv('ANDROID_KEYSTORE'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias 'urtv'
+                keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.findByName('release') ?: signingConfigs.debug
+        }
+    }
+
+    // the same Thmanyah fonts as the home screen
+    sourceSets {
+        main { assets.srcDirs += ['../launcher/src/main/assets'] }
+    }
+
+    // targetSdk 30 is deliberate (see defaultConfig); lint's «expired target» would stop the release build
+    lint { abortOnError false }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // camera pop-ups: RTSP (the eufy cameras) and HTTP video
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-exoplayer-rtsp:1.4.1'
+    implementation 'androidx.media3:media3-ui:1.4.1'
+}

@@ -234,6 +234,36 @@ for (const panel of ['prayers', 'verse', 'shows']) {
   await ctx.close();
 }
 
+// ---- «تنبيهات تلفزيونك»: a pop-up takes the card's place, then the card comes back (and stays off with panel=none)
+for (const panel of ['verse', 'none']) {
+  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+  await ctx.route(/^https?:/, r => r.abort());
+  const p = await ctx.newPage();
+  const errors = [];
+  p.on('pageerror', e => errors.push(e.message));
+  await p.goto(page('tv.html') + '#panel=' + panel);
+  await p.waitForTimeout(800);
+  const before = await p.evaluate(() => document.getElementById('week-hd').textContent);
+  await p.evaluate(() => urtvNote('حركة عند المدخل', 'الكاميرا شافت شخص', '', 2));
+  await p.waitForTimeout(700);
+  const during = await p.evaluate(() => {
+    const w = document.querySelector('.week');
+    return { note: w.classList.contains('note'), shown: getComputedStyle(w).display !== 'none',
+             hd: document.getElementById('week-hd').textContent, text: document.getElementById('week-list').innerText };
+  });
+  check(`pop-up over panel ${panel}: in the card, gold «تنبيه» heading`, !errors.length && during.note && during.shown
+        && during.hd.startsWith('تنبيه') && during.text.includes('حركة عند المدخل'), JSON.stringify(during));
+  await p.waitForTimeout(2200);
+  const after = await p.evaluate(() => {
+    const w = document.querySelector('.week');
+    return { note: w.classList.contains('note'), shown: getComputedStyle(w).display !== 'none',
+             hd: document.getElementById('week-hd').textContent };
+  });
+  check(`pop-up over panel ${panel}: the card comes back after`, !errors.length && !after.note
+        && (panel === 'none' ? !after.shown : after.shown && after.hd === before), JSON.stringify({ before, after }));
+  await ctx.close();
+}
+
 await browser.close();
 console.log(failed ? `\n${failed} failed` : '\nall page tests passed');
 process.exit(failed ? 1 : 0);

@@ -102,6 +102,18 @@ public class MainActivity extends Activity {
     private int packageSeq;
     private PopupWindow inputsPopup;
     private HomeCard homeCard;
+    // Home Assistant pop-ups from «تنبيهات تلفزيونك», shown in the card's place while Home is in front
+    static final String SHOW_NOTE = "sa.urtv.home.SHOW_NOTE", NOTE_PERMISSION = "sa.urtv.home.permission.SHOW_NOTE";
+    private NoteCard noteCard;
+    private final BroadcastReceiver notes = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent i) {
+            homeCard.dim(true);   // the card under it fades out while the note settles in its place
+            noteCard.show(i.getStringExtra("title"), i.getStringExtra("message"), i.getByteArrayExtra("image"),
+                    i.getIntExtra("seconds", 10), () -> homeCard.dim(false));
+            if (isOrderedBroadcast()) setResultCode(1);   // shown here: «تنبيهات تلفزيونك» skips its own pop-up
+        }
+    };
 
     private final BroadcastReceiver tick = new BroadcastReceiver() {
         @Override public void onReceive(Context c, Intent i) { updateClock(); updateWifi(); }
@@ -149,6 +161,7 @@ public class MainActivity extends Activity {
         updateClock();
         updateWifi();
         homeCard.refresh();
+        registerReceiver(notes, new IntentFilter(SHOW_NOTE), NOTE_PERMISSION, null);
         View last = lastFocusedId == View.NO_ID ? null : findViewById(lastFocusedId);
         if (last == null && !dockCards.isEmpty()) last = dockCards.get(0);
         if (last != null) last.requestFocus();
@@ -167,6 +180,8 @@ public class MainActivity extends Activity {
         unregisterReceiver(tick);
         if (inputsPopup != null) inputsPopup.dismiss();
         homeCard.pause();
+        unregisterReceiver(notes);
+        noteCard.hide();
     }
 
     @Override
@@ -241,6 +256,7 @@ public class MainActivity extends Activity {
         hero.addView(buildHeader(), lp(-1, -2, Gravity.TOP, dp(48), dp(36), dp(48), 0));
         // optional card under the pills, same size as beside the screensaver's clock
         homeCard = new HomeCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
+        noteCard = new NoteCard(this, hero, lp(dp(461), dp(250), Gravity.LEFT | Gravity.TOP, dp(48), dp(84), 0, 0));
 
         LinearLayout bottom = new LinearLayout(this);
         bottom.setOrientation(LinearLayout.VERTICAL);
