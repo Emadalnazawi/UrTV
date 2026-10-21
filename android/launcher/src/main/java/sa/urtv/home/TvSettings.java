@@ -161,10 +161,10 @@ public class TvSettings extends Activity {
         col.addView(sectionList, new LinearLayout.LayoutParams(-1, -2));
         String[][] names = {
             {"الشبكة", "wifi"}, {"البلوتوث", "bt"}, {"الصوت", "sound"}, {"الصورة", "display"},
-            {"شاشة التوقف", "saver"}, {"المفضلة", "dock"}, {"التنبيهات", "notify"}, {"النظام", "system"},
+            {"شاشة التوقف", "saver"}, {"المفضلة", "dock"}, {"المحتوى", "content"}, {"التنبيهات", "notify"}, {"النظام", "system"},
         };
         int[] icons = {R.drawable.ic_wifi, R.drawable.ic_bluetooth, R.drawable.ic_volume, R.drawable.ic_display,
-                R.drawable.ic_screensaver, R.drawable.ic_star, R.drawable.ic_bell, R.drawable.ic_info};
+                R.drawable.ic_screensaver, R.drawable.ic_star, R.drawable.ic_tune, R.drawable.ic_bell, R.drawable.ic_info};
         for (int i = 0; i < names.length; i++) {
             final int idx = i;
             LinearLayout r = new LinearLayout(this);
@@ -242,7 +242,7 @@ public class TvSettings extends Activity {
     // ================================================================ sections
 
     private static final int SECTION_WIFI = 0, SECTION_BT = 1, SECTION_SOUND = 2, SECTION_DISPLAY = 3,
-            SECTION_SAVER = 4, SECTION_DOCK = 5, SECTION_NOTIFY = 6, SECTION_SYSTEM = 7;
+            SECTION_SAVER = 4, SECTION_DOCK = 5, SECTION_CONTENT = 6, SECTION_NOTIFY = 7, SECTION_SYSTEM = 8;
 
     private void showSection(int idx, boolean animate) {
         int old = section;
@@ -263,6 +263,7 @@ public class TvSettings extends Activity {
             case SECTION_DISPLAY: displayPage(p); break;
             case SECTION_SAVER: saverPage(p); break;
             case SECTION_DOCK: dockPage(p); break;
+            case SECTION_CONTENT: contentPage(p); break;
             case SECTION_NOTIFY: notifyPage(p); break;
             default: systemPage(p);
         }
@@ -652,6 +653,63 @@ public class TvSettings extends Activity {
         for (Map.Entry<String, String> e : rest)
             p.link(e.getValue(), "", "", () -> { row.add(e.getKey()); Dock.save(this, row); popPage(); });
         return p;
+    }
+
+    // ---------------------------------------------------------------- content on the home screen
+
+    private void contentPage(Page p) {
+        note("المحتوى", "لما توقف على تطبيق في المفضلة تطلع بوستراته فوق. هنا تختار وش يطلع لكل تطبيق.");
+        java.util.Set<String> off = Showcase.set(this, Showcase.OFF);
+        java.util.Map<String, Integer> counts = publishedCounts();
+        Map<String, String> apps = Dock.launchable(this);
+        boolean shahid = apps.containsKey(ShahidLive.PKG);
+        if (shahid) {
+            p.header("شاهد");
+            p.toggle("البث المباشر", "قنواتك المباشرة أول البوسترات: البرنامج الحالي ووقته ووين وصل",
+                    () -> Showcase.liveOn(this), on -> Dock.prefs(this).edit().putBoolean(Showcase.LIVE_OFF, !on).apply());
+            p.link("القنوات", liveLabel(), "اختر القنوات اللي تطلع", () -> pushPage(channelsPage(), true));
+        }
+        p.header("التطبيقات");
+        for (String pkg : Dock.shown(this, apps)) {
+            Integer n = counts.get(pkg);
+            boolean live = ShahidLive.PKG.equals(pkg);
+            if (n == null && !live) { p.info(apps.get(pkg), "ما ينشر محتوى"); continue; }
+            String name = apps.containsKey(pkg) ? apps.get(pkg) : pkg;
+            p.toggle(name, n == null ? "" : MainActivity.arabicDigits(String.valueOf(n)) + " عنوان", () -> !Showcase.set(this, Showcase.OFF).contains(pkg), on -> {
+                java.util.Set<String> o = Showcase.set(this, Showcase.OFF);
+                if (on) o.remove(pkg); else o.add(pkg);
+                Showcase.putSet(this, Showcase.OFF, o);
+            });
+        }
+    }
+
+    private String liveLabel() {
+        int shown = ShahidLive.CHANNELS.length - Showcase.set(this, Showcase.LIVE_HIDDEN).size();
+        return MainActivity.arabicDigits(String.valueOf(shown)) + " من " + MainActivity.arabicDigits(String.valueOf(ShahidLive.CHANNELS.length));
+    }
+
+    private Page channelsPage() {
+        Page p = new Page("قنوات شاهد المباشرة");
+        note("القنوات", "اللي تشغّله يطلع في بوسترات شاهد بالترتيب هذا.");
+        for (String[] c : ShahidLive.CHANNELS) {
+            String id = c[0];
+            p.toggle(c[1], "", () -> !Showcase.set(this, Showcase.LIVE_HIDDEN).contains(id), on -> {
+                java.util.Set<String> h = Showcase.set(this, Showcase.LIVE_HIDDEN);
+                if (on) h.remove(id); else h.add(id);
+                Showcase.putSet(this, Showcase.LIVE_HIDDEN, h);
+            });
+        }
+        return p;
+    }
+
+    /** how many items each app publishes for the home screen */
+    private java.util.Map<String, Integer> publishedCounts() {
+        java.util.Map<String, Integer> out = new java.util.HashMap<>();
+        for (String t : new String[]{"preview_program", "watch_next_program"})
+            try (Cursor c = getContentResolver().query(Uri.parse("content://android.media.tv/" + t), new String[]{"package_name"}, null, null, null)) {
+                while (c != null && c.moveToNext()) { String k = c.getString(0); out.put(k, out.containsKey(k) ? out.get(k) + 1 : 1); }
+            } catch (RuntimeException ignored) { }
+        return out;
     }
 
     // ---------------------------------------------------------------- notifications

@@ -1196,6 +1196,8 @@ public class MainActivity extends Activity {
         }
     }
 
+    boolean hasPackage(String pkg) { return isInstalled(pkg); }
+
     private void openPackage(String pkg) {
         Intent i = getPackageManager().getLeanbackLaunchIntentForPackage(pkg);
         if (i == null) i = getPackageManager().getLaunchIntentForPackage(pkg);

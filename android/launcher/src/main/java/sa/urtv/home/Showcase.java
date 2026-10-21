@@ -49,7 +49,35 @@ final class Showcase {
     static final class Item {
         String pkg, title, detail, group, poster, wide, intent;
         float aspect = 16 / 9f;
-        int progress = -1;   // percent watched, «watch next» only
+        int progress = -1;   // percent watched («watch next»), or of the show on now (live)
+        boolean live;
+    }
+
+    // ---------------------------------------------------------------- what the user chose to see (TvSettings)
+
+    static final String OFF = "showcase_off", LIVE_OFF = "shahid_live_off", LIVE_HIDDEN = "shahid_live_hidden";
+
+    static java.util.Set<String> set(Context c, String key) {
+        String v = Dock.prefs(c).getString(key, "");
+        java.util.Set<String> out = new java.util.HashSet<>();
+        for (String x : v.split(",")) if (!x.isEmpty()) out.add(x);
+        return out;
+    }
+
+    static void putSet(Context c, String key, java.util.Set<String> v) {
+        Dock.prefs(c).edit().putString(key, android.text.TextUtils.join(",", v)).apply();
+    }
+
+    static boolean liveOn(Context c) { return !Dock.prefs(c).getBoolean(LIVE_OFF, false); }
+
+    /** live channels first (Shahid), then «watch next» and the app's rows; none for an app switched off */
+    private List<Item> itemsFor(String pkg) {
+        List<Item> l = new ArrayList<>();
+        if (set(m, OFF).contains(pkg)) return l;
+        if (ShahidLive.PKG.equals(pkg) && liveOn(m)) l.addAll(ShahidLive.items(set(m, LIVE_HIDDEN)));
+        List<Item> d = data.get(pkg);
+        if (d != null) l.addAll(d);
+        return l;
     }
 
     private static final Interpolator EASE = new PathInterpolator(0.32f, 0.72f, 0f, 1f);
@@ -132,6 +160,18 @@ final class Showcase {
                 done.setBackgroundColor(MainActivity.GOLD);
                 view.addView(done, new FrameLayout.LayoutParams(w * it.progress / 100, m.dp(4), Gravity.BOTTOM | Gravity.RIGHT));
             }
+            if (it.live) {
+                TextView badge = m.text(11, "medium", 0xFFFFFFFF);
+                badge.setText("مباشر");
+                badge.setPadding(m.dp(7), m.dp(1), m.dp(7), m.dp(2));
+                GradientDrawable bb = new GradientDrawable();
+                bb.setCornerRadius(m.dp(4));
+                bb.setColor(0xE6D93A3A);
+                badge.setBackground(bb);
+                FrameLayout.LayoutParams bl = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.RIGHT);
+                bl.setMargins(0, m.dp(6), m.dp(6), 0);
+                view.addView(badge, bl);
+            }
             GradientDrawable rd = new GradientDrawable();
             rd.setCornerRadius(m.dp(8));
             rd.setStroke(m.dp(2), 0xE6FFFFFF);
@@ -142,7 +182,7 @@ final class Showcase {
             view.setPivotX(w / 2f);
             view.setPivotY(h / 2f);
             view.setOnClickListener(v -> m.openItem(it));
-            if (it.poster != null) fetch(it.poster, w, h, bm -> {
+            if (it.poster != null) fetch(it.poster, it.wide, w, h, bm -> {
                 sharp.setImageBitmap(bm);
                 sharp.animate().alpha(soft.getAlpha() > 0 ? 0f : 1f).setDuration(260).start();
                 pool.execute(() -> {
@@ -246,7 +286,9 @@ final class Showcase {
         if (!force && System.currentTimeMillis() - loadedAt < FRESH_MS) return;
         loadedAt = System.currentTimeMillis();
         ContentResolver cr = m.getContentResolver();
+        boolean live = liveOn(m) && m.hasPackage(ShahidLive.PKG);
         pool.execute(() -> {
+            if (live) ShahidLive.refresh();
             Map<String, List<Item>> d = load(cr);
             main.post(() -> {
                 data = d;
@@ -255,10 +297,7 @@ final class Showcase {
         });
     }
 
-    boolean has(String pkg) {
-        List<Item> l = data.get(pkg);
-        return l != null && !l.isEmpty();
-    }
+    boolean has(String pkg) { return !itemsFor(pkg).isEmpty(); }
 
     private static Map<String, List<Item>> load(ContentResolver cr) {
         Map<String, List<Item>> out = new HashMap<>();
@@ -279,7 +318,7 @@ final class Showcase {
                 if (dur > 0 && pos > 0) {
                     it.progress = (int) Math.min(100, pos * 100 / dur);
                     long left = (dur - pos) / 60000;
-                    if (left > 0) it.detail = it.detail + " — بقي " + MainActivity.arabicDigits(String.valueOf(left)) + " دقيقة";
+                    if (left > 0) it.detail = it.detail + " — بقي " + ShahidLive.minutes(left);
                 }
                 add(out, it);
             }
@@ -364,7 +403,7 @@ final class Showcase {
         if (pkg.equals(shownPkg)) return true;
         boolean was = shownPkg != null;
         shownPkg = pkg;
-        build(data.get(pkg));
+        build(itemsFor(pkg));
         labels.setVisibility(View.VISIBLE);
         stage.setVisibility(View.VISIBLE);
         for (View v : new View[]{labels, stage}) {
@@ -590,7 +629,7 @@ final class Showcase {
         if (url == null || url.equals(backUrl)) return;
         backUrl = url;
         int w = m.getResources().getDisplayMetrics().widthPixels / 2;   // shown dimmed and big: half size is plenty
-        fetch(url, w, w * 9 / 16, bm -> {
+        fetch(url, null, w, w * 9 / 16, bm -> {
             if (!url.equals(backUrl)) return;
             ImageView next = backs[1 - backFront], cur = backs[backFront];
             next.setImageBitmap(bm);
@@ -605,16 +644,19 @@ final class Showcase {
 
     private interface Got { void got(Bitmap b); }
 
-    private void fetch(String url, int w, int h, Got got) {
+    /** a picture, or (when it doesn't load) the fallback: a live show without its poster takes the channel's */
+    private void fetch(String url, String fallback, int w, int h, Got got) {
         String key = url + "@" + w;
         Bitmap cached = images.get(key);
         if (cached != null) { got.got(cached); return; }
         Context c = m.getApplicationContext();
         pool.execute(() -> {
             Bitmap bm = decode(c, url, w, h);
+            if (bm == null && fallback != null && !fallback.equals(url)) bm = decode(c, fallback, w, h);
             if (bm == null) return;
             images.put(key, bm);
-            main.post(() -> got.got(bm));
+            Bitmap done = bm;
+            main.post(() -> got.got(done));
         });
     }
 
