@@ -31,6 +31,8 @@
         <package android:name="com.tcl.tv" />
         <package android:name="com.tcl.suspension" />
         <package android:name="sa.urtv.screensaver" />
+        <package android:name="sa.urtv.notify" />
+        <package android:name="com.android.tv.settings" />
         <!-- the stock Google homes (Dock.GOOGLE_HOMES): so getPackageInfo sees a disabled one on Android 11+ -->
         <package android:name="com.google.android.apps.tv.launcherx" />
         <package android:name="com.google.android.tvlauncher" />
@@ -62,6 +64,14 @@
         </activity>
 
         <!-- «ترتيب المفضلة»: the favourites as a list; also opened from the screensaver's settings -->
+        <!-- «إعدادات تلفزيونك»: the everyday settings in Arabic, a panel from the right (the top bar's settings button) -->
+        <activity
+            android:name=".SettingsPanel"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:screenOrientation="landscape" />
+
         <activity
             android:name=".DockActivity"
             android:exported="true"

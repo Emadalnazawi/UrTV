@@ -23,6 +23,8 @@
         <item>com.tcl.suspension</item>
         <item>com.tcl.t_solo</item>
         <item>com.tcl.dashboard</item>
+        <item>com.mediatek.tv.agent</item>        <!-- TvServices (MediaTek sets) -->
+        <item>com.mediatek.wwtv.webview</item>    <!-- MediaTek TV WebView -->
     </string-array>
 
     <!-- The TV's Live TV / tuner app, listed last in the Inputs menu. Empty to leave it out.
@@ -32,6 +34,9 @@
 
     <!-- The manufacturer's own source picker, used if switching to an input directly fails. -->
     <string name="input_picker_package" translatable="false">com.tcl.suspension</string>
+
+    <!-- Arabic order for the dock and the grid: the first app is at the right and has focus first. -->
+    <bool name="rtl_rows">true</bool>
 
     <!-- Tiles per row in the grid. -->
     <integer name="columns">5</integer>
