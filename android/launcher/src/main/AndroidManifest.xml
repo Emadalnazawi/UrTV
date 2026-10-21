@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- the optional home-screen card reads the screensaver's settings (signature permission, same key) -->
     <uses-permission android:name="sa.urtv.screensaver.READ_CONFIG" />
+    <!-- the settings screen: change the screensaver's settings, and Bluetooth on/off with its paired devices -->
+    <uses-permission android:name="sa.urtv.screensaver.permission.CONFIGURE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <!-- «تنبيهات تلفزيونك» shows Home Assistant pop-ups in the home card's place (same signing key only) -->
     <permission android:name="sa.urtv.home.permission.SHOW_NOTE" android:protectionLevel="signature" />
@@ -66,15 +70,16 @@
             </intent-filter>
         </activity>
 
-        <!-- «ترتيب المفضلة»: the favourites as a list; also opened from the screensaver's settings -->
-        <!-- «إعدادات تلفزيونك»: the everyday settings in Arabic, a panel from the right (the top bar's settings button) -->
+        <!-- «إعدادات تلفزيونك» as a TV screen: sections at the right, controls in the middle, a preview at the left -->
         <activity
-            android:name=".SettingsPanel"
+            android:name=".TvSettings"
             android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:excludeFromRecents="true"
+            android:windowSoftInputMode="adjustNothing"
             android:screenOrientation="landscape" />
 
+        <!-- «ترتيب المفضلة»: the favourites as a list; also opened from the screensaver's settings -->
         <activity
             android:name=".DockActivity"
             android:exported="true"

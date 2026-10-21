@@ -343,8 +343,8 @@ public class MainActivity extends Activity {
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
         wifiPill.setOnClickListener(v -> launch(new Intent(Settings.ACTION_WIFI_SETTINGS)));
         Pill settings = pill("الإعدادات", R.drawable.ic_settings);
-        // «إعدادات تلفزيونك» (SettingsPanel); its last row opens Android's full settings
-        settings.setOnClickListener(v -> { startActivity(new Intent(this, SettingsPanel.class)); overridePendingTransition(0, 0); });
+        // «إعدادات تلفزيونك» (TvSettings): full-screen, three columns; its «النظام» section opens Android's full settings
+        settings.setOnClickListener(v -> { startActivity(new Intent(this, TvSettings.class)); overridePendingTransition(0, 0); });
         for (Pill p : isInstalled(SAVER_PKG) ? new Pill[]{inputs, wifiPill, settings, saver}
                                              : new Pill[]{inputs, wifiPill, settings}) {
             right.addView(p, llp(-2, dp(30), dp(10), 0, 0, 0));

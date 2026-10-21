@@ -7,6 +7,8 @@
     <!-- «تنبيهات تلفزيونك» shows Home Assistant pop-ups in the card beside the clock (same signing key only);
          declared here too, so it works without the home screen -->
     <permission android:name="sa.urtv.home.permission.SHOW_NOTE" android:protectionLevel="signature" />
+    <!-- «تلفزيونك»'s settings screen changes the screensaver's settings (same signing key only) -->
+    <permission android:name="sa.urtv.screensaver.permission.CONFIGURE" android:protectionLevel="signature" />
 
     <!-- the launcher (same signing key) reads the settings for its home-screen card -->
     <permission
@@ -73,6 +75,19 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- the same, from «تلفزيونك»'s settings screen (same signing key) -->
+        <receiver
+            android:name=".SaverAppReceiver"
+            android:exported="true"
+            android:permission="sa.urtv.screensaver.permission.CONFIGURE">
+            <intent-filter>
+                <action android:name="sa.urtv.screensaver.GET" />
+                <action android:name="sa.urtv.screensaver.SET" />
+                <action android:name="sa.urtv.screensaver.CITIES" />
+                <action android:name="sa.urtv.screensaver.UPDATE" />
             </intent-filter>
         </receiver>
 

@@ -60,6 +60,8 @@ preBuild.dependsOn copyWallpapers
 def copyWeb = tasks.register('copyWeb', Copy) {
     from('../../dist') { include 'tv.html'; into 'web' }
     from('../../assets/fonts') { include '*.woff2'; into 'fonts' }
+    // the settings screen's instant team search (TheSportsDB ids with Arabic names, by league)
+    from('../../assets/shared') { include 'teams.json'; into 'data' }
     into "$buildDir/generated/web"
 }
 preBuild.dependsOn copyWeb
