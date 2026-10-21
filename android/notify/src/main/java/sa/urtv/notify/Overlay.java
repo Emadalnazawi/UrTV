@@ -10,6 +10,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -88,7 +89,7 @@ final class Overlay {
         row.addView(texts, new LinearLayout.LayoutParams(0, -2, 1f));
         if (texts.getChildCount() > 0 || row.getChildCount() > 1) card.addView(row);
 
-        int mediaW = dp(Math.max(160, Math.min(1280, n.mediaWidthDp)));
+        int mediaW = Math.max(dp(160), Math.min(n.mediaWidthPx, ctx.getResources().getDisplayMetrics().widthPixels * 2 / 3));
         if (n.image != null) addPicture(card, BitmapFactory.decodeByteArray(n.image, 0, n.image.length), mediaW);
         else if (n.imageUrl != null) fetchPicture(card, n.imageUrl, mediaW);
         if (n.videoUrl != null) addVideo(card, n.videoUrl, mediaW);
@@ -108,7 +109,8 @@ final class Overlay {
             shown = card;
             main.postDelayed(hide, n.seconds * 1000L);
         } catch (RuntimeException e) {
-            releasePlayer();   // no overlay permission yet: see MainActivity
+            Log.e("UrTVNotify", "can't show the pop-up", e);   // usually: no overlay permission yet (MainActivity says so)
+            releasePlayer();
         }
     }
 

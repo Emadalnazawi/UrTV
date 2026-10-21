@@ -76,7 +76,8 @@ public class MainActivity extends Activity {
         super.onResume();
         boolean overlay = Settings.canDrawOverlays(this);
         status.setText(getString(R.string.status, ip(), NotifyService.PORT_NFA, NotifyService.PORT_PIPUP)
-                + "\n" + getString(overlay ? R.string.overlay_ok : R.string.overlay_missing));
+                + "\n" + getString(overlay ? R.string.overlay_ok : R.string.overlay_missing)
+                + (NotifyService.busyPort != 0 ? "\n" + getString(R.string.port_busy, NotifyService.busyPort) : ""));
     }
 
     private static String ip() {

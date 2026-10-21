@@ -18,7 +18,7 @@ final class Note {
     int color = 0xFF263238;
     byte[] icon, image;
     String imageUrl, videoUrl;
-    int mediaWidthDp = 480;
+    int mediaWidthPx = 640;   // PiPup's «width» is in screen pixels
 
     /** Home Assistant's «Notifications for Android TV / Fire TV»: multipart form fields and files. */
     static Note fromForm(Map<String, String> f, Map<String, byte[]> files) {
@@ -55,8 +55,8 @@ final class Note {
         JSONObject media = j.optJSONObject("media");
         if (media != null) {
             JSONObject v = media.optJSONObject("video"), i = media.optJSONObject("image");
-            if (v != null) { n.videoUrl = v.optString("uri", null); n.mediaWidthDp = v.optInt("width", 480); }
-            else if (i != null) { n.imageUrl = i.optString("uri", null); n.mediaWidthDp = i.optInt("width", 480); }
+            if (v != null) { n.videoUrl = v.optString("uri", null); n.mediaWidthPx = v.optInt("width", 640); }
+            else if (i != null) { n.imageUrl = i.optString("uri", null); n.mediaWidthPx = i.optInt("width", 640); }
         }
         return n;
     }

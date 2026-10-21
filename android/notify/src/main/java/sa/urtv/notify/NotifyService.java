@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -22,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 public class NotifyService extends Service {
     static final int PORT_NFA = 7676, PORT_PIPUP = 7979;
     private Http nfa, pipup;
+    // a port another app already holds (the store's «Notifications for Android TV» takes 7676)
+    static volatile int busyPort;
     private Overlay overlay;
 
     static void start(Context c) {
@@ -44,16 +47,17 @@ public class NotifyService extends Service {
         try {
             nfa = new Http(PORT_NFA, r -> {
                 if (!"POST".equals(r.method)) return;   // GET: Home Assistant checking the TV is there
+                Log.i("UrTVNotify", "7676: fields " + r.fields.keySet() + " files " + r.files.keySet());
                 overlay.show(Note.fromForm(r.fields, r.files));
             });
-        } catch (IOException ignored) { }
+        } catch (IOException e) { busyPort = PORT_NFA; }
         try {
             pipup = new Http(PORT_PIPUP, r -> {
                 if (!"POST".equals(r.method)) return;
                 if (r.path.startsWith("/cancel")) { overlay.hide(); return; }
                 overlay.show(Note.fromPiPup(new JSONObject(new String(r.body, StandardCharsets.UTF_8))));
             });
-        } catch (IOException ignored) { }
+        } catch (IOException e) { busyPort = PORT_PIPUP; }
     }
 
     @Override
