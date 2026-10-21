@@ -21,6 +21,7 @@ final class Sounds {
     private static SoundPool pool;
     private static int move, ok, back, edge, open;
     private static final Handler main = new Handler(Looper.getMainLooper());
+    private static final float LEVEL = 0.6f;   // all of them 40% quieter than first made
 
     static void init(Context c) {
         if (pool != null) return;
@@ -38,6 +39,7 @@ final class Sounds {
     private static void play(Context c, int id, float vol) {
         if (pool == null || id == 0) return;
         if (Settings.System.getInt(c.getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 1) == 0) return;
+        vol *= LEVEL;
         pool.play(id, vol, vol, 1, 0, 1f);
     }
 
