@@ -119,6 +119,9 @@ public class TvSettings extends Activity {
         root.addView(middle, mp);
         root.addView(buildSections(), new LinearLayout.LayoutParams(dp(190), -1));
         setContentView(root);
+        Sounds.init(this);
+        Sounds.quiet(this);
+        Sounds.open(this);   // a beginning: three rising notes
 
         root.setAlpha(0f);
         root.setTranslationX(dp(40));
@@ -139,11 +142,20 @@ public class TvSettings extends Activity {
 
     @Override
     public void onBackPressed() {
+        Sounds.back(this);
         View f = getCurrentFocus();
         if (stack.size() > 1) { popPage(); return; }
         if (f != null && isInMiddle(f)) { sectionViews.get(section).requestFocus(); return; }
         finish();
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        View before = getCurrentFocus();
+        boolean handled = super.dispatchKeyEvent(e);
+        Sounds.key(this, e, handled, before, false);
+        return handled;
     }
 
     // ================================================================ columns

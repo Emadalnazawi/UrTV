@@ -109,7 +109,7 @@ public class MainActivity extends Activity {
     private Showcase showcase;
     private LinearLayout clockGroup;
     private boolean compact;
-    private View lastDockCard;
+    private View lastDockCard, settingsPill;
     // the clock stays big when the home screen opens (or comes back from the screensaver) until the remote moves
     private boolean engaged;
     private final BroadcastReceiver dreamEnded = new BroadcastReceiver() {
@@ -153,6 +153,8 @@ public class MainActivity extends Activity {
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         setContentView(buildUi());
+        Sounds.init(this);
+        Sounds.quiet(this);   // our own sounds (Sounds), not Android's clicks
         buildApps();
 
         IntentFilter pf = new IntentFilter();
@@ -235,10 +237,10 @@ public class MainActivity extends Activity {
         // Back with the posters up: they go, the clock comes back big; the next press of the remote shows them again
         // one step at a time: from the lens back to the favourites (the row stays), then the posters go
         View f = getCurrentFocus();
-        if (f != null && showcase.owns(f) && lastDockCard != null) { lastDockCard.requestFocus(); return; }
-        if (showcase.isShown()) { calm(); return; }
+        if (f != null && showcase.owns(f) && lastDockCard != null) { Sounds.back(this); lastDockCard.requestFocus(); return; }
+        if (showcase.isShown()) { Sounds.back(this); calm(); return; }
         // Home has nowhere to go back to; Back from the grid returns to the dock.
-        if (scroll.getScrollY() > 0 && !dockCards.isEmpty()) dockCards.get(0).requestFocus();
+        if (scroll.getScrollY() > 0 && !dockCards.isEmpty()) { Sounds.back(this); dockCards.get(0).requestFocus(); }
     }
 
     // ---------------------------------------------------------------- layout
@@ -379,6 +381,7 @@ public class MainActivity extends Activity {
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
         wifiPill.setOnClickListener(v -> launch(new Intent(Settings.ACTION_WIFI_SETTINGS)));
         Pill settings = pill("الإعدادات", R.drawable.ic_settings);
+        settingsPill = settings;   // it opens with its own sound (the settings' «beginning»), not OK's
         // «إعدادات تلفزيونك» (TvSettings): full-screen, three columns; its «النظام» section opens Android's full settings
         settings.setOnClickListener(v -> { startActivity(new Intent(this, TvSettings.class)); overridePendingTransition(0, 0); });
         for (Pill p : isInstalled(SAVER_PKG) ? new Pill[]{inputs, wifiPill, settings, saver}
@@ -1268,7 +1271,10 @@ public class MainActivity extends Activity {
             showInputs(pills.get(0));
             return true;
         }
-        return super.dispatchKeyEvent(e);
+        View before = getCurrentFocus();
+        boolean handled = super.dispatchKeyEvent(e);
+        Sounds.key(this, e, handled, before, before == settingsPill);
+        return handled;
     }
 
     /** 16:9 container. */
