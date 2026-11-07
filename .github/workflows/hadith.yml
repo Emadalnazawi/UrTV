@@ -1,12 +1,12 @@
 name: Verify hadith against the six books
 
 # The hadith collections are unreachable from the dev container; CI checks each hadith
-# and pushes the report to the data-hadith branch for review.
+# and pushes the reports (hadith, and the adhkar card's) to the data-hadith branch for review.
 on:
   workflow_dispatch:
   push:
-    branches: [master, content]
-    paths: ['.github/tools/verify_hadith.py', 'assets/shared/hadith.json']
+    branches: [master, next, content, work/quran-verify]
+    paths: ['.github/tools/verify_hadith.py', '.github/tools/verify_adhkar.py', 'assets/shared/hadith.json', 'assets/shared/adhkar.json']
 
 permissions:
   contents: write
@@ -17,12 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 .github/tools/verify_hadith.py
+      - run: python3 .github/tools/verify_adhkar.py   # the morning and evening adhkar: hadith/adhkar-report.json
       - name: Push to data-hadith
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan data-hadith
+          # a work branch writes its own report branch, so it never overwrites the one review reads
+          B=data-hadith; [ "$GITHUB_REF_NAME" = work/quran-verify ] && B=data-hadith-verify
+          git checkout --orphan "$B"
           git rm -rfq --cached .
           git add -f hadith   # the folder is in .gitignore for local runs
           git commit -qm "Hadith check against the six books"
-          git push -f origin data-hadith
+          git push -f origin "$B"

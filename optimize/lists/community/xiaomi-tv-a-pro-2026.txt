@@ -1,0 +1,28 @@
+# UrTV community list: xiaomi-tv-a-pro-2026
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-tv-a-pro-2026/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: MITVMZTU0 TVAPRO752026
+# match-device: 
+
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.xiaomi.tvqs.overseas.y24
+com.google.android.feedback
+com.mitv.tvhome.atv
+com.mitv.tvhome.michannel
+com.mitv.tvhome.mitvplus
+com.mitv.tvhome.oemtab
+com.xm.webcontent
+android.autoinstalls.config.google.gtvpai
+com.xiaomi.mitv.tvmanager
+com.xiaomi.mitv.updateservice
+com.mitv.upgrader
+com.mediatek.tv.systemupdater
+com.google.android.tungsten.setupwraith
+com.google.android.play.games
+com.xiaomi.mimusic2
+com.amazon.amazonvideo.livingroom
+com.google.android.youtube.tvmusic

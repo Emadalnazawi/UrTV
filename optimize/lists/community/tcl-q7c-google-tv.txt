@@ -1,0 +1,46 @@
+# UrTV community list: tcl-q7c-google-tv
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-q7c-google-tv/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: G084KGB Q7CQDMINILED TCL9618
+# match-device: G08
+
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.exhibit
+com.tcl.tv.tclhome_passive
+com.tcl.waterfall.overseas
+com.tcl.channelplus
+com.tcl.usercenter
+com.tcl.guard
+com.tcl.logkit
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.android.adservices.api
+com.android.ondevicepersonalization.services
+com.android.federatedcompute.services
+com.tcl.ocean.instructions
+com.tcl.repairguide
+com.android.printspooler
+com.google.android.syncadapters.calendar
+com.google.android.onetimeinitializer
+com.tcl.hearaid
+com.tcl.t_solo
+com.tcl.UpdatePeripheral
+com.tcl.smartalexa
+com.tcl.ui_mediaCenter
+com.google.android.katniss
+com.tcl.airplay2
+com.mediatek.AirplayAPK
+com.mediatek.airplaydaemon
+com.tcl.miracast
+com.tcl.magiconnectfree
+com.netflix.ninja
+com.netflix.tokenmanager
+com.amazon.amazonvideo.livingroom
+com.google.android.videos
+com.google.android.play.games
+com.google.android.apps.tv.launcherx
+com.google.android.tungsten.setupwraith

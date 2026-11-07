@@ -1,0 +1,27 @@
+# UrTV community list: noblex-shinjuku
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/noblex-shinjuku/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: NOBLEX
+# match-model: NOBLEXTV
+# match-device: 
+
+android.autoinstalls.config.skyworth
+fusion.android.tv.demo
+com.smartdevice.common.demonow
+com.mstar.android.tv.disclaimercustomization
+com.Smartdevice.emanual
+com.google.android.feedback
+com.google.android.apps.nbu.smartconnect.tv
+com.mediatek.testpq
+com.google.android.tvrecommendations
+com.smartdevice.leanbacklauncher.customizer
+com.google.android.katniss
+com.google.android.backdrop
+com.google.android.play.games
+com.google.android.youtube.tvmusic
+com.mubi
+com.airoha.ble.ota
+com.android.providers.calendar
+com.google.android.syncadapters.calendar

@@ -1,0 +1,26 @@
+# UrTV community list: toshiba-cosmos-android-tv
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/toshiba-cosmos-android-tv/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TOSHIBA
+# match-model: 
+# match-device: 
+
+com.vestel.vestelreporter
+fusion.android.tv.demo
+android.autoinstalls.config.vestel.cosmos
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.partnercustomizer
+com.google.android.feedback
+com.google.android.syncadapters.calendar
+com.google.android.videos
+com.google.android.play.games
+com.google.android.apps.nbu.smartconnect.tv
+com.google.android.backdrop
+com.google.android.youtube.tv
+com.google.android.youtube.tvmusic
+com.amazon.amazonvideo.livingroom
+com.mediatek.wwtv.mediaplayer
+com.mediatek.tv.freeviewplay
+com.google.android.tvlauncher

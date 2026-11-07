@@ -1,0 +1,54 @@
+# UrTV community list: tcl-43s450f-ca
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-43s450f-ca/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: 43S450FCA AFTDEC012E
+# match-device: 
+
+com.amazon.client.metrics.api
+com.amazon.neo.minerva
+com.amazon.neo.minerva.logcat
+com.amazon.wirelessmetrics.service
+com.amazon.perfcollection
+com.amazon.perfc
+com.amazon.dp.logger
+com.amazon.ceviche
+com.amazon.tv.developer.dataservice
+com.amazon.device.telemetry.emitter
+com.amazon.livedeviceservice
+com.amazon.privacypassservice
+com.amazon.wifilocker
+com.amazon.tv.acr
+com.amazon.audiolatencymeasurer
+com.amazon.kso.blackbird
+com.amazon.sneakpeek
+com.amazon.hybridadidservice
+com.amazon.media.recommendations
+com.amazon.tv.easyupgrade
+com.amazon.shoptv.client
+com.amazon.hedwig
+com.amazon.tv.democontent.provider
+com.amazon.systemnotices
+com.amazon.tv.releasenotes
+com.amazon.uxnotification
+com.amazon.tv.earlyaccess
+com.amazon.bueller.photos
+com.amazon.tahoe
+com.amazon.minitv.android.app
+com.amazon.cloud9
+com.amazon.tv.website_launcher
+com.amazon.naatyam
+com.amazon.tmm.tutorial
+com.amazon.storm.lightning.tutorial
+ca.bellmedia.cravetv
+com.cbs.ca
+com.wbd.stream
+com.apple.atve.amazon.appletv
+com.amazon.whisperjoin.middleware.v2.np
+com.amazon.tv.ffsprovisioneeclient
+com.amazon.ods.kindleconnect
+com.amazon.smarthomemapviewapp
+com.amazon.tv.mattercohost
+com.amazon.ftv.screensaver

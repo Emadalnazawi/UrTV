@@ -1,0 +1,27 @@
+UthmanicHafs-v30.woff2: KFGQPC HAFS Uthmanic Script, version 3.0
+Copyright (c) 2010 King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Al-Munawwarah.
+Publisher: https://fonts.qurancomplex.gov.sa/
+
+Used for the Quran text only («آية اليوم» and the Quranic adhkar), together with the text made for it:
+the KFGQPC / QPC Hafs text (assets/shared/verses.json and adhkar.json, field "uthmani"), compared in CI
+(.github/tools/verify_uthmani.py) code point for code point with the `text_qpc_hafs` field of the Quran.com
+API v4 for all 500 verses and the Quranic adhkar. The ayah-end sign is kept as U+06DD and the number, the
+form this font draws as the ornament (the API gives a no-break space and the digits, which draw as plain digits).
+Never show this text in another font, nor another Quran text in this font.
+
+Source of this copy: the font file UthmanicHafs-v-3.0.ttf shipped in the npm package @quran.ws/text 0.1.0
+(https://registry.npmjs.org/@quran.ws/text/-/text-0.1.0.tgz, CC-BY-4.0 for the package's data; the font keeps
+KFGQPC's own licence), SHA-256 of that TTF
+5c47602425fb4190327ab9e1a2e8ed2f53dceaf595d8ccc29ac32b8b209ad398 (the hash the package records for the
+publisher's UthmanicHafs-v-3.0.zip member).
+
+Checked in CI (.github/tools/verify_uthmani.py, report on the data-quran-verify branch) against the publisher's own
+release, https://fonts.qurancomplex.gov.sa/ (KFGQPC-Hafs-V30.zip, KFGQPC Hafs V30.ttf, SHA-256
+c9dd7e71a454565b13d89e5e6f2663a918acb0a20a23eea31eccb32a3aeec47a): the same 611 code points with the same
+advance widths and the same outlines as this copy. The file hash differs from the one above (the two files are
+not byte for byte the same), the glyphs are the same.
+The only change: the TTF is wrapped as WOFF2 (lossless container, every glyph and table kept; no subsetting).
+
+The font's own licence (name table, id 13), in short: free of cost to use, copy and distribute; the font
+cannot be sold, modified, altered, translated, reverse engineered, decompiled, disassembled or reproduced.
+That last part is why the font is NOT subset at build time: the whole, unmodified font is embedded.

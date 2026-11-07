@@ -26,10 +26,21 @@ Incremental: the matches decide the clubs every run (about 70 requests), but a t
 Wikidata lookups, and known league ids and national teams are reused. RUN_FULL=1 (the monthly run, or a manual run
 with "full") checks everything again.
 
+Other sports: Prefs.LEAGUES also holds team leagues of other sports (NBA, NFL, ...; LEAGUES[...]["sport"], football
+by default), collected exactly like football leagues, one runner each; every team in teams.json has its "sport".
+Their Arabic names are in teams-ar.json (city and name as Saudi screens write them), which wins as for clubs. A
+team of another sport is told apart from a club of the same name by its sport: «الأهلي (كرة السلة)».
+
+Events (Formula 1, UFC, boxing, tennis): not teams but races, cards and tournaments. The "Events" part finds their
+leagues on TheSportsDB by name and writes teams/events.json ({"f1": [{id, name}], ...}, the next
+assets/shared/events.json, which the page reads to ask each league for its next events); tennis only when the
+free API gives it upcoming events. Its report holds what each league answered (names, dates, countries), for
+checking what the screen can parse. It also looks for a Saudi basketball league (report["saudi basketball"]).
+
 In CI: `plan` lists the parts, `collect --part NAME` runs on one runner per league and one for the national teams,
 and `merge` puts them together; with no arguments it does all three in one process.
 
-Writes teams/teams.json ([{id, en, ar, arFrom, leagues, alt}], the next assets/shared/teams.json),
+Writes teams/teams.json ([{id, en, ar, arFrom, sport, leagues, alt}], the next assets/shared/teams.json),
 teams/teams-cache.json (the next .github/tools/teams-cache.json), teams/diff.json and teams/diff.md (added, removed
 and renamed against assets/shared/teams.json) and teams/report.json (with the requests made). Exits 1 after writing
 them if a check failed, so the run shows red with its data still there for review.
@@ -80,8 +91,20 @@ LEAGUES = {
     "Qatar Stars League": {"country": "Qatar", "wd": {"Q846"}, "adj": "القطري", "min": 12},
     "American Major League Soccer": {"country": "United States", "wd": {"Q30", "Q16"}, "adj": "الأمريكي", "min": 30,
                                      "calendar": True},
+    # other sports: "sport" is TheSportsDB's strSport. The NBA names its seasons "2025-2026", the NFL "2025"; both
+    # have a Canadian or foreign side in preseason games, so the league's own team list decides who belongs
+    "NBA": {"sport": "Basketball", "country": "United States", "wd": {"Q30", "Q16"}, "adj": "الأمريكي", "min": 30},
+    "NFL": {"sport": "American Football", "country": "United States", "wd": {"Q30"}, "adj": "الأمريكي", "min": 32,
+            "calendar": True},
 }
-GUESSES = {"Portuguese Primeira Liga": "4344", "Turkish Super Lig": "4339"}   # used only if the name matches
+for _l in LEAGUES.values():
+    _l.setdefault("sport", "Soccer")
+SPORT_AR = {"Soccer": "كرة القدم", "Basketball": "كرة السلة", "American Football": "كرة القدم الأمريكية"}
+# what a Wikidata description of a team of each sport says, and Wikidata's class for such a team
+SPORT_WORDS = {"Soccer": re.compile(r"football|soccer", re.I), "Basketball": re.compile(r"basketball", re.I),
+               "American Football": re.compile(r"american football|gridiron|national football league", re.I)}
+SPORT_CLASS = {"Soccer": "Q476028", "Basketball": "Q13393265", "American Football": "Q17156793"}
+GUESSES = {"Portuguese Primeira Liga": "4344", "Turkish Super Lig": "4339", "NBA": "4387", "NFL": "4391"}   # used only if the name matches
 ALIASES = {"United States": ["USA", "United States of America"], "Jordan": ["Jordan national football team"],
            "South Korea": ["Korea Republic"], "Iran": ["IR Iran"], "China": ["China PR"]}
 NATIONAL = {   # national teams: TheSportsDB's English name -> our Arabic name
@@ -110,6 +133,12 @@ NOT_A_CLUB = re.compile(r"women|female|ladies|futsal|basketball|handball|volleyb
 # letters Thmanyah (the screen's font) lacks, as Arabic writes them
 FONT_FIX = str.maketrans({"گ": "ج", "ژ": "ج", "ڨ": "ق", "ی": "ي", "ک": "ك", "ۀ": "ه", "ہ": "ه", "ھ": "ه", "ە": "ه",
                           "ۆ": "و", "ٱ": "ا"})
+
+
+def not_a_club(desc, sport="Soccer"):   # a basketball team is "basketball" in its description, not a mistake
+    return bool(NOT_A_CLUB.search(re.sub("basketball", "", desc, flags=re.I) if sport == "Basketball" else desc))
+
+
 ARABIC_NAME = re.compile(r"[\u0621-\u063A\u0641-\u064A\u0660-\u0669\u067E\u0686\u06A4 .'\-]+")
 
 
@@ -312,7 +341,12 @@ def league_ids(names, cached=None):
     for country in dict.fromkeys(LEAGUES[n]["country"] for n in names if n in LEAGUES):
         if all(n in ids for n in names):
             break
-        found = get("search_all_leagues.php?" + urllib.parse.urlencode({"c": country, "s": "Soccer"}))
+        sports = {LEAGUES[n]["sport"] for n in names if n in LEAGUES and LEAGUES[n]["country"] == country}
+        found = {}
+        for sport in sorted(sports):
+            got = get("search_all_leagues.php?" + urllib.parse.urlencode({"c": country, "s": sport}))
+            for k in ("countries", "countrys", "leagues"):
+                found.setdefault(k, []).extend(got.get(k) or [])
         for l in found.get("countries") or found.get("countrys") or found.get("leagues") or []:
             ids.setdefault(l["strLeague"], l["idLeague"])
     for name, i in GUESSES.items():
@@ -320,6 +354,26 @@ def league_ids(names, cached=None):
             if name in [l.get("strLeague") for l in get(f"lookupleague.php?id={i}").get("leagues") or []]:
                 ids[name] = i
     return ids
+
+
+def fill_by_id(lid, name, every, reach=6, limit=24):
+    """The free API shows a league's first 100 games and its team lists hold 10, which leaves a league of 30 teams a
+    few short early in a season. TheSportsDB numbers a league's teams one after another (the NBA's are 134860-134889),
+    so the ids next to those found are looked up, and kept when they answer as teams of this league. Returns the
+    ids asked."""
+    known = [int(i) for i in every if i.isdigit()]
+    asked = 0
+    if len(every) >= LEAGUES[name]["min"] or not known:
+        return asked
+    for i in [x for x in range(min(known) - reach, max(known) + reach + 1) if str(x) not in every]:
+        if len(every) >= LEAGUES[name]["min"] or asked >= limit:
+            break
+        asked += 1
+        hit = (get(f"lookupteam.php?id={i}").get("teams") or [None])[0]
+        if hit and str(hit.get("idLeague")) == str(lid) and hit.get("strSport") == LEAGUES[name]["sport"] \
+                and hit.get("strTeam"):
+            every[str(i)] = hit["strTeam"].strip()
+    return asked
 
 
 def collect_league(name, lid, today, teams, report, problems):
@@ -340,8 +394,21 @@ def collect_league(name, lid, today, teams, report, problems):
     every = {}
     for found in [*seasons.values(), rounds]:
         every.update(found)
+    if LEAGUES[name]["sport"] != "Soccer":   # preseason games name foreign sides: the league's own list decides
+        own = {str(t["idTeam"]): t["strTeam"].strip() for t in get("search_all_teams.php?" + urllib.parse.urlencode(
+            {"l": name})).get("teams") or [] if t.get("idTeam") and t.get("strTeam")}
+        report.setdefault("league team lists", {})[name] = len(own)
+        if len(own) >= LEAGUES[name]["min"]:
+            every = {i: own[i] for i in own}
+            rounds = {i: en for i, en in rounds.items() if i in own}
+            for found in seasons.values():
+                for i in [i for i in found if i not in own]:
+                    del found[i]
+        else:
+            every.update(own)
+            report.setdefault("ids looked up next to the found ones", {})[name] = fill_by_id(lid, name, every)
     for i, en in every.items():
-        t = teams.setdefault(i, {"en": en, "leagues": []})
+        t = teams.setdefault(i, {"en": en, "leagues": [], "sport": LEAGUES[name]["sport"]})
         if name not in t["leagues"]:
             t["leagues"].append(name)
     # the newest season with matches is the current one: its last and next rounds belong to it
@@ -361,12 +428,19 @@ def collect_league(name, lid, today, teams, report, problems):
                         break
     report["clubs per league"][name] = {"clubs": len(every), "seasons": {s: len(f) for s, f in clubs_in.items()},
                                         "last and next rounds": len(rounds)}
+    for k in ("ids looked up next to the found ones", "league team lists"):
+        if name in report.get(k, {}):
+            report["clubs per league"][name][k] = report[k][name]
     if any(without.values()):
         report["clubs per league"][name]["named in matches without an id"] = {s: v for s, v in without.items() if v}
     print(f"{name}: {len(every)} clubs {report['clubs per league'][name]['seasons']}", flush=True)
     if len(seasons) < 2:
         problems.append(f"{name}: matches found for {len(seasons)} of the last two seasons")
     for s, found in clubs_in.items():   # a club without an id still counts: the season's data is all there
+        if LEAGUES[name]["sport"] != "Soccer":   # the free API shows 100 games of a season: the union above is checked
+            if len(every) < LEAGUES[name]["min"]:
+                problems.append(f"{name}: {len(every)} teams, at least {LEAGUES[name]['min']} expected")
+            break
         if len(found) + len(without[s]) < LEAGUES[name]["min"]:
             problems.append(f"{name} {s}: {len(found)} clubs"
                             + (f" and {len(without[s])} without an id" if without[s] else "")
@@ -462,8 +536,11 @@ def wikidata_arabic(teams, report, cache=None):
     first. A team looked up before under the same name keeps that answer (none too: a full run asks again)."""
     found, notes = {}, report["wikidata"]
     need = {}
+    _, curated_names, _ = curated()
     for i, t in teams.items():
         c = (cache or {}).get("teams", {}).get(i)
+        if t.get("sport", "Soccer") != "Soccer" and curated_names.get(team_key(t["en"])):
+            continue   # ours wins anyway: no request for a team of another sport whose name we wrote
         # a team without a name, or with only a transliteration, is asked about again: Wikidata may have it by now
         if c and "wd" in c and team_key(c.get("en", "")) == team_key(t["en"]) \
                 and c.get("arFrom") not in ("translit", "missing"):
@@ -503,7 +580,7 @@ def wikidata_arabic(teams, report, cache=None):
                 for r in rows:
                     by_id.setdefault(r["id"]["value"], {})[r["item"]["value"]] = {k: v["value"] for k, v in r.items()}
                 for i, items in by_id.items():
-                    good = [v for v in items.values() if not NOT_A_CLUB.search(v.get("desc", ""))
+                    good = [v for v in items.values() if not not_a_club(v.get("desc", ""), teams[i].get("sport", "Soccer"))
                             and same_team(teams[i]["en"], v.get("en", ""))]
                     if len(good) != 1:
                         notes["ids on several or unlike items"].append(f"{i} {teams[i]['en']}: "
@@ -552,12 +629,12 @@ def by_name(teams, found, notes):
         for i in rest:
             if search == "clubs":
                 d = wiki(WIKIDATA, {"action": "query", "list": "search", "srnamespace": 0, "srlimit": 5,
-                                    "srsearch": f'{teams[i]["en"]} haswbstatement:P31=Q476028'})
+                                    "srsearch": f'{teams[i]["en"]} haswbstatement:P31={SPORT_CLASS[teams[i].get("sport", "Soccer")]}'})
                 candidates[i] = [h["title"] for h in d.get("query", {}).get("search", [])]
             else:
                 d = wiki(WIKIDATA, {"action": "wbsearchentities", "search": teams[i]["en"], "language": "en",
                                     "type": "item", "limit": 7})
-                candidates[i] = [h["id"] for h in d.get("search", []) if FOOTBALL.search(h.get("description", ""))]
+                candidates[i] = [h["id"] for h in d.get("search", []) if SPORT_WORDS[teams[i].get("sport", "Soccer")].search(h.get("description", ""))]
         accept(teams, rest, candidates, entities, found)
         notes[f"matched by a search of {search}"] = sum(1 for i in rest if i in found)
     notes["matched by name"] = sum(1 for i in left if i in found)
@@ -580,7 +657,8 @@ def accept(teams, ids, candidates, entities, found):
             en = ((e.get("labels") or {}).get("en") or {}).get("value", "")
             where = {((c.get("mainsnak") or {}).get("datavalue") or {}).get("value", {}).get("id")
                      for c in (e.get("claims") or {}).get("P17", [])}
-            if not FOOTBALL.search(desc) or NOT_A_CLUB.search(desc) or (where and country and not where & country) \
+            sport = teams[i].get("sport", "Soccer")
+            if not SPORT_WORDS[sport].search(desc) or not_a_club(desc, sport) or (where and country and not where & country) \
                     or not same_team(teams[i]["en"], en) or (SIDE.search(en) and not SIDE.search(teams[i]["en"])):
                 continue
             ar = ((e.get("labels") or {}).get("ar") or {}).get("value", "")
@@ -649,6 +727,13 @@ def unique_names(teams, report, problems):
             if t["ar"]:
                 g.setdefault(plain_ar(t["ar"]), []).append(i)
         return [v for v in g.values() if len(v) > 1]
+    for ids in groups():   # the same name in two sports: the one that is not football says its sport
+        if len({teams[i].get("sport", "Soccer") for i in ids}) > 1:
+            for i in ids:
+                t = teams[i]
+                if t.get("sport", "Soccer") != "Soccer":
+                    before, t["ar"] = t["ar"], f"{t['ar']} ({SPORT_AR.get(t['sport'], t['sport'])})"
+                    report["names told apart"].append(f"{i} {t['en']}: {before} -> {t['ar']}")
     for ids in groups():
         national = [i for i in ids if NATIONAL_LEAGUE in teams[i]["leagues"]]
         saudi = [i for i in ids if i not in national and is_saudi(teams[i])]
@@ -676,7 +761,7 @@ def unique_names(teams, report, problems):
 def diff(old, new):
     """Added, removed and renamed teams, and teams that changed leagues, for the monthly review."""
     o, n = {t["id"]: t for t in old}, {t["id"]: t for t in new}
-    brief = lambda t: {k: t.get(k) for k in ("id", "en", "ar", "leagues")}   # noqa: E731
+    brief = lambda t: {k: t.get(k) for k in ("id", "en", "ar", "sport", "leagues")}   # noqa: E731
     return {
         "added": [brief(n[i]) for i in n if i not in o],
         "removed": [brief(o[i]) for i in o if i not in n],
@@ -724,8 +809,77 @@ def slug(name):
 
 
 def plan():
-    """The parts, for the workflow's matrix: every league of Prefs.LEAGUES, then the national teams."""
-    return [{"name": n, "slug": slug(n)} for n in prefs_leagues() + [NATIONAL_LEAGUE]]
+    """The parts, for the workflow's matrix: every league of Prefs.LEAGUES, the national teams, then the events."""
+    return [{"name": n, "slug": slug(n)} for n in prefs_leagues() + [NATIONAL_LEAGUE, EVENTS_PART]]
+
+
+# ---------- events: races, cards and tournaments, not teams
+
+EVENTS_PART = "Events"
+# the page's #events= key -> how TheSportsDB names its leagues (all_leagues.php); tennis also needs strSport "Tennis"
+EVENT_LEAGUES = {
+    "f1": re.compile(r"^formula (?:1|one)$", re.I),
+    "ufc": re.compile(r"^(?:ufc|ultimate fighting championship)$", re.I),
+    "boxing": re.compile(r"^(?:pro(?:fessional)? )?boxing$", re.I),
+    "tennis": re.compile(r"\b(?:atp|wta)\b", re.I),
+}
+EVENT_LOOSE = re.compile(r"formula|ufc|mma|boxing|\batp\b|\bwta\b|tennis|grand slam", re.I)   # for the report
+EVENT_FIELDS = ("strEvent", "strEventAlternate", "strLeague", "strHomeTeam", "strAwayTeam", "dateEvent", "strTime",
+                "strTimestamp", "strVenue", "strCity", "strCountry", "strStatus", "strSeason", "intRound")
+MAX_TENNIS = 3
+# TheSportsDB league ids around the ones events live at (Formula 1 4370, UFC 4443, ATP/WTA 4464/4517...): which is
+# which is read from what each answers, never assumed
+EVENT_IDS = [4370, 4443, 4444, 4445, 4446, 4447, 4448, 4449, 4450, 4464, 4465, 4466, 4467, 4468, 4517, 4518, 4519, 4520]
+
+
+def event_sample(events, n=6):   # what a league answers, for reading the report (the screen parses these fields)
+    return [{k: e.get(k) for k in EVENT_FIELDS if e.get(k) not in (None, "")} for e in (events or [])[:n]]
+
+
+def collect_events(report, problems):
+    """{key: [{id, name}]} for #events=: each wanted league found by name, tennis only if it has upcoming events.
+    Also looks for a Saudi basketball league. The report keeps what each league answered."""
+    leagues = list(get("all_leagues.php").get("leagues") or [])
+    notes = report.setdefault("events", {})
+    notes["all_leagues.php gave"] = len(leagues)
+    # the free key's list holds 10 leagues: look the likely ids up one by one, as the report shows
+    notes["lookupleague.php"] = {}
+    for i in EVENT_IDS:
+        got = (get(f"lookupleague.php?id={i}").get("leagues") or [{}])[0]
+        notes["lookupleague.php"][str(i)] = [got.get("strLeague"), got.get("strSport")]
+        if got.get("strLeague") and got["idLeague"] not in {l.get("idLeague") for l in leagues}:
+            leagues.append(got)
+    notes["leagues that look like events"] = [{"id": l["idLeague"], "name": l["strLeague"], "sport": l.get("strSport")}
+                                              for l in leagues if EVENT_LOOSE.search(l.get("strLeague", ""))][:60]
+    found = {}
+    for key, rx in EVENT_LEAGUES.items():
+        hits = [l for l in leagues if rx.search(l.get("strLeague", "")) and (key != "tennis" or l.get("strSport") == "Tennis")]
+        notes[key] = []
+        for l in hits[:8]:
+            nxt = get(f"eventsnextleague.php?id={l['idLeague']}").get("events") or []
+            past = get(f"eventspastleague.php?id={l['idLeague']}").get("events") or []
+            notes[key].append({"id": l["idLeague"], "name": l["strLeague"], "sport": l.get("strSport"),
+                               "upcoming": len(nxt), "past": len(past), "next": event_sample(nxt),
+                               "last": event_sample(past, 4)})
+            if key != "tennis" or nxt:
+                found.setdefault(key, []).append({"id": str(l["idLeague"]), "name": l["strLeague"]})
+        if key == "tennis":
+            found["tennis"] = found.get("tennis", [])[:MAX_TENNIS]
+            if not found["tennis"]:
+                notes["tennis"].append("skipped: no ATP/WTA league with upcoming events on the free API")
+                found.pop("tennis")
+        elif key not in found:
+            problems.append(f"events: no TheSportsDB league named like {key} ({rx.pattern})")
+        elif key != "boxing":
+            found[key] = found[key][:1]   # one league is the sport; boxing may hold several promotions' leagues
+    saudi = [{"id": l["idLeague"], "name": l["strLeague"]} for l in leagues
+             if l.get("strSport") == "Basketball" and re.search("saudi", l.get("strLeague", ""), re.I)]
+    if not saudi:
+        for l in get("search_all_leagues.php?" + urllib.parse.urlencode({"c": "Saudi Arabia", "s": "Basketball"})) \
+                .get("countries") or []:
+            saudi.append({"id": l["idLeague"], "name": l["strLeague"]})
+    notes["saudi basketball"] = saudi or "no Saudi basketball league on TheSportsDB"
+    return found
 
 
 def new_report():
@@ -745,12 +899,15 @@ def collect_part(part, today, cache, listed):
                 hit = find_national(en, teams, report, cache, listed)
                 if hit:
                     national[en] = list(hit)
-                    teams.setdefault(hit[0], {"en": hit[1], "leagues": []})
+                    teams.setdefault(hit[0], {"en": hit[1], "leagues": [], "sport": "Soccer"})
                     teams[hit[0]].update(ar=ar)
                     teams[hit[0]]["leagues"].append(NATIONAL_LEAGUE)
             out["national"] = national
             report["problems"] += [f"national team not found: {x}" for x in report["national teams not found"]]
             print(len(national), "of", len(NATIONAL), "national teams", flush=True)
+        elif part == EVENTS_PART:
+            out["events"] = collect_events(report, report["problems"])
+            print({k: [l["name"] for l in v] for k, v in out["events"].items()}, flush=True)
         elif part not in LEAGUES:
             report["problems"].append(f"{part} is in Prefs.LEAGUES but not in team_ids.py's LEAGUES (country, minimum)")
         else:
@@ -787,7 +944,8 @@ def merge(parts, today, cache, started=None):
     problems = report["problems"]
     by_part = {p["part"]: p for p in parts}
     teams, national, league_id = {}, {}, {}
-    for name in leagues + [NATIONAL_LEAGUE]:
+    events = {}
+    for name in leagues + [NATIONAL_LEAGUE, EVENTS_PART]:
         p = by_part.get(name)
         if p is None:
             problems.append(f"{name}: no data from its collection (the job failed before writing it)")
@@ -806,6 +964,9 @@ def merge(parts, today, cache, started=None):
                                                 "rate limited (429)": p["requests"]["rate limited (429)"],
                                                 "minutes": p["minutes"]}
         national.update(p.get("national", {}))
+        events.update(p.get("events", {}))
+        if "events" in r:
+            report["events"] = r["events"]
         if "league id" in p:
             league_id[name] = p["league id"]
         for i, t in p["teams"].items():
@@ -825,7 +986,8 @@ def merge(parts, today, cache, started=None):
     problems += [f"no Arabic name for {t['en']} ({i}, {', '.join(t['leagues'])}): add it to assets/shared/teams-ar.json"
                  for i, t in teams.items() if t["arFrom"] == "missing"]
     order = leagues + [NATIONAL_LEAGUE]
-    out = [{"id": i, "en": t["en"], "ar": t["ar"], "arFrom": t["arFrom"], "leagues": t["leagues"], "alt": alt_names(t)}
+    out = [{"id": i, "en": t["en"], "ar": t["ar"], "arFrom": t["arFrom"],
+            "sport": t.get("sport", "Soccer"), "leagues": t["leagues"], "alt": alt_names(t)}
            for i, t in teams.items()]
     out.sort(key=lambda t: (order.index(t["leagues"][0]), t["en"]))
     new_cache = {"leagues": league_id, "national": national,
@@ -845,6 +1007,7 @@ def merge(parts, today, cache, started=None):
     d = diff(old, out)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "teams.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (OUT / "events.json").write_text(json.dumps(events, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (OUT / "teams-cache.json").write_text(json.dumps(new_cache, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
     (OUT / "diff.json").write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (OUT / "diff.md").write_text(diff_md(d, len(old), len(out)), encoding="utf-8")
@@ -882,7 +1045,7 @@ def main(argv=None):
         problems = merge(parts, today, cache)
     else:
         names = [x["name"] for x in plan()]
-        guess = (0 if all(n in cache["leagues"] for n in names[:-1]) else 15) + 5 * (len(names) - 1) \
+        guess = (0 if all(n in cache["leagues"] for n in names[:-2]) else 15) + 5 * (len(names) - 2) + 20 \
             + 3 * sum(en not in cache["national"] for en in NATIONAL) + (0 if listed or cache["teams"] else 420)
         print(f"{'full' if FULL else 'incremental'} run: about {guess} TheSportsDB requests, "
               f"{guess * PACE / 60:.0f} minutes or more in one process", flush=True)

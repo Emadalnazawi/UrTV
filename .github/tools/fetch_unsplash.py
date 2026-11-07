@@ -11,15 +11,24 @@ from pathlib import Path
 
 # Free key from unsplash.com/developers, stored as the UNSPLASH_ACCESS_KEY repository secret.
 KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
-UA = {"User-Agent": "urtv background picker", "Accept-Version": "v1", "Authorization": "Client-ID " + KEY}
+UA = {"User-Agent": "urtv background picker", "Accept-Version": "v1"}
+API_HOST = "api.unsplash.com"
 QUERIES = ["AlUla", "Saudi Arabia landscape", "Saudi Arabia desert", "Riyadh skyline", "Jeddah", "Abha",
            "Edge of the World Saudi", "Hegra", "Saudi Arabia mountains", "Red Sea Saudi", "Tabuk", "Diriyah",
            "NEOM", "Saudi Arabia night", "Empty Quarter"]
 
 
+def headers_for(url):
+    """The key goes only to the API itself: the image URLs in its answers are other hosts (a CDN) and must never get it."""
+    u = urllib.parse.urlsplit(url)
+    if u.scheme == "https" and u.hostname == API_HOST:
+        return dict(UA, Authorization="Client-ID " + KEY)
+    return dict(UA)
+
+
 def get(url, raw=False):
     time.sleep(1.5)
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+    with urllib.request.urlopen(urllib.request.Request(url, headers=headers_for(url)), timeout=60) as r:
         return r.read() if raw else json.load(r)
 
 

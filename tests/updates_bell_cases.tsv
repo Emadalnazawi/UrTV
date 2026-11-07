@@ -1,0 +1,18 @@
+# op	args	expected (last column)
+# the bell: only a wanted setting, no kids mode, a usable store, and real evidence
+shown	1	0	1	WAITING	yes
+shown	0	0	1	WAITING	no
+shown	1	1	1	WAITING	no
+shown	1	0	0	WAITING	no
+shown	1	0	1	NONE	no
+shown	1	0	1	UNKNOWN	no
+# the source: asked on the first look, not again inside 6 hours, again on a return (force), again at 6 hours, again when the clock went back
+asks	0@1000	WAITING	1 WAITING
+asks	0@1000,0@2000,0@21600999	WAITING	1 WAITING
+asks	0@1000,0@21601000	WAITING	2 WAITING
+asks	0@1000,1@2000	NONE	2 NONE
+asks	0@5000,0@4000	WAITING	2 WAITING
+# unknown and a failing source are no bell, and an empty answer is unknown
+asks	1@0	UNKNOWN	1 UNKNOWN
+asks	1@0	THROW	1 UNKNOWN
+asks	1@0	NULL	1 UNKNOWN

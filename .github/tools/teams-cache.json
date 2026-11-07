@@ -13,7 +13,9 @@
 "Egyptian Premier League": "4829",
 "UAE Pro League": "4678",
 "Qatar Stars League": "4663",
-"American Major League Soccer": "4346"
+"American Major League Soccer": "4346",
+"NBA": "4387",
+"NFL": "4391"
 },
 "national": {
 "Saudi Arabia": [
@@ -3258,6 +3260,794 @@
 ],
 "arFrom": "wikidata"
 },
+"134860": {
+"en": "Boston Celtics",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Boston Celtics",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134861": {
+"en": "Brooklyn Nets",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Brooklyn Nets",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134862": {
+"en": "New York Knicks",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New York Knicks",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134863": {
+"en": "Philadelphia 76ers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Philadelphia 76ers",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134864": {
+"en": "Toronto Raptors",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Toronto Raptors",
+"alt": [],
+"country": "Canada",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134865": {
+"en": "Golden State Warriors",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Golden State Warriors",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134866": {
+"en": "Los Angeles Clippers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Los Angeles Clippers",
+"alt": [
+"LA Clippers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134867": {
+"en": "Los Angeles Lakers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Los Angeles Lakers",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134868": {
+"en": "Phoenix Suns",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Phoenix Suns",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134869": {
+"en": "Sacramento Kings",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Sacramento Kings",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134870": {
+"en": "Chicago Bulls",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Chicago Bulls",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134871": {
+"en": "Cleveland Cavaliers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Cleveland Cavaliers",
+"alt": [
+"Cavs"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134872": {
+"en": "Detroit Pistons",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Detroit Pistons",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134873": {
+"en": "Indiana Pacers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Indiana Pacers",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134874": {
+"en": "Milwaukee Bucks",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Milwaukee Bucks",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134875": {
+"en": "Dallas Mavericks",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Dallas Mavericks",
+"alt": [
+"Mavs"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134876": {
+"en": "Houston Rockets",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Houston Rockets",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134877": {
+"en": "Memphis Grizzlies",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Memphis Grizzlies",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134878": {
+"en": "New Orleans Pelicans",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New Orleans Pelicans",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134879": {
+"en": "San Antonio Spurs",
+"checked": "2026-10-23",
+"lookup": {
+"name": "San Antonio Spurs",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134880": {
+"en": "Atlanta Hawks",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Atlanta Hawks",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134881": {
+"en": "Charlotte Hornets",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Charlotte Hornets",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134882": {
+"en": "Miami Heat",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Miami Heat",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134883": {
+"en": "Orlando Magic",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Orlando Magic",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134884": {
+"en": "Washington Wizards",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Washington Wizards",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134885": {
+"en": "Denver Nuggets",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Denver Nuggets",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134886": {
+"en": "Minnesota Timberwolves",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Minnesota Timberwolves",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134887": {
+"en": "Oklahoma City Thunder",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Oklahoma City Thunder",
+"alt": [
+"OKC Thunder"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134888": {
+"en": "Portland Trail Blazers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Portland Trail Blazers",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134889": {
+"en": "Utah Jazz",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Utah Jazz",
+"alt": [],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134918": {
+"en": "Buffalo Bills",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Buffalo Bills",
+"alt": [
+"Bills"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134919": {
+"en": "Miami Dolphins",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Miami Dolphins",
+"alt": [
+"Dolphins"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134920": {
+"en": "New England Patriots",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New England Patriots",
+"alt": [
+"Patriots"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134921": {
+"en": "New York Jets",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New York Jets",
+"alt": [
+"Jets"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134922": {
+"en": "Baltimore Ravens",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Baltimore Ravens",
+"alt": [
+"Ravens"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134923": {
+"en": "Cincinnati Bengals",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Cincinnati Bengals",
+"alt": [
+"Bengals"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134924": {
+"en": "Cleveland Browns",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Cleveland Browns",
+"alt": [
+"Browns"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134925": {
+"en": "Pittsburgh Steelers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Pittsburgh Steelers",
+"alt": [
+"Steelers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134926": {
+"en": "Houston Texans",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Houston Texans",
+"alt": [
+"Texans"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134927": {
+"en": "Indianapolis Colts",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Indianapolis Colts",
+"alt": [
+"Colts"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134928": {
+"en": "Jacksonville Jaguars",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Jacksonville Jaguars",
+"alt": [
+"Jaguars"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134929": {
+"en": "Tennessee Titans",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Tennessee Titans",
+"alt": [
+"Titans"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134930": {
+"en": "Denver Broncos",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Denver Broncos",
+"alt": [
+"Broncos"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134931": {
+"en": "Kansas City Chiefs",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Kansas City Chiefs",
+"alt": [
+"Chiefs"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134932": {
+"en": "Las Vegas Raiders",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Las Vegas Raiders",
+"alt": [
+"Raiders"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134934": {
+"en": "Dallas Cowboys",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Dallas Cowboys",
+"alt": [
+"Cowboys"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134935": {
+"en": "New York Giants",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New York Giants",
+"alt": [
+"Giants"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134936": {
+"en": "Philadelphia Eagles",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Philadelphia Eagles",
+"alt": [
+"Eagles"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134937": {
+"en": "Washington Commanders",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Washington Commanders",
+"alt": [
+"Commanders"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134938": {
+"en": "Chicago Bears",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Chicago Bears",
+"alt": [
+"Bears"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134939": {
+"en": "Detroit Lions",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Detroit Lions",
+"alt": [
+"Lions"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134940": {
+"en": "Green Bay Packers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Green Bay Packers",
+"alt": [
+"Packers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134941": {
+"en": "Minnesota Vikings",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Minnesota Vikings",
+"alt": [
+"Vikings"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134942": {
+"en": "Atlanta Falcons",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Atlanta Falcons",
+"alt": [
+"Falcons"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134943": {
+"en": "Carolina Panthers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Carolina Panthers",
+"alt": [
+"Panthers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134944": {
+"en": "New Orleans Saints",
+"checked": "2026-10-23",
+"lookup": {
+"name": "New Orleans Saints",
+"alt": [
+"Saints"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134945": {
+"en": "Tampa Bay Buccaneers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Tampa Bay Buccaneers",
+"alt": [
+"Buccaneers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134946": {
+"en": "Arizona Cardinals",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Arizona Cardinals",
+"alt": [
+"Cardinals"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134948": {
+"en": "San Francisco 49ers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "San Francisco 49ers",
+"alt": [
+"49ers"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"134949": {
+"en": "Seattle Seahawks",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Seattle Seahawks",
+"alt": [
+"Seahawks"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
 "135292": {
 "en": "Orlando City",
 "checked": "2026-10-20",
@@ -3415,6 +4205,34 @@
 "alt": [],
 "country": "",
 "gender": ""
+},
+"wd": null,
+"arFrom": "curated"
+},
+"135907": {
+"en": "Los Angeles Rams",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Los Angeles Rams",
+"alt": [
+"Rams"
+],
+"country": "United States",
+"gender": "Male"
+},
+"wd": null,
+"arFrom": "curated"
+},
+"135908": {
+"en": "Los Angeles Chargers",
+"checked": "2026-10-23",
+"lookup": {
+"name": "Los Angeles Chargers",
+"alt": [
+"Chargers"
+],
+"country": "United States",
+"gender": "Male"
 },
 "wd": null,
 "arFrom": "curated"

@@ -1,0 +1,47 @@
+# kind, input, mode (12 or 24), digits, expected, note. time: hh:mm; face: h:mm without the suffix; suffix: the hour; on: the fragment's clock= value; sun: the greeting's sun line
+time	00:00	12	hindi	١٢:٠٠ ص	12-hour: midnight is 12 ص
+time	00:30	12	hindi	١٢:٣٠ ص	12-hour: just after midnight
+time	05:12	12	hindi	٥:١٢ ص	12-hour: Fajr, no zero in front
+time	11:59	12	hindi	١١:٥٩ ص	12-hour: the last minute of the morning
+time	12:00	12	hindi	١٢:٠٠ م	12-hour: noon is 12 م
+time	12:05	12	hindi	١٢:٠٥ م	12-hour: just after noon
+time	18:40	12	hindi	٦:٤٠ م	12-hour: Maghrib
+time	23:59	12	hindi	١١:٥٩ م	12-hour: the last minute of the day
+time	17:57	12	latin	5:57 م	12-hour, latin digits
+time	24:30	12	hindi	١٢:٣٠ ص	12-hour: an Isha after midnight is 12:30 ص, as the page says it
+time	00:00	24	hindi	٠٠:٠٠	24-hour: midnight
+time	00:30	24	hindi	٠٠:٣٠	24-hour: just after midnight
+time	05:12	24	hindi	٠٥:١٢	24-hour: the hour has two digits
+time	07:30	24	hindi	٠٧:٣٠	24-hour: 07:30
+time	11:59	24	hindi	١١:٥٩	24-hour: the last minute of the morning
+time	12:00	24	hindi	١٢:٠٠	24-hour: noon
+time	18:40	24	hindi	١٨:٤٠	24-hour: Maghrib
+time	23:59	24	hindi	٢٣:٥٩	24-hour: the last minute of the day
+time	24:30	24	hindi	٠٠:٣٠	24-hour: 24:30, an Isha after midnight, shows 00:30
+time	25:05	24	latin	01:05	24-hour: past 25:00 wraps too
+time	17:57	24	latin	17:57	24-hour, latin digits
+time	07:05	24	latin	07:05	24-hour, latin digits, zero in front
+time	nonsense	24	hindi	nonsense	not a time: left as it is
+time	5	12	hindi	5	no colon: left as it is
+face	7:05	12	hindi	٧:٠٥	12-hour clock face: no suffix, no zero in front of the hour
+face	0:07	12	hindi	١٢:٠٧	12-hour clock face: midnight is 12
+face	13:00	12	latin	1:00	12-hour clock face, latin digits
+face	7:05	24	hindi	٠٧:٠٥	24-hour clock face: the hour has two digits
+face	0:00	24	hindi	٠٠:٠٠	24-hour clock face: midnight
+face	23:59	24	latin	23:59	24-hour clock face, latin digits
+suffix	0	12	hindi	[ص]	12-hour: midnight is ص
+suffix	11	12	hindi	[ص]	12-hour: 11 is ص
+suffix	12	12	hindi	[م]	12-hour: noon is م
+suffix	23	12	hindi	[م]	12-hour: 23 is م
+suffix	24	12	hindi	[ص]	12-hour: 24 wraps to ص
+suffix	0	24	hindi	[]	24-hour: no suffix at midnight
+suffix	18	24	hindi	[]	24-hour: no suffix in the evening
+on	24			true	clock=24 is on
+on				false	nothing is off
+on	12			false	anything else is off
+on	24 			false	not exactly 24 is off
+on	on			false	on is not the value the page reads
+sun	17:57	12	hindi	الغروب ٥:٥٧ م	sun line, 12-hour (as before)
+sun	17:57	24	hindi	الغروب ١٧:٥٧	sun line, 24-hour
+sun	05:41	24	latin	الغروب 05:41	sun line, 24-hour, latin
+sun	05:41	12	latin	الغروب 5:41 ص	sun line, 12-hour, latin

@@ -10,6 +10,7 @@ com.tcl.t_solo
 
 # TCL extras
 com.tcl.gamebar                        # game bar overlay
+com.tcl.guard                          # the remote's Guard (cleaner) button opens only this, on TCL C05/G05
 com.tcl.interactive
 com.tcl.MultiScreenInteraction_TV      # T-Cast (AirPlay and Chromecast stay on)
 com.tcl.UpdatePeripheral               # accessory firmware updates

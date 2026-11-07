@@ -62,5 +62,104 @@ try:
     check("cloud container address: not OK", code == 1 and "not a home network address" in out, out)
 finally:
     socket.create_connection = real
+
+# ---- scan(): which device is the TV
+import tempfile
+
+FIND = {"192.168.1.23": "me", "192.168.1.10": "tv1", "192.168.1.11": "tv2", "192.168.1.1": "gw", "192.168.56.101": "vm"}
+INFO = {"192.168.1.10": {"name": "Living room", "manufacturer": "Acme", "model": "X1"},
+        "192.168.1.11": {"name": "Bedroom", "manufacturer": "Other", "model": "Y2"}}
+
+
+def scan_with(adb_hosts, info=INFO, route="192.168.1.1", ifaces="2: wlan0    inet 192.168.1.23/24 brd 192.168.1.255 scope global wlan0\n"
+              "3: vboxnet0    inet 192.168.56.1/24 scope global vboxnet0\n"):
+    saved = {k: getattr(ft, k) for k in ("local_ip", "run_text", "knock_all", "mdns_hosts", "neighbours", "cast_info", "fake_network",
+                                         "connects", "HOST_FILE")}
+    saved_state = (ft.wireless.load_state, ft.wireless.save_state)
+    d = tempfile.mkdtemp()
+    ft.HOST_FILE = d + "/.tv_host"
+    ft.local_ip = lambda: "192.168.1.23"
+    ft.run_text = lambda *c: ifaces if c[:2] == ("ip", "-o") else f"default via {route} dev wlan0\n" if c[:2] == ("ip", "route") else ""
+    ft.knock_all = lambda pairs, t, w=128: [p for p in pairs if p[0] in adb_hosts or p[1] == 8008 and p[0] in info]
+    ft.mdns_hosts, ft.neighbours, ft.fake_network = (lambda ip: ([], [])), (lambda: []), (lambda net: False)
+    ft.cast_info = lambda h: info.get(h, {})
+    ft.connects = lambda h, p, t=1.0: False
+    ft.wireless.load_state, ft.wireless.save_state = (lambda: {}), (lambda st: None)
+    out = io.StringIO()
+    try:
+        with redirect_stdout(out):
+            code = ft.scan()
+    finally:
+        for k, v in saved.items():
+            setattr(ft, k, v)
+        ft.wireless.load_state, ft.wireless.save_state = saved_state
+    f = Path(d) / ".tv_host"
+    return code, out.getvalue(), (f.read_text().strip() if f.exists() else None)
+
+
+code, out, saved_host = scan_with({"192.168.1.10", "192.168.1.11"})
+check("two candidates: exit 3, not saved", code == 3 and saved_host is None, (code, out, saved_host))
+check("two candidates listed with brand/model/name",
+      "1) 192.168.1.10 — Acme X1 (Living room)" in out and "2) 192.168.1.11 — Other Y2 (Bedroom)" in out, out)
+check("two candidates: the «!!» line", "!! More than one device answers with ADB open: ask the person which one is the TV (Settings → Network on the "
+      "TV shows its address), then run: optimize/find-tv.sh use <IP>" in out, out)
+code, out, saved_host = scan_with({"192.168.1.10"})
+check("one candidate: saved, brand/model printed", code == 0 and saved_host == "192.168.1.10" and "ADB open on: 192.168.1.10 — Acme X1 (Living room)" in out,
+      (code, out, saved_host))
+code, out, saved_host = scan_with({"192.168.1.10", "192.168.56.101", "192.168.1.1", "192.168.1.23"})
+check("VM subnet, gateway and own address skipped", code == 0 and saved_host == "192.168.1.10" and "56.101" not in out.split("Saved")[0].split("ADB open on")[-1], (code, out, saved_host))
+code, out, saved_host = scan_with({"192.168.1.1", "192.168.56.101", "192.168.1.23"})
+check("only non-TV addresses answer: nothing saved", code == 1 and saved_host is None and "No TV with ADB open" in out, (code, out, saved_host))
+code, out, saved_host = scan_with({"192.168.1.10", "192.168.1.12"}, info={})
+check("no Cast info: listed by address only", code == 3 and "1) 192.168.1.10\n" in out and "2) 192.168.1.12\n" in out, out)
+check("virtual interface network not scanned", "192.168.56" not in scan_with({"192.168.1.10"})[1].split("\n")[0], "")
+check("parse_gateways: ip route / route -n get / netstat / route print",
+      ft.parse_gateways("default via 192.168.1.1 dev eth0") == ["192.168.1.1"] and ft.parse_gateways("   gateway: 10.0.0.1") == ["10.0.0.1"]
+      and ft.parse_gateways("default            192.168.0.1        UGScg  en0") == ["192.168.0.1"]
+      and ft.parse_gateways("          0.0.0.0          0.0.0.0      192.168.2.1   192.168.2.5     25") == ["192.168.2.1"], "")
+# no known gateway: .1 is skipped only if it answers 80/443/53
+check("fallback: .1 answering 80 is the router", ft.candidates(["192.168.1.1", "192.168.1.10"], set(), set(), [], lambda h, p: p == 80) == ["192.168.1.10"], "")
+check("fallback: .1 answering nothing is kept", ft.candidates(["192.168.1.1"], set(), set(), [], lambda h, p: False) == ["192.168.1.1"], "")
+check("parse_ifaces names", ("vboxnet0", "192.168.56.1", 24) in ft.parse_ifaces("3: vboxnet0    inet 192.168.56.1/24 scope global vboxnet0")
+      and ("en0", "192.168.1.5", 24) in ft.parse_ifaces("en0: flags=8863<UP>\n\tinet 192.168.1.5 netmask 0xffffff00 broadcast 192.168.1.255"), "")
+check("virtual_ip: a bare address in a VM range is virtual; the same address inside a scanned network, or on a real interface, is not",
+      ft.virtual_ip("192.168.99.7") and not ft.virtual_ip("192.168.99.7", nets=[ft.ipaddress.ip_network("192.168.99.0/24")])
+      and not ft.virtual_ip("192.168.99.7", "wlan0") and ft.virtual_ip("192.168.99.7", "vboxnet0"), "")
+_saved_if = ft.interfaces
+ft.interfaces = lambda: [("wlan0", "192.168.99.23", 24), ("docker0", "172.17.0.1", 16)]
+nets = [str(n) for n in ft.my_networks("192.168.99.23")]
+ft.interfaces = _saved_if
+check("a home router that uses 192.168.99.x (a real interface, the route out) is scanned; docker0 is not", nets == ["192.168.99.0/24"], nets)
+
+
+# ---- use IP
+def use_with(arg, open_ports=(5555,), info=None, state=None):
+    saved = (ft.HOST_FILE, ft.cast_info, ft.wireless.load_state, ft.wireless.save_state)
+    d = tempfile.mkdtemp()
+    ft.HOST_FILE = d + "/.tv_host"
+    ft.cast_info = lambda h: info or {}
+    ft.wireless.load_state, ft.wireless.save_state = (lambda: state or {}), (lambda st: None)
+    out = io.StringIO()
+    try:
+        with redirect_stdout(out):
+            code = ft.use_cmd([arg], knock=lambda h, p: p in open_ports)
+    finally:
+        ft.HOST_FILE, ft.cast_info = saved[0], saved[1]
+        ft.wireless.load_state, ft.wireless.save_state = saved[2], saved[3]
+    f = Path(d) / ".tv_host"
+    return code, out.getvalue(), (f.read_text().strip() if f.exists() else None)
+
+
+code, out, h = use_with("192.168.1.10", info=INFO["192.168.1.10"])
+check("use: reachable home IP saved with brand/model", code == 0 and h == "192.168.1.10" and "TV: 192.168.1.10 — Acme X1 (Living room)" in out, (code, out, h))
+code, out, h = use_with("8.8.8.8")
+check("use: non-home IP refused", code == 2 and h is None and "!!" in out, (code, out, h))
+code, out, h = use_with("not-an-ip")
+check("use: not an IP refused", code == 2 and h is None, (code, out, h))
+code, out, h = use_with("192.168.1.10", open_ports=())
+check("use: unreachable refused", code == 1 and h is None and "!!" in out, (code, out, h))
+code, out, h = use_with("192.168.1.10", open_ports=(37123,), state={"host": "192.168.1.10", "port": 37123})
+check("use: remembered Wireless-debugging port accepted", code == 0 and h == "192.168.1.10", (code, out, h))
+
 print("\nall find-tv checks passed" if not failed else f"\n{failed} failed")
 sys.exit(1 if failed else 0)

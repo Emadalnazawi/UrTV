@@ -1,0 +1,25 @@
+# UrTV community list: vision-2024vision43stv
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/vision-2024vision43stv/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: VISION
+# match-model: 2024VISION43STV TPT950D4TPB751
+# match-device: 
+
+com.cvte.gaia.ad.service
+com.cvte.wonder.cloud.service
+com.cvte.industries
+com.zeasn.services.general
+com.cvte.tv.pictorial
+com.cvte.tv.weather
+com.cvte.tv.steward
+com.cvte.tv.launcher.space
+com.cvte.tv.launcher.space.skin
+com.netflix.mediaclient
+com.amazon.avod.thirdpartyclient
+com.amazon.amazonvideo.livingroom
+com.amazon.rialto.cordova.webapp.webapp2660c968ef8949678398aeb6fd6cb036
+com.tiktok.tv
+deezer.android.tv
+com.ted.android.tv

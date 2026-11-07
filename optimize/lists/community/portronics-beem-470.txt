@@ -1,0 +1,64 @@
+# UrTV community list: portronics-beem-470
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/portronics-beem-470/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: PORTRONICS
+# match-model: BEEM470SMARTLEDPROJECTOR SUN50IW12P1
+# match-device: 
+
+com.htc.htclauncherhighenglishd08
+com.htc.expandsdk
+com.htc.screensaver
+com.htc.storeos
+com.htc.eventuploadservice
+com.htc.htcotaupdate
+com.htc.hyk_test
+com.hysd.vafocus
+com.softwinner.awlivetv
+com.softwinner.TvdVideo
+com.softwinner.TvdFileManager
+com.softwinner.ImageParser
+com.softwinner.awlogsettings
+com.softwinner.screenshot
+com.softwinner.settingsassist
+com.softwinner.settingssetup
+com.softwinner.provision
+com.softwinner.theme.color
+com.softwinner.theme.icon
+com.softwinner.update
+android.rockchip.update.service
+com.android.nfx
+com.google.android.youtube.tv
+com.google.android.apps.searchlite.overlay
+org.chromium.webview_shell
+com.mobisystems.office
+com.android.music
+com.android.musicfx
+com.android.dreams.basic
+com.android.wallpaperbackup
+com.android.wallpapercropper
+com.android.printspooler
+com.android.printservice.recommendation
+com.android.bips
+com.android.htmlviewer
+com.android.egg
+com.android.soundpicker
+com.android.providers.userdictionary
+com.android.providers.blockednumber
+com.android.cellbroadcastreceiver
+com.android.cellbroadcastservice
+com.android.nfc
+com.android.se
+com.android.bluetoothmidiservice
+com.android.hotspot2.osulogin
+com.android.pacprocessor
+com.android.proxyhandler
+com.android.localtransport
+com.android.backupconfirm
+com.android.sharedstoragebackup
+com.android.managedprovisioning
+com.android.onetimeinitializer
+com.android.dynsystem
+com.android.cts.ctsshim
+com.android.cts.priv.ctsshim

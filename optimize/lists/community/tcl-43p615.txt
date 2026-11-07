@@ -1,0 +1,50 @@
+# UrTV community list: tcl-43p615
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-43p615/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: 43P615
+# match-device: 
+
+com.tcl.bi
+com.google.android.feedback
+com.google.android.tvrecommendations
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+android.autoinstalls.config.tcl.device
+com.tcl.overseasappshow
+com.tcl.tv.tclhome_passive
+com.tcl.waterfall.overseas
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.guard
+com.tcl.usercenter
+com.tcl.dashboard
+com.tcl.copydatatotv
+com.tcl.useragreement
+com.tcl.notereminder
+com.tcl.ui_mediaCenter
+com.google.android.katniss
+com.google.android.tv.assistant
+com.tcl.assistant
+com.tcl.micmanager
+com.tcl.smartalexa
+com.tcl.miracast
+com.tcl.MultiScreenInteraction_TV
+com.google.android.backdrop
+com.netflix.ninja
+com.google.android.youtube.tvmusic
+com.amazon.amazonvideo.livingroom
+com.disney.disneyplus
+com.disney.starplus
+com.wbd.stream
+com.dazn
+com.spotify.tv.android
+tv.pluto.android
+tv.wuaki.apptv
+com.internet.tvbrowser
+com.apgsolutionsllc.APGSOLUTIONSLLC0007
+com.google.android.play.games
+com.android.printspooler
+com.android.dreams.basic

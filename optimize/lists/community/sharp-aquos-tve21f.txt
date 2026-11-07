@@ -1,0 +1,39 @@
+# UrTV community list: sharp-aquos-tve21f
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sharp-aquos-tve21f/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SHARP
+# match-model: AQUOSTVE21F
+# match-device: BANQIAO
+
+tv.anoki.acr.anokiacroptin
+fusion.android.tv.demo
+android.autoinstalls.config.sharp
+android.autoinstalls.config.hkc
+com.mediatek.android.leanbacklauncher.partnercustomizer
+com.cvte.tv.fac.menu
+com.cvte.tv.fac.aging
+com.at.factory.factorymanager
+com.at.factory.androidtvaidlservice
+com.cvte.tv.at
+com.google.android.tvrecommendations
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.backdrop
+com.android.tv.feedbackconsent
+com.google.android.syncadapters.calendar
+com.google.android.tungsten.setupwraith
+com.google.android.katniss
+com.google.android.apps.mediashell
+com.google.android.tv.remote.service
+com.tcl.browser
+com.cxinventor.file.explorer
+com.amazon.amazonvideo.livingroom
+com.disney.disneyplus
+com.spotify.tv.android
+tv.arte.plus7
+fr.francetv.pluzz
+com.megogo.application
+com.limelight
+org.videolan.vlc

@@ -1,0 +1,24 @@
+# UrTV community list: super-general-cvte-t972
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/super-general-cvte-t972/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SUPER
+# match-model: GENERAL554KSMARTTV HV550QUB TPSK708DPC821
+# match-device: 
+
+com.system.memory.tool
+com.android.media.tools
+com.cvte.gaia.ad.service
+com.cvte.wonder.cloud.service
+com.cvte.tv.pictorial
+com.cvte.tv.steward
+com.cvte.tv.weather
+com.stark.store
+com.cvte.tv.systemupgrade
+org.mozilla.tv.firefox
+com.android.browser
+com.google.android.feedback
+com.ionitech.airscreen
+com.cvte.tv.launcher.highend
+com.cvte.tv.launcher.highend.skin

@@ -1,0 +1,47 @@
+# UrTV community list: xiaomi-mitv-astp0
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-mitv-astp0/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: L55M7EA MITVASTP0
+# match-device: 
+
+com.miui.analytics
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.mitv.cloudcontrol
+com.xiaomi.mitv.tvpush.tvpushservice
+com.android.smspush
+com.xm.webcontent
+com.mitv.shoplugin
+com.xiaomi.mitv.shop
+com.xiaomi.mitv.tvmanager
+com.xiaomi.mitv.upgrade
+com.xiaomi.gamecenter.sdk.service.mibox
+com.xiaomi.mitv.karaoke.service
+com.xiaomi.wakeupservice
+com.xiaomi.mimusic2
+com.mitv.gallery
+com.xiaomi.screenrecorder
+com.xiaomi.mitv.smartpanel
+com.xiaomi.mitv.calendar
+com.xiaomi.tweather
+com.mitv.screensaver
+com.xiaomi.mitv.healthdiagnosis
+com.xiaomi.mitv.legal.webview
+com.android.printspooler
+com.xiaomi.mibox.lockscreen
+com.xiaomi.miplay
+com.duokan.airkan.tvbox
+com.xiaomi.wfdsinkhelperservice
+com.xiaomi.mi_connect_service
+com.xiaomi.mitv.remotecontroller.service
+com.xiaomi.voicecontrol
+com.xiaomi.mico.mqtt.service.application.tv
+com.mipay.wallet.tv
+com.xiaomi.mitv.pay
+com.xiaomi.mitv.payment
+com.mitv.mivideoplayer
+com.xiaomi.smarthome.tv
+com.sohu.inputmethod.sogou.tv

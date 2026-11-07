@@ -1,0 +1,32 @@
+# UrTV community list: coocaa-k3-pro-90p3d-max
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/coocaa-k3-pro-90p3d-max/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: COOCAA SKYWORTH
+# match-model: 8R145P3DM COOCAAK3PRO90P3DMAX
+# match-device: 
+
+com.tianci.ad
+com.skyworth.aisense
+com.coocaa.sysreport
+com.tianci.push
+com.dstv.ad1
+com.coocaa.tvpi
+com.tianci.autoinstaller
+com.coocaa.sport
+com.coocaa.educate
+com.coocaa.lifeassistant
+com.coocaa.app_browser
+com.coocaa.teampresent
+com.coocaa.mitee.tv
+com.coocaa.miitee.guard
+com.tianci.family.photograph
+com.coocaa.os.thememanager
+com.coocaa.theme_package_ccos_nine
+com.coocaa.theme_package_ccos_seven
+com.coocaa.os.customerservice
+com.coocaa.messageprovider
+com.coocaa.playtvskill
+com.coocaa.guide
+com.itwgame.mota.nearme.gamecenter

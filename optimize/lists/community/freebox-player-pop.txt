@@ -1,0 +1,37 @@
+# UrTV community list: freebox-player-pop
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/freebox-player-pop/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: FREEBOX
+# match-model: FBX8AM PLAYERPOP
+# match-device: PREFERENCES
+
+fr.freebox.fbxstats
+com.google.android.feedback
+com.google.android.tv.bugreportsender
+com.droidlogic.readlog
+com.google.android.tvrecommendations
+android.autoinstalls.config.sei
+com.nes.dvb.playtest
+com.ctc
+com.utsmta.app
+com.android.camera2
+com.android.printspooler
+com.google.android.katniss
+fr.tf1.mytf1.free
+fr.m6.m6replay.free
+fr.francetv.pluzz
+com.google.android.youtube.tv
+com.google.android.youtube.tvmusic
+com.canal.android.canal
+com.disney.disneyplus
+fr.freebox.disneypluslauncher
+com.nextinteractive.rmcbfmplay.tv.free
+org.videolan.vlc
+fr.free.aktu
+fr.francetv.zouzous
+fr.tfou.max
+com.google.android.videos
+com.google.android.play.games
+com.tcl.browser

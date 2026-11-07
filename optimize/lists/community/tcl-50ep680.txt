@@ -1,0 +1,56 @@
+# UrTV community list: tcl-50ep680
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-50ep680/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: 50EP680
+# match-device: 
+
+com.tcl.bi
+com.tcl.tv.tclhome_passive
+com.tcl.waterfall.overseas
+com.tcl.esticker
+com.tcl.notereminder
+com.tcl.overseasappshow
+com.tcl.copydatatotv
+com.tcl.dashboard
+com.tcl.partnercustomizer
+com.google.android.katniss
+com.google.android.tv.assistant
+com.tcl.assistant
+com.google.android.tvrecommendations
+com.google.android.videos
+com.google.android.play.games
+com.google.android.youtube.tvmusic
+com.google.android.music
+com.google.android.feedback
+com.google.android.backdrop
+com.king.candycrushsaga
+com.asanteegames.magicrampage
+com.mautilus.tvgames.portal.androidtv
+com.popoko.tictactoe
+com.secretexit.turbodismount
+com.vectorunit.purple.googleplay
+com.wrcplus.release
+paskov.biz.happyfruits
+rocks.funkykarts
+ro.pontes.forinaline
+net.hexage.ritual
+com.joxdev.orbia
+com.bruyere.android.solitaire
+ca.cbc.mobile.android.cbcnewsandroidwebview
+com.abc.abcnews
+com.bloomberg.btva
+com.cnn.mobile.android.tv
+com.nousguide.android.rbtv
+com.ted.android.tv
+com.vimeo.android.videoapp
+dw.com.androidtv.live
+net.aljazeera.english
+jp.co.rarity.tvweb
+com.cloudmosa.puffinTV
+cm.aptoidetv.pt
+com.curiosity.curiositystream.androidtv
+com.teamviewer.quicksupport.market
+io.tiv.dvtv.tv

@@ -1,0 +1,43 @@
+# UrTV community list: tcl-uniontv-latin-america
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-uniontv-latin-america/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: SEMLART41KBS1 UNIONTV
+# match-device: 
+
+com.tcl.bi
+com.google.android.feedback
+com.google.android.tv.bugreportsender
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+com.tcl.partnercustomizer
+com.tcl.partnercustomizer.resource
+com.google.android.leanbacklauncher.partnerwidget
+com.google.android.leanbacklauncher.partnercustomizer
+com.tcl.dashboard
+com.tcl.tv.tclhome_passive
+android.autoinstalls.config.tcl.device
+com.tcl.esticker
+com.tcl.appmarket2
+com.tcl.tvweishi
+com.tcl.usercenter
+com.tcl.copydatatotv
+com.tcl.waterfall.overseas
+com.google.android.videos
+com.google.android.play.games
+com.google.android.music
+com.android.printspooler
+com.tcl.useragreement
+com.google.android.katniss
+com.nousguide.android.rbtv
+tv.twitch.android.app
+com.google.android.backdrop
+com.google.android.tts
+com.google.android.marvin.talkback
+com.google.android.speech.pumpkin
+com.android.gallery3d
+com.android.wallpaper.livepicker
+com.android.dreams.basic
+com.tcl.common.terminalmanagerplus

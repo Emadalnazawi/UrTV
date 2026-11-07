@@ -1,0 +1,49 @@
+# UrTV community list: amazon-fire-tv-afttiff43
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/amazon-fire-tv-afttiff43/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: AMAZON
+# match-model: AFTTIFF43 AMZK24NE54K50M600A FIRETV504KSMARTTV
+# match-device: 
+
+com.amazon.tv.acr
+com.amazon.tv.fw.metrics
+com.amazon.neo.minerva
+com.amazon.neo.minerva.logcat
+com.amazon.wirelessmetrics.service
+com.amazon.perfcollection
+com.amazon.perfc
+com.amazon.dp.logger
+com.amazon.hybridadidservice
+com.amazon.sneakpeek
+com.amazon.tv.democontent.provider
+com.amazon.shoptv.client
+com.amazon.shoptv.firetv.client
+com.amazon.storm.lightning.tutorial
+com.amazon.tmm.tutorial
+com.amazon.bueller.music
+com.amazon.bueller.photos
+com.amazon.tv.localgallery
+com.amazon.gamehub
+com.amazon.minitv.android.app
+com.amazon.naatyam
+com.amazon.tahoe
+com.amazon.tv.alexaalerts
+com.amazon.tv.alexanotifications
+com.amazon.audiohome
+com.amazon.tv.ftvambient
+com.amazon.ftv.screensaver
+com.amazon.kso.blackbird
+com.amazon.media.recommendations
+com.amazon.tv.easyupgrade
+com.amazon.hedwig
+com.amazon.client.metrics.api
+com.amazon.ceviche
+com.amazon.tv.developer.dataservice
+com.amazon.wifilocker
+com.amazon.systemnotices
+com.amazon.tv.releasenotes
+com.amazon.uxnotification
+com.android.printspooler
+com.android.bips

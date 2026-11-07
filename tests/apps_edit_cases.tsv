@@ -1,0 +1,149 @@
+# tests/apps_edit_test.py: AppsEdit, the grid's order, kids mode, the gate and the adhan rule. Columns: command, arguments…, expected, note (see AppsEditRun.java)
+# A grid of 3 columns: a b c / d e f / g h. Five favourites, ten at most. Times in ms.
+# carrying: OK picks up, the arrows move it across the grid, OK drops, Back puts it back
+new	3	5	10	1	a,b,c,d,e,f,g,h	-	-	a fresh grid, the focus on b
+ok	0	PICKED|a,b,c,d,e,f,g,h|1|c|-|-	OK picks b up, nothing moves yet
+move	0	1	MOVED|a,c,b,d,e,f,g,h|2|c|-|-	one step toward the end
+move	0	1	MOVED|a,c,d,b,e,f,g,h|3|c|-|-	and on into the next row (carrying crosses the rows)
+up	0	MOVED|b,a,c,d,e,f,g,h|0|c|-|-	UP: the row above
+down	0	MOVED|a,c,d,b,e,f,g,h|3|c|-|-	DOWN: the row below
+down	0	MOVED|a,c,d,e,f,g,b,h|6|c|-|-	DOWN again: the last row
+down	0	NOTHING|a,c,d,e,f,g,b,h|6|c|-|-	the last row: nowhere below
+ok	0	DROPPED|a,c,d,e,f,g,b,h|6|-|-|-	dropped
+saved	true|a,c,d,e,f,g,b,h|-|-|-	moved: the order is saved, nothing hidden
+new	3	5	10	7	a,b,c,d,e,f,g,h	-	-	a fresh grid, on h (the last)
+ok	0	PICKED|a,b,c,d,e,f,g,h|7|c|-|-	pick h up
+move	0	1	NOTHING|a,b,c,d,e,f,g,h|7|c|-|-	the end of the grid is an edge
+move	0	-8	NOTHING|a,b,c,d,e,f,g,h|7|c|-|-	far past the start: stays
+up	0	MOVED|a,b,c,d,h,e,f,g|4|c|-|-	to the row above
+back	0	CANCELLED|a,b,c,d,e,f,g,h|7|-|-|-	Back while carrying: h goes back, the focus on it
+saved	false|keep|-|-|-	nothing changed: nothing is saved
+new	3	5	10	2	a,b,c,d,e,f,g,h	-	-	a fresh grid, on c
+ok	0	PICKED|a,b,c,d,e,f,g,h|2|c|-|-	pick c up
+move	0	-1	MOVED|a,c,b,d,e,f,g,h|1|c|-|-	toward the start
+move	0	1	MOVED|a,b,c,d,e,f,g,h|2|c|-|-	and back
+ok	0	DROPPED|a,b,c,d,e,f,g,h|2|-|-|-	dropped where it was: not moved
+saved	false|keep|-|-|-	put back where it was: nothing to save
+# the Arabic directions: the same as the favourites (FavEdit.step)
+new	3	5	10	1	a,b,c,d,e,f,g,h	-	-	a fresh grid, on b
+key	0	22	1	FOCUS|a,b,c,d,e,f,g,h|0|-|-|-	RIGHT in Arabic: toward the start
+key	0	21	1	FOCUS|a,b,c,d,e,f,g,h|1|-|-|-	LEFT in Arabic: toward the end
+key	0	21	0	FOCUS|a,b,c,d,e,f,g,h|0|-|-|-	LEFT left to right: toward the start
+# the focus without carrying: within its row, as on the home screen
+new	3	5	10	2	a,b,c,d,e,f,g,h	-	-	on c, the end of the first row
+move	0	1	NOTHING|a,b,c,d,e,f,g,h|2|-|-|-	the end of a row stays
+move	0	-1	FOCUS|a,b,c,d,e,f,g,h|1|-|-|-	back along the row
+down	0	FOCUS|a,b,c,d,e,f,g,h|1|x|-|-	DOWN from a tile: its ×
+move	0	1	FOCUS|a,b,c,d,e,f,g,h|2|x|-|-	from a × the arrows go to the next ×
+down	0	FOCUS|a,b,c,d,e,f,g,h|5|-|-|-	DOWN from the ×: the tile below
+down	0	FOCUS|a,b,c,d,e,f,g,h|5|x|-|-	its ×
+down	0	FOCUS|a,b,c,d,e,f,g,h|7|-|-|-	the tile below (the last row is shorter: its last tile)
+up	0	FOCUS|a,b,c,d,e,f,g,h|4|-|-|-	UP: the row above
+up	0	FOCUS|a,b,c,d,e,f,g,h|1|-|-|-	and the first row
+up	0	NOTHING|a,b,c,d,e,f,g,h|1|-|-|-	the first row with no «تراجع»: stays
+back	0	EXIT|a,b,c,d,e,f,g,h|1|-|-|-	Back with nothing in the hand ends the mode (the screen saves)
+# the ×: hide, «تراجع», and «المخفية» at the end
+new	3	5	10	4	a,b,c,d,e,f,g,h	-	-	on e
+down	0	FOCUS|a,b,c,d,e,f,g,h|4|x|-|-	its ×
+ok	1000	HIDDEN|a,b,c,d,f,g,h|4|-|e|-	OK on the × hides it at once; the focus on the app that took its place; «المخفية» is now after h
+expire	5999	kept|true	«تراجع» still there at 5 s less 1 ms
+up	2000	FOCUS|a,b,c,d,f,g,h|1|-|e|-	UP from the second row: the row above (not yet the chip)
+up	2000	FOCUS|a,b,c,d,f,g,h|1|u|e|-	from the first row: «تراجع»
+move	2000	1	NOTHING|a,b,c,d,f,g,h|1|u|e|-	the arrows do nothing on «تراجع»
+ok	2000	UNDONE|a,b,c,d,e,f,g,h|4|-|-|-	OK on it: e back in its place, the focus on it
+saved	false|keep|-|-|-	hidden and back: nothing to save
+new	3	5	10	4	a,b,c,d,e,f,g,h	-	-	again on e
+down	0	FOCUS|a,b,c,d,e,f,g,h|4|x|-|-	its ×
+ok	1000	HIDDEN|a,b,c,d,f,g,h|4|-|e|-	hidden
+back	2000	UNDONE|a,b,c,d,e,f,g,h|4|-|-|-	Back while «تراجع» shows undoes, wherever the focus is
+new	3	5	10	4	a,b,c,d,e,f,g,h	-	-	again on e
+down	0	FOCUS|a,b,c,d,e,f,g,h|4|x|-|-	its ×
+ok	1000	HIDDEN|a,b,c,d,f,g,h|4|-|e|-	hidden
+expire	6000	expired|false	the seconds are over
+back	6000	EXIT|a,b,c,d,f,g,h|4|-|e|-	Back now ends the mode
+saved	true|keep|e|-|-	saved: e hidden
+new	3	5	10	7	a,b,c,d,e,f,g,h	x,y	-	two apps hidden from before: «المخفية» after h, on h
+move	0	1	FOCUS|a,b,c,d,e,f,g,h|8|h|x,y|-	toward the end: «المخفية»
+down	0	NOTHING|a,b,c,d,e,f,g,h|8|h|x,y|-	«المخفية» has no ×
+ok	0	LIST|a,b,c,d,e,f,g,h|8|h|x,y|-	OK on it: the list
+show	0	y	-1	SHOWN|a,b,c,d,e,f,g,h,y|8|-|x|-	y chosen: back at the end (an order is kept), the focus on it
+show	0	z	-1	NOTHING|a,b,c,d,e,f,g,h,y|8|-|x|-	an app that is not hidden: nothing
+move	0	1	NOTHING|a,b,c,d,e,f,g,h,y|8|-|x|-	«المخفية» is now the start of the next row: the end of this row stays
+down	0	FOCUS|a,b,c,d,e,f,g,h,y|8|x|x|-	its ×
+down	0	FOCUS|a,b,c,d,e,f,g,h,y|9|h|x|-	DOWN from the ×: «المخفية» below
+ok	0	LIST|a,b,c,d,e,f,g,h,y|9|h|x|-	the list again
+show	0	x	-1	SHOWN|a,b,c,d,e,f,g,h,y,x|9|-|-|-	x back: nothing hidden, no «المخفية»
+move	0	1	NOTHING|a,b,c,d,e,f,g,h,y,x|9|-|-|-	the end
+ok	0	PICKED|a,b,c,d,e,f,g,h,y,x|9|c|-|-	pick x up
+show	0	y	-1	NOTHING|a,b,c,d,e,f,g,h,y,x|9|c|-|-	nothing is shown while an app is carried
+back	0	CANCELLED|a,b,c,d,e,f,g,h,y,x|9|-|-|-	put back
+saved	true|keep|-|x,y|-	saved: x and y shown again
+new	3	5	10	4	a,b,c,d,e,f,g,h	-	-	on e
+down	0	FOCUS|a,b,c,d,e,f,g,h|4|x|-|-	its ×
+ok	1000	HIDDEN|a,b,c,d,f,g,h|4|-|e|-	hidden: «المخفية» after h
+move	1000	1	FOCUS|a,b,c,d,f,g,h|5|-|e|-	along the row
+move	1000	1	NOTHING|a,b,c,d,f,g,h|5|-|e|-	the end of the row
+down	1000	FOCUS|a,b,c,d,f,g,h|5|x|e|-	its ×
+down	1000	FOCUS|a,b,c,d,f,g,h|7|h|e|-	«المخفية» below
+ok	1000	LIST|a,b,c,d,f,g,h|7|h|e|-	the list
+show	1000	e	4	SHOWN|a,b,c,d,e,f,g,h|4|-|-|-	e shown from the list where its name puts it (no order kept), and «تراجع» goes
+back	2000	EXIT|a,b,c,d,e,f,g,h|4|-|-|-	Back: nothing to undo, the mode ends
+saved	false|keep|-|-|-	hidden and shown in one visit: nothing to save
+new	3	5	10	0	a,b	x	-	one hidden
+show	0	x	9	SHOWN|a,b,x|2|-|-|-	a place past the end is the end
+new	3	5	10	0	a,b,c	-	-	one row: a b c
+down	0	FOCUS|a,b,c|0|x|-|-	×
+ok	1000	HIDDEN|b,c|0|-|a|-	hide a
+down	1000	FOCUS|b,c|0|x|a|-	×
+ok	1000	HIDDEN|c|0|-|a,b|-	hide b
+down	1000	FOCUS|c|0|x|a,b|-	×
+ok	1000	HIDDEN|-|0|h|a,b,c|-	hide c: no app left, only «المخفية»
+down	1000	NOTHING|-|0|h|a,b,c|-	nothing to go to
+ok	1000	LIST|-|0|h|a,b,c|-	the list
+# UP from the first row while carrying: into the favourites, at their end, while they have room
+new	3	8	10	4	a,b,c,d,e,f,g,h	-	-	eight favourites; on e
+ok	0	PICKED|a,b,c,d,e,f,g,h|4|c|-|-	pick e up
+up	0	MOVED|a,e,b,c,d,f,g,h|1|c|-|-	the first row
+up	0	TO_FAVOURITES|a,b,c,d,f,g,h|1|-|-|e	and into the favourites
+ok	0	PICKED|a,b,c,d,f,g,h|1|c|-|e	pick b up
+up	0	TO_FAVOURITES|a,c,d,f,g,h|1|-|-|e,b	into the favourites: ten now
+ok	0	PICKED|a,c,d,f,g,h|1|c|-|e,b	pick c up
+up	0	FAVOURITES_FULL|a,c,d,f,g,h|1|c|-|e,b	ten is the most: «المفضلة ممتلئة», still carried
+back	0	CANCELLED|a,c,d,f,g,h|1|-|-|e,b	Back: c goes back
+saved	true|a,c,d,f,g,h|-|-|e,b	saved: two to the favourites
+# the order the grid shows (no saved order: by name, as always)
+topup	x.youtube,x.netflix,x.shahid	z.downloader,a.appletv,m.crunchy	5	a.appletv,m.crunchy	the dock is topped up from the other apps in the order of their package names (the same in Arabic and English, where labels sort differently)
+topup	x.youtube,x.netflix,x.shahid	a.appletv,z.downloader,m.crunchy	5	a.appletv,m.crunchy	the same answer whatever order the rest comes in
+topup	x.a,x.b,x.c,x.d,x.e	a.appletv	5	-	five favourites: nothing is added
+topup	x.a	a.b	5	a.b	fewer other apps than needed: all of them
+arrange	a,b,c,d	-	a,b,c,d	nothing saved: by name
+arrange	a,b,c,d	c,a	c,a,b,d	the saved order first, then the rest by name
+arrange	a,b,c,d,n	d,c,b,a	d,c,b,a,n	a new app: at the end
+arrange	a,c,d	d,gone,c,b,a	d,c,a	apps that went: dropped quietly
+arrange	a,b	b,b,,a	b,a	a repeated or empty name in the saved order counts once
+# kids mode: no edit
+allowed	0	edit	kids mode off: the mode is offered
+allowed	1	no	kids mode on: no «تعديل التطبيقات» (it shows only the allowed apps)
+# entering the mode: the same gate as «تعديل المفضلة» (قفل الإعدادات)
+gate	0		0	GO	no PIN: nothing asks
+gate	1		0	GO	a PIN but the settings not locked: nothing asks
+gate	1	@urtv	0	ASK	PIN and the settings locked: the PIN is asked
+gate	1	@urtv	1	GO	opened with the PIN already: not asked twice
+gate	1	@wifi	0	GO	another pill's lock is not the settings'
+# the adhan: any key stops it first, in the mode too (the home screen asks AdhanKeys before the mode, checked in the source)
+adhanreset	-	a fresh press
+adhan	22	0	0	STOP	RIGHT stops it
+adhan	22	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	22	1	0	EAT	and its release
+adhanreset	-	a fresh press
+adhan	19	0	0	STOP	UP stops it (not a move into the favourites)
+adhan	19	1	0	EAT	and its release
+adhanreset	-	a fresh press
+adhan	20	0	0	STOP	DOWN stops it
+adhanreset	-	a fresh press
+adhan	23	0	0	STOP	OK stops it (not a pick-up)
+adhan	23	1	0	EAT	and its release
+adhanreset	-	a fresh press
+adhan	4	0	0	STOP	BACK stops it (the mode goes on)
+adhanreset	-	fresh
+adhan	24	0	0	PASS	the volume key is left alone

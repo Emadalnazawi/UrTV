@@ -1,0 +1,35 @@
+# UrTV community list: rca-ai-pont
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/rca-ai-pont/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: RCA
+# match-model: AIPONTSA ISDB92RC
+# match-device: REDWOOD
+
+com.homwee.aipont
+com.homwee.store
+com.homwee.help
+com.homwee.chinstallapk
+com.homwee.chtvmanager
+com.homwee.upgrade
+com.homwee.dmt.upgrade
+android.autoinstalls.config.homwee
+com.homwee.mmp.screenshare
+com.homwee.multiscreenshare
+com.homwee.mmp.fileexplorer
+com.homwee.mmp.imageplayer
+tv.anoki.acr.anokiacroptin
+com.cltv.fast
+com.google.android.tvrecommendations
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.google.android.partnersetup
+com.google.android.tungsten.setupwraith
+com.google.android.katniss
+com.homwee.alexacontrol
+com.google.android.tts
+com.google.android.marvin.talkback
+com.google.android.backdrop
+com.google.android.syncadapters.calendar
+com.google.android.tv.remote.service

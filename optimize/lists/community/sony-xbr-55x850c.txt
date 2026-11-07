@@ -1,0 +1,45 @@
+# UrTV community list: sony-xbr-55x850c
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-xbr-55x850c/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIAXBR55X850C SVPDTV15
+# match-device: 
+
+tv.samba.ssm
+com.sony.dtv.da.service
+com.qterics.da.product
+com.google.android.tv.bugreportsender
+com.google.android.feedback
+com.sony.dtv.b2b.vendorprotocol
+com.sony.dtv.sonyselect
+com.sony.dtv.discovery
+com.sony.dtv.bivlinfo
+com.sony.dtv.tvlaunchercustomizer
+com.google.android.tvrecommendations
+android.autoinstalls.config.sony.bravia
+com.sony.dtv.customersupport
+com.sony.dtv.smarthelp
+com.sony.dtv.imanual
+com.sony.dtv.touchpad.tutorial
+com.google.android.tvtutorials
+com.google.android.videos
+com.google.android.play.games
+com.google.android.music
+com.amazon.aiv.us
+com.google.android.inputmethod.japanese
+com.google.android.katniss
+com.google.android.speech.pumpkin
+com.amazon.amazonvideo.livingroom
+com.disney.disneyplus
+com.hbo.hbonow
+com.pandora.android.atv
+com.tubitv
+tv.pluto.android
+tv.twitch.android.app
+org.pbskids.video
+com.crackle.androidtv
+air.com.vudu.air.DownloaderTablet
+com.accuweather.android
+com.sony.rvu

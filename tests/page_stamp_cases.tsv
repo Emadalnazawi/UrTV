@@ -1,0 +1,13 @@
+# of TAB text TAB expected TAB note ;  newer TAB a TAB b TAB 1|0 TAB note
+of	<head><meta charset="utf-8"><meta name="urtv-build" content="20261023191829"><title>x</title>	20261023191829	the stamp is found
+of	<head><title>an old page</title>		an old page has none
+of	<meta name="urtv-build" content="2026102319">		a short or broken stamp is none
+of	<meta name="urtv-build"\n content="20260101000000">	20260101000000	a line break inside the tag
+of			empty
+newer	20261023191829	20261023185000	1	a newer download beats the app's page
+newer	20261023185000	20261023191829	0	an older download (a stale CDN copy) does not, whatever its file time
+newer	20261023191829	20261023191829	0	the same build: the app's own page
+newer	20261023191829		1	a page with a stamp beats one without
+newer		20261023191829	0	a page with none never beats one with
+newer			0	two old pages: the app's own
+newer	20270101000000	20261231235959	1	across a year

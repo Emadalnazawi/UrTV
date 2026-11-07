@@ -7,15 +7,34 @@ on:
     branches: [master, next, content]
   pull_request:
   workflow_dispatch:
+  workflow_call:   # android.yml runs it before publishing to apk-latest
 
 jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Thmanyah's licence allows its files only inside a built product: they live in the private
+      # tshi-dev/urtv-fonts and are put in place here, never committed to this repository
+      - uses: actions/checkout@v4
+        with:
+          repository: tshi-dev/urtv-fonts
+          token: ${{ secrets.FONTS_TOKEN }}
+          path: .fonts-private
+      - name: Private fonts
+        run: |
+          cp .fonts-private/web/*.woff2 assets/fonts/
+          mkdir -p android/launcher/src/main/assets/fonts
+          cp .fonts-private/android/*.otf android/launcher/src/main/assets/fonts/
+          rm -rf .fonts-private
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: pip install fonttools brotli pillow
+      # a Python of its own: pip then installs into its site-packages, which python -I still sees (optimize/ runs its
+      # scripts with -I, like the venv does on people's computers); the runner's system pip went to the user's folder
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install fonttools brotli pillow -r .github/tools/cities-world/requirements.txt
       - run: npm install --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
       - run: tests/run.sh

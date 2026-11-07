@@ -1,0 +1,45 @@
+# UrTV community list: sony-bravia-ae2
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-bravia-ae2/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIA4KAE2 BRAVIAAE2
+# match-device: 
+
+tv.samba.ssm
+tv.samba.ssm.ui
+com.qterics.da.product
+com.sony.dtv.da.service
+com.sonyericsson.idd.agent
+com.sony.dtv.usercontext
+com.sony.dtv.seeds.iot
+com.sony.dtv.promos
+com.sony.dtv.sonyselect
+com.sony.dtv.sonytab
+com.google.android.feedback
+com.sony.dtv.sonybugreportsys
+com.sony.dtv.b2b.vendorprotocol
+android.autoinstalls.config.sony.bravia
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+com.sony.dtv.customersupport
+com.sony.dtv.smarthelp
+com.sony.dtv.calibrationmonitor
+com.sony.dtv.gestureapp
+com.sony.dtv.livingfit
+com.sony.dtv.osat.music.toast
+com.mediatek.dtv.tvinput.atsctuner
+com.sony.dtv.tvinput.atsc3tuner
+com.sony.dtv.tvinput.atsc3tuner.drmlicenseinstaller
+com.sony.dtv.atscbrowserservice
+com.sony.dtv.broadcastclock.broadcastrequirementcontrol
+com.sony.dtv.broadcastclock.clocksyncservice
+com.sony.dtv.broadcastsettings
+com.sony.dtv.servicemode.tuner
+com.crunchyroll.crunchyroid
+com.sonypicturescore
+com.google.android.videos
+com.google.android.play.games
+com.google.android.tungsten.setupwraith

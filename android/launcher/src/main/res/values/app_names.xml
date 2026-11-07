@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic names for the home screen, as package|name. A name the owner's agent set on the TV (optimize/dock.sh name)
+  comes first; then an app's own name if it has Arabic letters; then this list; else the app's own name.
+  Only packages known for certain.
+-->
+<resources>
+    <string-array name="app_names" translatable="false">
+        <item>com.google.android.youtube.tv|يوتيوب</item>
+        <item>com.google.android.youtube.tvkids|يوتيوب كيدز</item>
+        <item>com.google.android.youtube.tvmusic|يوتيوب ميوزك</item>
+        <item>com.netflix.ninja|نتفليكس</item>
+        <item>com.netflix.mediaclient|نتفليكس</item>
+        <item>net.mbc.shahidTV|شاهد</item>
+        <item>com.disney.disneyplus|ديزني +</item>
+        <item>com.amazon.amazonvideo.livingroom|برايم فيديو</item>
+        <item>com.apple.atve.androidtv.appletv|ابل تي في</item>
+        <item>com.spotify.tv.android|سبوتيفاي</item>
+        <item>com.android.vending|متجر بلاي</item>
+        <item>com.android.tv.settings|الإعدادات</item>
+        <item>com.android.settings|الإعدادات</item>
+        <item>com.google.android.tv|القنوات المباشرة</item>
+        <item>com.android.documentsui|الملفات</item>
+        <item>com.google.android.documentsui|الملفات</item>
+        <!-- the two the setup installs (optimize/install.sh extras) -->
+        <item>com.phlox.tvwebbrowser|المتصفح</item>
+        <item>org.smarttube.stable|سمارت تيوب</item>
+    </string-array>
+</resources>

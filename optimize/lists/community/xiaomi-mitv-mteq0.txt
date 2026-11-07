@@ -1,0 +1,61 @@
+# UrTV community list: xiaomi-mitv-mteq0
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-mitv-mteq0/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: L55MAEP MITVMTEQ0 TVEAPRO55
+# match-device: 
+
+com.miui.analytics
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.xiaomi.tvqs
+com.xiaomi.mitv.healthdiagnosis
+com.xiaomi.mitv.debug
+com.xiaomi.mitv.csi
+com.xiaomi.screenrecorder
+com.xiaomi.android.TV.audio
+com.mediatek.TimeMeasurementAgent
+com.mstar.android.media.tests
+com.xiaomi.mitv.tvpush.tvpushservice
+com.mitv.cloudcontrol
+com.xm.webcontent
+com.duokan.videodaily
+com.mitv.screensaver
+fusion.android.tv.demo
+com.xiaomi.gamecenter.sdk.service.mibox
+com.xiaomi.mitv.shop
+com.xiaomi.mitv.pay
+com.xiaomi.mitv.payment
+com.mipay.wallet.tv
+com.xiaomi.account
+com.xiaomi.account.auth
+com.xiaomi.mitv.upgrade
+com.xiaomi.mitv.appstore
+com.xiaomi.mitv.tvmanager
+com.xiaomi.mitv.smartpanel
+com.xiaomi.setupwizard
+com.xiaomi.miplay
+com.xiaomi.mitv.smartshare
+com.duokan.airkan.tvbox
+com.xiaomi.wfdsinkhelperservice
+com.xiaomi.smarthome.tv
+com.xiaomi.mico.mqtt.service.application.tv
+com.xiaomi.mi_connect_service
+com.xiaomi.voicecontrol
+com.xiaomi.wakeupservice
+com.xiaomi.mimusic2
+com.xiaomi.tweather
+com.xiaomi.mitv.calendar
+com.mitv.mivideoplayer
+com.mitv.videoplayer
+com.xiaomi.mitv.karaoke.service
+com.xiaomi.mibox.lockscreen
+com.xiaomi.mitv.handbook
+com.xiaomi.mitv.legal.webview
+com.mitv.alarmcenter
+com.mitv.gallery
+com.xiaomi.tv.gallery
+com.xiaomi.mitv.mediaexplorer
+com.mitv.toolhouse

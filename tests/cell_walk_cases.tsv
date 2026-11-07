@@ -1,0 +1,14 @@
+# next: position, count, right (1/0), expected cell (-1: an end of the grid) | consume: moved, repeat, onCell, expected, (note last)
+next	5	114	1	4	right goes to the cell before: the first cell is on the right
+next	5	114	0	6	left goes to the cell after
+next	0	114	1	-1	right of the first cell (the right edge): nowhere
+next	113	114	0	-1	left of the last cell (the left edge): nowhere
+next	0	114	0	1	left of the first cell
+next	113	114	1	112	right of the last cell
+next	0	1	1	-1	a grid of one cell: nowhere
+next	0	1	0	-1	a grid of one cell: nowhere
+consume	1	0	1	true	it moved
+consume	0	0	1	true	first press at an end, focus on a cell: consumed (was handed to Android's search, which goes the other way)
+consume	0	3	1	true	held at an end: consumed
+consume	0	3	0	true	a repeat is consumed even when the focus is not on a cell
+consume	0	0	0	false	first press with the focus off the grid: left to Android as before

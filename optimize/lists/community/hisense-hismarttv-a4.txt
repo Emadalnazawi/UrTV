@@ -1,0 +1,31 @@
+# UrTV community list: hisense-hismarttv-a4
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/hisense-hismarttv-a4/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: HISENSE
+# match-model: HISMARTTVA4
+# match-device: XIAOYUSHAN
+
+com.hisense.app.logreport
+com.google.android.feedback
+com.google.android.tv.bugreportsender
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+com.google.android.leanbacklauncher
+com.hisense.storemode
+fusion.android.tv.demo
+com.mstar.android.tv.disclaimercustomization
+android.autoinstalls.config.hisense.xiaoyushan
+com.seraphic.browser
+com.google.android.music
+com.google.android.videos
+com.google.android.play.games
+com.google.android.apps.nbu.smartconnect.tv
+com.netflix.ninja
+com.amazon.amazonvideo.livingroom
+com.hisense.tv.hisremotenow
+com.jamdeo.tv.mediacenter
+com.hisense.myapplication
+com.hisense.tv.ota
+com.hisense.remoteupgrade

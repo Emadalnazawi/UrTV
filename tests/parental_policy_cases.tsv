@@ -1,0 +1,499 @@
+# op	...	...	...	expected (the last column)
+# 1. nothing ever set: every launch path goes straight through, kids mode shows every app
+nothing				-
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER	sa.urtv.screensaver	GO
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	GO
+ask	INPUT_LIVE_TV	live.tv	GO
+ask	INPUT_PICKER	input.picker	GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI	settings.pkg	GO
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+ask	SLEEP_ACCESSIBILITY	settings.pkg	GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	MENU_APP	app	GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+ask	PARENTAL_SCREEN		GO
+visible	a,b,c			a,b,c
+kidsstart			false
+kidsleave			false
+# lists kept but no PIN (turned off with pin off): still nothing asks, kids mode is not on
+state	0	1	app,@inputs,@urtv	app	-
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER	sa.urtv.screensaver	GO
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	GO
+ask	INPUT_LIVE_TV	live.tv	GO
+ask	INPUT_PICKER	input.picker	GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI	settings.pkg	GO
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+ask	SLEEP_ACCESSIBILITY	settings.pkg	GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+ask	PARENTAL_SCREEN		GO
+visible	a,app,c			a,app,c
+# 2. a PIN and nothing locked: only the parental screen asks
+state	1	0			-
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER	sa.urtv.screensaver	GO
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	GO
+ask	INPUT_LIVE_TV	live.tv	GO
+ask	INPUT_PICKER	input.picker	GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI	settings.pkg	GO
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+ask	SLEEP_ACCESSIBILITY	settings.pkg	GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+ask	PARENTAL_SCREEN		ASK
+# 3. one app locked: only the paths that open that app ask (its tile, its row, a pill that opens it)
+state	1	0	app		-
+ask	TILE	app	ASK
+ask	GRID	app	ASK
+ask	TILE	other	GO
+ask	GRID	other	GO
+ask	PILL_TV_SETTINGS	app	ASK
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+ask	PILL_INPUTS		GO
+# the same app opened from the sources list (live TV) asks too
+state	1	0	live.tv,input.picker		-
+ask	INPUT_LIVE_TV	live.tv	ASK
+ask	INPUT_PICKER	input.picker	ASK
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+# 4. each pill, by its own lock
+state	1	0	@inputs		-
+ask	PILL_INPUTS		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	MENU_KEY		ASK
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@inputs		-
+ask	MENU_KEY		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		ASK
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@wifi		-
+ask	PILL_WIFI	settings.pkg	ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@tvsettings		-
+ask	PILL_TV_SETTINGS	settings.pkg	ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	SLEEP_ACCESSIBILITY	settings.pkg	ASK
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@tvsettings		-
+ask	SLEEP_ACCESSIBILITY	settings.pkg	ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS	settings.pkg	ASK
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@tasks		-
+ask	PILL_TASKS		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	CARD_TASKS		ASK
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@tasks		-
+ask	CARD_TASKS		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		ASK
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@saver		-
+ask	PILL_SAVER	sa.urtv.screensaver	ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	ASK
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@saver		-
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER	sa.urtv.screensaver	ASK
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@listen		-
+ask	PILL_LISTEN		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_SLEEP		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+state	1	0	@sleep		-
+ask	PILL_SLEEP		ASK
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	PILL_SAVER		GO
+ask	PILL_SAVER_SETTINGS		GO
+ask	INPUT_LIVE_TV		GO
+ask	INPUT_PICKER		GO
+ask	WIDGET_MATCHES		GO
+ask	PILL_INPUTS		GO
+ask	MENU_KEY		GO
+ask	PILL_WIFI		GO
+ask	PILL_TV_SETTINGS		GO
+ask	SLEEP_ACCESSIBILITY		GO
+ask	PILL_TASKS		GO
+ask	CARD_TASKS		GO
+ask	PILL_LISTEN		GO
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+# 5. «قفل الإعدادات»: the long-press menu, its arrange row and the arrange screen
+state	1	0	@urtv		-
+ask	MENU		ASK
+ask	MENU_ARRANGE		ASK
+ask	ARRANGE_SCREEN		ASK
+ask	UPDATE_SCREEN		ASK
+ask	TILE	app	GO
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+state	1	0			-
+ask	MENU		GO
+ask	MENU_ARRANGE		GO
+ask	ARRANGE_SCREEN		GO
+ask	UPDATE_SCREEN		GO
+# 6. the parental screen always asks once a PIN is set (it has no toggle), and once opened with the PIN not again until the home screen is back
+state	1	0			-
+ask	PARENTAL_SCREEN		ASK
+unlock	PARENTAL_SCREEN		-
+ask	PARENTAL_SCREEN		GO
+clear				-
+ask	PARENTAL_SCREEN		ASK
+# 7. an app opened with the PIN does not ask again until the home screen comes back; other locked apps still ask
+state	1	0	app,app2,@inputs		-
+ask	TILE	app	ASK
+unlock	TILE	app	-
+ask	TILE	app	GO
+ask	GRID	app	GO
+ask	TILE	app2	ASK
+ask	PILL_INPUTS		ASK
+clear				-
+ask	TILE	app	ASK
+# a pill opened with the PIN and the app it opens: both are open for the visit
+state	1	0	@saver,sa.urtv.screensaver		-
+ask	PILL_SAVER	sa.urtv.screensaver	ASK
+unlock	PILL_SAVER	sa.urtv.screensaver	-
+ask	PILL_SAVER_SETTINGS	sa.urtv.screensaver	GO
+ask	TILE	sa.urtv.screensaver	GO
+# 8. what each path asks about
+targets	TILE	app	app
+targets	GRID	app	app
+targets	PILL_INPUTS		@inputs
+targets	PILL_WIFI	w	@wifi,w
+targets	PILL_TV_SETTINGS	s	@tvsettings,s
+targets	SLEEP_ACCESSIBILITY	s	@tvsettings,s
+targets	PILL_TASKS		@tasks
+targets	CARD_TASKS		@tasks
+targets	PILL_SAVER	sa.urtv.screensaver	@saver,sa.urtv.screensaver
+targets	PILL_LISTEN		@listen
+targets	PILL_SLEEP		@sleep
+targets	MENU		@urtv
+targets	MENU_ARRANGE		@urtv
+targets	MENU_APP	com.netflix.ninja	@urtv,@tvsettings,com.netflix.ninja
+targets	ARRANGE_SCREEN		@urtv
+targets	PARENTAL_SCREEN		@parental
+targets	INPUT_LIVE_TV	live.tv	live.tv
+targets	MENU_KEY		@inputs
+# the app menu's «تفاصيل التطبيق» and «حذف التطبيق» (MENU_APP): «قفل الإعدادات», the TV's settings' lock or the app's own lock each ask
+state	1	0	@tvsettings		-
+ask	MENU_APP	app	ASK
+state	1	0	@urtv		-
+ask	MENU_APP	app	ASK
+state	1	0	app		-
+ask	MENU_APP	app	ASK
+ask	MENU_APP	other	GO
+state	1	0			-
+ask	MENU_APP	app	GO
+# 9. kids mode: only the allowed apps; off, every app
+state	1	1		a,c	-
+visible	a,b,c,d			a,c
+visible	b,d			-
+kidsleave			true
+kidsstart			true
+state	1	0		a,c	-
+visible	a,b,c,d			a,b,c,d
+kidsleave			false
+state	1	1			-
+visible	a,b			-
+kidsstart			false
+state	0	1		a	-
+visible	a,b			a,b
+kidsstart			false
+kidsleave			false
+# kids mode hides apps from the screen; it does not lock a pill, and a locked app that is allowed still asks
+state	1	1	app,@wifi	app	-
+visible	app,b			app
+ask	TILE	app	ASK
+ask	PILL_INPUTS		GO
+ask	PILL_WIFI	w	ASK
+# 10. lists are read back safely
+state	1	1	a,,b c, @x ,a;rm	x y,z	-
+visible	a,b,x,z,y			z
+ask	TILE	a	ASK
+ask	TILE	b	GO
+# 11. the remote's shortcut keys (YouTube, Netflix, Settings): nothing set goes straight through; a locked app or the locked «الإعدادات» pill still asks
+nothing				-
+ask	REMOTE_APP	yt	GO
+ask	REMOTE_SETTINGS	settings.pkg	GO
+state	1	0	yt		-
+ask	REMOTE_APP	yt	ASK
+ask	REMOTE_APP	nf	GO
+ask	REMOTE_SETTINGS	settings.pkg	GO
+unlock	TILE	yt	-
+ask	REMOTE_APP	yt	GO
+state	1	0	@tvsettings		-
+ask	REMOTE_SETTINGS	settings.pkg	ASK
+ask	REMOTE_APP	yt	GO
+state	1	0	settings.pkg		-
+ask	REMOTE_SETTINGS	settings.pkg	ASK
+targets	REMOTE_APP	yt	yt
+targets	REMOTE_SETTINGS	s	@tvsettings,s
+# «مركز التحكم»: opening the panel asks about @center only; the tiles that open something keep their own pills' locks
+nothing				-
+ask	PILL_CENTER		GO
+state	1	0	@center		-
+ask	PILL_CENTER		ASK
+ask	PILL_SLEEP		GO
+ask	PILL_WIFI	settings.pkg	GO
+ask	PILL_TV_SETTINGS	settings.pkg	GO
+ask	PILL_SAVER	sa.urtv.screensaver	GO
+ask	PILL_INPUTS		GO
+unlock	PILL_CENTER		-
+ask	PILL_CENTER		GO
+state	1	0	@sleep,@wifi,@tvsettings,@saver		-
+ask	PILL_CENTER		GO
+ask	PILL_SLEEP		ASK
+ask	PILL_WIFI	settings.pkg	ASK
+ask	PILL_TV_SETTINGS	settings.pkg	ASK
+ask	PILL_SAVER	sa.urtv.screensaver	ASK
+state	0	1	@center		-
+ask	PILL_CENTER		GO
+state	1	0	@center		-
+targets	PILL_CENTER			@center
+
+paths				ARRANGE_SCREEN,CARD_TASKS,GRID,INPUT_LIVE_TV,INPUT_PICKER,MENU,MENU_APP,MENU_ARRANGE,MENU_KEY,OUR_SETTINGS,PARENTAL_SCREEN,PILL_CENTER,PILL_INPUTS,PILL_LISTEN,PILL_SAVER,PILL_SAVER_SETTINGS,PILL_SLEEP,PILL_TASKS,PILL_TV_SETTINGS,PILL_UPDATES,PILL_WIFI,REMOTE_APP,REMOTE_SETTINGS,SLEEP_ACCESSIBILITY,TILE,UPDATE_SCREEN,WIDGET_MATCHES
+# `dock.sh pin lock/unlock`: what may be named, and what `pin status` says about a kept list
+state	1	0	com.netflix.ninja,@wifi		-
+lockedline					@wifi,com.netflix.ninja
+state	0	0	com.netflix.ninja,@wifi		-
+lockedline					@wifi,com.netflix.ninja (kept, but nothing asks while there is no PIN)
+state	0	0			-
+lockedline					none
+validtarget	com.netflix.ninja				true
+validtarget	a.b				true
+validtarget	@inputs				true
+validtarget	@wifi				true
+validtarget	@tvsettings				true
+validtarget	@tasks				true
+validtarget	@saver				true
+validtarget	@center				true
+validtarget	@Center				false
+validtarget	@listen				true
+validtarget	@sleep				true
+validtarget	@urtv				true
+validtarget	@parental				false
+validtarget	@kids				false
+validtarget	netflix				false
+validtarget	com..x				false
+validtarget	1com.x				false
+validtarget	com.x'y				false
+validtarget	com.x;reboot				false
+validtarget					false
+# 12. the updates bell opens the Play Store: nothing set goes through; the Play Store locked (its package) asks, the other pills' locks do not
+nothing				-
+ask	PILL_UPDATES	play	GO
+state	1	0	play		-
+ask	PILL_UPDATES	play	ASK
+state	1	0	wifi.pkg		-
+ask	PILL_UPDATES	play	GO
+# «إعدادات تلفزيونك» (the control center's tile) and the remote's Settings key: our settings screen, locked by «قفل الإعدادات» (@urtv) only
+nothing				-
+ask	OUR_SETTINGS		GO
+state	1	0	@urtv		-
+ask	OUR_SETTINGS		ASK
+unlock	OUR_SETTINGS		-
+ask	OUR_SETTINGS		GO
+state	1	0	@tvsettings,@saver,@center		-
+ask	OUR_SETTINGS		GO
+targets	OUR_SETTINGS			@urtv

@@ -1,0 +1,24 @@
+# UrTV community list: stellamore-t950s
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/stellamore-t950s/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: STELLAMORE
+# match-model: BE30A3 ROPRODUCTDEVICETYPET950S T950SPROJECTOR
+# match-device: 
+
+zeasn.open.technical.tv.store.stellamore.tv
+com.zeasn.deviceportal.asdprovider.xym_hisi351
+com.stm
+com.stm.factorytest
+com.stellamore.tvfactory
+com.stellamore.guide
+com.android.printspooler
+com.android.musicfx
+com.android.providers.calendar
+com.android.providers.contacts
+com.google.android.syncadapters.calendar
+com.google.android.syncadapters.contacts
+com.android.wallpaperbackup
+com.android.adservices.api
+com.android.ondevicepersonalization.services

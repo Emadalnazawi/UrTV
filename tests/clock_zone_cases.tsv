@@ -1,0 +1,32 @@
+# kind	inputs...	expected	note
+# at: instant (UTC), the TV's zone, the city's zone  ->  the city's hour:minute, day of the month, same/differs
+at	2026-06-15T19:30:00Z	Asia/Riyadh	Asia/Dubai	23:30 15 differs	Dubai is an hour ahead of Riyadh
+at	2026-06-15T20:30:00Z	Asia/Riyadh	Asia/Dubai	0:30 16 differs	the city's date turns an hour before the TV's
+at	2026-06-15T19:30:00Z	Asia/Riyadh	Asia/Riyadh	22:30 15 same	the same zone: no line
+at	2026-06-15T19:30:00Z	Asia/Riyadh	Asia/Kuwait	22:30 15 same	another zone, the same offset: no line
+at	2026-06-15T19:30:00Z	UTC	Asia/Riyadh	22:30 15 differs	a TV on UTC, a city on Riyadh time
+at	2026-01-15T12:00:00Z	UTC	Africa/Cairo	14:00 15 differs	Cairo in winter is UTC+2
+at	2026-07-15T12:00:00Z	UTC	Africa/Cairo	15:00 15 differs	Cairo in summer time is UTC+3
+at	2026-07-15T12:00:00Z	Asia/Riyadh	Africa/Cairo	15:00 15 same	in summer Cairo and Riyadh agree
+# parse: the screensaver's fragment -> city|zone
+parse	city=%D8%AF%D8%A8%D9%8A&lat=25.2&lon=55.3&tz=Asia%2FDubai&teams=	دبي|Asia/Dubai	a saved city and zone
+parse	city=%D8%AF%D8%A8%D9%8A&tz=Not%2FAZone	دبي|Asia/Riyadh	a zone nobody knows is Riyadh
+parse	lat=1&lon=2	|Asia/Riyadh	no city, no zone
+parse	city=%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9&tz=Africa%2FCairo	القاهرة|Africa/Cairo	another city
+# label: the city -> the small line under the clock
+label	دبي	بتوقيت دبي	as the screensaver's
+# line: city, zone, pm, the clocks differ (1/0) -> the home screen's line under the clock ("-" = not shown)
+line	الرياض	Asia/Riyadh		0	-	Riyadh, Umm al-Qura: no line, today's look (the greeting is not asked)
+line	الرياض	Asia/Riyadh		1	بتوقيت الرياض	a TV on another zone: as before
+line	المنامة	Asia/Bahrain		0	بتوقيت المنامة · حساب الخليج	Bahrain: its calculation named
+line	الدوحة	Asia/Qatar		0	بتوقيت الدوحة · حساب قطر	Qatar
+line	مدينة الكويت	Asia/Kuwait		0	بتوقيت مدينة الكويت · حساب الكويت	Kuwait
+line	دبي	Asia/Dubai		1	بتوقيت دبي · حساب الإمارات	the UAE, another zone
+line	مسقط	Asia/Muscat		0	بتوقيت مسقط · حساب عُمان	Oman
+line	القطيف	Asia/Riyadh	jafari	0	بتوقيت القطيف · الحساب الجعفري	the Ja'fari method, anywhere
+line	القاهرة	Africa/Cairo		0	بتوقيت القاهرة · حساب الهيئة المصرية	Egypt: the Egyptian Authority's, named
+line	بيروت	Asia/Beirut		1	بتوقيت بيروت · حساب الهيئة المصرية	Lebanon: the Egyptian method too
+line	عمان	Asia/Amman		1	بتوقيت عمان · حساب الأردن	Jordan
+line	الرباط	Africa/Casablanca		1	بتوقيت الرباط · حساب المغرب	Morocco
+line	الجزائر	Africa/Algiers		1	بتوقيت الجزائر · حساب الجزائر	Algeria
+line	تونس	Africa/Tunis		1	بتوقيت تونس · حساب تونس	Tunisia

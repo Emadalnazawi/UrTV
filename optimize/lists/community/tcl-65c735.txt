@@ -1,0 +1,38 @@
+# UrTV community list: tcl-65c735
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-65c735/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: 65C735 G054KGB
+# match-device: G05
+
+com.tcl.ttvs
+com.tcl.guard
+com.google.android.feedback
+com.google.android.partnersetup
+com.tcl.waterfall.overseas
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.usercenter
+com.tcl.dashboard
+com.tcl.tv.tclhome_passive
+com.tcl.esticker
+tv.wuaki.apptv
+com.google.android.youtube.tvmusic
+com.google.android.play.games
+com.google.android.videos
+com.tcl.gallery
+com.tcl.ui_mediaCenter
+com.tcl.notereminder
+com.tcl.hearaid
+com.google.android.marvin.talkback
+com.google.android.syncadapters.calendar
+com.google.android.onetimeinitializer
+com.google.android.katniss
+com.google.android.tv.assistant
+com.tcl.assistant
+com.tcl.smartalexa
+com.tcl.airplay2
+com.mediatek.AirplayAPK
+com.google.android.tungsten.setupwraith

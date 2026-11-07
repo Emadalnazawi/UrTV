@@ -7,6 +7,9 @@ com.google.android.apps.mediashell     # Chromecast built-in / Google Cast
 com.tcl.miracast                       # screen mirroring from Android phones
 com.tcl.magiconnectfree                # TCL phone-to-TV connect
 
+# Music (field report: the community list turned it off and the owner wanted it)
+com.google.android.apps.youtube.music  # YouTube Music
+
 # Voice and remote
 com.google.android.katniss             # Google Assistant / voice search from the remote
 com.google.android.tv.assistant        # Google Assistant on TV
@@ -26,6 +29,8 @@ com.android.tv.settings
 com.tcl.systemserver
 com.tcl.versionUpdateApp               # firmware (OTA) updates
 com.tcl.providers.config               # firmware configuration provider
+com.tcl.xian.StartandroidService       # TCL's firmware updater gets the device number from it: off, «Network Update» fails
+com.xiaomi.android.tvsetup.partnercustomizer   # Xiaomi: answers the remote's Netflix, Prime and Input buttons and its Bluetooth pairing
 com.tcl.android.webview
 com.google.android.webview
 com.android.systemui

@@ -1,0 +1,123 @@
+# op	arg1	arg2	expected   (times in ms: 60000 = a minute)
+new			-
+isset			false
+verify	1234	0	NOT_SET
+set	1234		ok
+isset			true
+plain	1234		false
+peek			pin
+verify	1234	0	OK
+# four wrong tries count down, the fifth locks for one minute
+verify	1111	1000	WRONG left=4 wait=0
+verify	2222	2000	WRONG left=3 wait=0
+verify	3333	3000	WRONG left=2 wait=0
+verify	4444	4000	WRONG left=1 wait=0
+fails			4
+verify	5555	5000	WRONG left=0 wait=60000
+fails			5
+# locked: even the right PIN is turned away and not looked at, and the wait runs down
+verify	1234	35000	LOCKED wait=30000
+wait	35000		30000
+verify	1234	64999	LOCKED wait=1
+fails			5
+# the wait over: the right PIN opens and the count starts over
+verify	1234	65000	OK
+fails			0
+peek			pin
+# the next five (counted from a right PIN) lock for one minute again, not five
+verify	0000	100000	WRONG left=4 wait=0
+verify	0000	101000	WRONG left=3 wait=0
+verify	0000	102000	WRONG left=2 wait=0
+verify	0000	103000	WRONG left=1 wait=0
+verify	0000	104000	WRONG left=0 wait=60000
+# five more after the minute: five minutes; then fifteen; then fifteen again
+verify	1234	164000	OK
+# (a right PIN above started over; now the climb without one)
+new			-
+set	1234		ok
+verify	9999	1000	WRONG left=4 wait=0
+verify	9999	2000	WRONG left=3 wait=0
+verify	9999	3000	WRONG left=2 wait=0
+verify	9999	4000	WRONG left=1 wait=0
+verify	9999	5000	WRONG left=0 wait=60000
+fails			5
+verify	1234	64999	LOCKED wait=1
+verify	9999	66000	WRONG left=4 wait=0
+verify	9999	67000	WRONG left=3 wait=0
+verify	9999	68000	WRONG left=2 wait=0
+verify	9999	69000	WRONG left=1 wait=0
+verify	9999	70000	WRONG left=0 wait=300000
+fails			10
+verify	1234	369999	LOCKED wait=1
+verify	9999	371000	WRONG left=4 wait=0
+verify	9999	372000	WRONG left=3 wait=0
+verify	9999	373000	WRONG left=2 wait=0
+verify	9999	374000	WRONG left=1 wait=0
+verify	9999	375000	WRONG left=0 wait=900000
+fails			15
+verify	1234	1274999	LOCKED wait=1
+verify	9999	1276000	WRONG left=4 wait=0
+verify	9999	1277000	WRONG left=3 wait=0
+verify	9999	1278000	WRONG left=2 wait=0
+verify	9999	1279000	WRONG left=1 wait=0
+verify	9999	1280000	WRONG left=0 wait=900000
+fails			20
+verify	1234	2179999	LOCKED wait=1
+verify	9999	2181000	WRONG left=4 wait=0
+verify	9999	2182000	WRONG left=3 wait=0
+verify	9999	2183000	WRONG left=2 wait=0
+verify	9999	2184000	WRONG left=1 wait=0
+verify	9999	2185000	WRONG left=0 wait=900000
+fails			25
+verify	1234	3084999	LOCKED wait=1
+# a right PIN in the middle starts the climb over
+new			-
+set	1234		ok
+verify	9999	1000	WRONG left=4 wait=0
+verify	9999	2000	WRONG left=3 wait=0
+verify	9999	3000	WRONG left=2 wait=0
+verify	9999	4000	WRONG left=1 wait=0
+verify	1234	5000	OK
+verify	9999	6000	WRONG left=4 wait=0
+verify	9999	7000	WRONG left=3 wait=0
+verify	9999	8000	WRONG left=2 wait=0
+verify	9999	9000	WRONG left=1 wait=0
+verify	9999	10000	WRONG left=0 wait=60000
+# setting a new PIN clears the tries; clearing removes the PIN and the tries
+verify	9999	70000	WRONG left=4 wait=0
+set	4321		ok
+fails			0
+verify	1234	70001	WRONG left=4 wait=0
+verify	4321	70002	OK
+clear			ok
+isset			false
+peek			
+verify	4321	70003	NOT_SET
+# only 4 digits are a PIN
+new			-
+set	4321		ok
+verify	432	1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+verify	43210	1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+verify	abcd	1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+verify		1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+verify	43 1	1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+verify	٤٣٢١	1	WRONG left=4 wait=0
+clear			ok
+set	4321		ok
+# a broken lock value is read as no tries; a clock set far back never waits longer than the last wait
+corrupt			ok
+fails			0
+verify	4321	2	OK
+clock	1000	99999999999	900000
+# two records of one PIN differ (salted), each checks, another PIN does not
+same	1234	1235	true

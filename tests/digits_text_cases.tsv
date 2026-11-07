@@ -1,0 +1,14 @@
+# latin(0|1) TAB input TAB expected TAB note
+0	8:55	٨:٥٥	a clock, hindi
+1	٨:٥٥	8:55	a clock, latin
+1	8:55	8:55	already latin
+0	٨:٥٥	٨:٥٥	already hindi
+0	١٢ جمادى الأولى ١٤٤٨ هـ - 23 أكتوبر	١٢ جمادى الأولى ١٤٤٨ هـ - ٢٣ أكتوبر	a mixed date, hindi
+1	١٢ جمادى الأولى ١٤٤٨ هـ - ٢٣ أكتوبر	12 جمادى الأولى 1448 هـ - 23 أكتوبر	a mixed date, latin
+0	30%	٣٠٪	percent, hindi
+1	٣٠٪	30%	percent, latin
+1	٣٫١٢٣	3.123	a version, latin
+0	نوم 23 د	نوم ٢٣ د	words around, hindi
+1	نوم ٢٣ د	نوم 23 د	words around, latin
+0			empty
+1	بدون أرقام	بدون أرقام	no digits

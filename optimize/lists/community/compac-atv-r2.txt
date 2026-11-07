@@ -1,0 +1,25 @@
+# UrTV community list: compac-atv-r2
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/compac-atv-r2/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: COMPAC
+# match-model: ATVR2
+# match-device: 
+
+com.apps.function.gdpr
+com.vewd.core.service
+com.google.android.feedback
+com.google.android.tv.bugreportsender
+com.apps.channels
+com.apps.eshow
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+android.autoinstalls.config.scbc.device
+com.apps.clear
+com.google.android.apps.nbu.smartconnect.tv
+com.apps.wifihotspot
+com.android.printspooler
+com.apps.networkspeed
+com.apps.timeclock
+com.google.android.apps.mediashell

@@ -96,6 +96,20 @@ check("Saudi Al-Arabi keeps «العربي», Qatar's gets «العربي الق
 check("two names that differ only in hamza are told apart too", ti.plain_ar(got["7"]) != ti.plain_ar(got["8"]), got)
 check("no names left shared", len({ti.plain_ar(a) for a in got.values()}) == len(got) and not problems, (got, problems))
 
+# the same name in two sports: the football club keeps it, the other says its sport
+sp = {"1": {"en": "Al-Ahli", "ar": "الأهلي", "sport": "Soccer", "leagues": ["Saudi-Arabian Pro League"]},
+      "2": {"en": "Al-Ahli Jeddah", "ar": "الأهلي", "sport": "Basketball", "leagues": ["Saudi Basketball"]},
+      "3": {"en": "Miami Heat", "ar": "ميامي هيت", "sport": "Basketball", "leagues": ["NBA"]}}
+ti.unique_names(sp, {"names told apart": []}, [])
+check("a basketball team named like a club says its sport", sp["1"]["ar"] == "الأهلي"
+      and sp["2"]["ar"] == "الأهلي (كرة السلة)" and sp["3"]["ar"] == "ميامي هيت", {i: t["ar"] for i, t in sp.items()})
+check("every NBA and NFL team is named in teams-ar.json, so Wikidata is never asked",
+      all(last.get(ti.team_key(n)) for n in ("Los Angeles Lakers", "Golden State Warriors", "Kansas City Chiefs",
+                                              "San Francisco 49ers", "Philadelphia 76ers")), "a name is missing")
+check("«لوس أنجلوس ليكرز» and «غولدن ستيت ووريورز» as the owner spells them",
+      last[ti.team_key("Los Angeles Lakers")] == "لوس أنجلوس ليكرز"
+      and last[ti.team_key("Golden State Warriors")] == "غولدن ستيت ووريورز")
+
 # every name the committed list calls ours comes back from teams-ar.json, so no run can lose it to the cache,
 # Wikidata or a transliteration
 listed = json.loads((ROOT / "assets/shared/teams.json").read_text(encoding="utf-8"))
@@ -149,6 +163,14 @@ PINNED = {("Saudi-Arabian Pro League", 0): ("136013", "Al-Hilal"), ("Saudi-Arabi
           ("Spanish La Liga", 0): ("133738", "Real Madrid"), ("English Premier League", 0): ("133604", "Arsenal")}
 
 
+EVENT_LEAGUES = [{"strLeague": "Formula 1", "idLeague": "E1", "strSport": "Motorsport"},
+                 {"strLeague": "UFC", "idLeague": "E2", "strSport": "Fighting"},
+                 {"strLeague": "Boxing", "idLeague": "E3", "strSport": "Fighting"},
+                 {"strLeague": "ATP World Tour", "idLeague": "E4", "strSport": "Tennis"},
+                 {"strLeague": "WTA Tour", "idLeague": "E5", "strSport": "Tennis"},
+                 {"strLeague": "Formula 2", "idLeague": "E6", "strSport": "Motorsport"}]
+
+
 def fake_world(extra=None, renamed=None):
     clubs = {}
     for k, n in enumerate(LEAGUE_NAMES):
@@ -173,7 +195,17 @@ def fake_fetch(world, calls):
         path, _, query = url[len(ti.API):].partition("?")
         q = dict(up.parse_qsl(query))
         if path == "all_leagues.php":
-            return {"leagues": [{"strLeague": n, "idLeague": f"L{k}"} for k, n in enumerate(LEAGUE_NAMES)]}
+            return {"leagues": [{"strLeague": n, "idLeague": f"L{k}", "strSport": ti.LEAGUES[n]["sport"]}
+                                for k, n in enumerate(LEAGUE_NAMES)] + EVENT_LEAGUES}
+        if path == "search_all_teams.php":   # a sport's own team list: the NBA's has no preseason guests
+            return {"teams": [{"idTeam": i, "strTeam": names[i]} for i, _ in clubs[q["l"]]]}
+        if path == "eventsnextleague.php":
+            return {"events": [{"idEvent": "1", "strEvent": "Fake Grand Prix", "dateEvent": "2030-01-01"}]
+                    if q["id"] != "E5" else None}   # no upcoming WTA event
+        if path == "eventspastleague.php":
+            return {"events": [{"idEvent": "0", "strEvent": "Old Grand Prix"}]}
+        if path == "search_all_leagues.php":
+            return {"countries": None}
         if path == "eventsseason.php":
             n = LEAGUE_NAMES[int(q["id"][1:])]
             if q["s"] not in SEASONS[n]:
@@ -236,6 +268,20 @@ def short_get(path):   # 2026-27 lists 19 of La Liga's 20: Club 19 is in last se
     return {"events": None}
 
 
+# early in a season the free API's first 100 games miss teams: the ids next to the found ones are looked up
+asked_ids = []
+def id_get(path):
+    i = path.rsplit("=", 1)[1]
+    asked_ids.append(i)
+    return {"teams": [{"idTeam": i, "strTeam": f"Team {i}", "idLeague": "4387", "strSport": "Basketball"}]
+            if i in ("134888", "134889") else None}
+real_get, ti.get = ti.get, id_get
+have = {str(134860 + i): f"Team {i}" for i in range(28)}
+ti.fill_by_id("4387", "NBA", have)
+ti.get = real_get
+check("a short league is completed from the ids next to its own, and stops at the minimum", len(have) == 30
+      and "134888" in have and "134889" in have, (len(have), asked_ids))
+
 real_get, ti.get = ti.get, short_get
 report, problems, teams = {"clubs per league": {}}, [], {}
 with contextlib.redirect_stdout(io.StringIO()):
@@ -263,8 +309,22 @@ with tempfile.TemporaryDirectory() as tmp:
     lookups = [c for c in calls if "lookupteam.php" in c]
     every = len(json.loads((tmp / "one/teams.json").read_text(encoding="utf-8")))
     parts = len(ti.plan())
-    check("full run: every team looked up (and one probe per part)", len(lookups) == every + parts,
+    check("full run: every team looked up (and one probe per part that has teams)", len(lookups) == every + parts - 1,
           (len(lookups), every, parts))
+    teams_out = {t["id"]: t for t in json.loads((tmp / "one/teams.json").read_text(encoding="utf-8"))}
+    sports = {t["sport"] for t in teams_out.values()}
+    check("full run: every team has its sport (football, basketball, American football)",
+          sports == {"Soccer", "Basketball", "American Football"}, sports)
+    check("full run: the NBA's 30 and the NFL's 32 teams, by league",
+          sum("NBA" in t["leagues"] for t in teams_out.values()) == 31 and sum("NFL" in t["leagues"]
+          for t in teams_out.values()) == 33, [(l, sum(l in t["leagues"] for t in teams_out.values())) for l in ("NBA", "NFL")])
+    events = json.loads((tmp / "one/events.json").read_text(encoding="utf-8"))
+    check("full run: events.json holds one Formula 1, UFC and boxing league and the tennis one with events",
+          events == {"f1": [{"id": "E1", "name": "Formula 1"}], "ufc": [{"id": "E2", "name": "UFC"}],
+                     "boxing": [{"id": "E3", "name": "Boxing"}], "tennis": [{"id": "E4", "name": "ATP World Tour"}]}, events)
+    check("full run: the report keeps what a league answered, and says no Saudi basketball league was found",
+          report["events"]["f1"][0]["next"][0]["strEvent"] == "Fake Grand Prix"
+          and "no Saudi basketball" in str(report["events"]["saudi basketball"]), report["events"]["saudi basketball"])
     check("full run: Jordan found in its matches", any("Jordan" in x for x in report["national teams found in their matches"]),
           report["national teams not found"])
     check("full run: every league above its minimum", not [p for p in report["problems"] if "expected" in p], report["problems"])
@@ -276,8 +336,9 @@ with tempfile.TemporaryDirectory() as tmp:
     lookups = sorted(up.parse_qs(up.urlparse(c).query)["id"][0] for c in calls if "lookupteam.php" in c)
     check("incremental: only the new and the renamed club looked up (after one probe)",
           lookups == sorted([new_club[0], renamed] + list(ti.PROBE)), lookups)
-    check("incremental: no league or national team searched again",
-          not [c for c in calls if "all_leagues.php" in c or "searchteams.php" in c or "searchevents.php" in c],
+    check("incremental: no league or national team searched again (only the events part reads all_leagues.php)",
+          len([c for c in calls if "/all_leagues.php" in c]) == 1
+          and not [c for c in calls if "searchteams.php" in c or "searchevents.php" in c],
           [c for c in calls if "search" in c][:4])
     cached = json.loads((tmp / "one/teams-cache.json").read_text(encoding="utf-8"))["teams"]
     again = sum(1 for i, c in cached.items() if c["arFrom"] in ("translit", "missing") and i != renamed)

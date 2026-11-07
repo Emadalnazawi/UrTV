@@ -1,0 +1,158 @@
+# tests/fav_edit_test.py: FavEdit, the gate and the adhan rule. Columns: command, arguments…, expected, note (see FavEditRun.java)
+# move / drop / cancel / remove / undo. Rows a..g, the least is 5. Times in ms.
+new	5	1	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|1|c	OK picks the focused app up, the row is as it was
+move	0	1	MOVED|a,c,b,d,e,f,g|2|c	one step toward the end moves the carried app live
+move	0	1	MOVED|a,c,d,b,e,f,g|3|c	and again
+move	0	-1	MOVED|a,c,b,d,e,f,g|2|c	one step back
+ok	0	DROPPED|a,c,b,d,e,f,g|2|-	OK again drops it where it is
+new	5	3	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|3|c	pick up d
+move	0	-1	MOVED|a,b,d,c,e,f,g|2|c	d one place toward the start
+move	0	-1	MOVED|a,d,b,c,e,f,g|1|c	and one more
+move	0	-1	MOVED|d,a,b,c,e,f,g|0|c	to the start
+move	0	-1	NOTHING|d,a,b,c,e,f,g|0|c	the start of the row is an edge: it stays
+back	0	CANCELLED|a,b,c,d,e,f,g|3|-	Back while carrying puts it back where it was, and the focus is on it again
+new	5	6	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|6|c	pick up the last one
+move	0	1	NOTHING|a,b,c,d,e,f,g|6|c	the end of the row is an edge too
+up	0	0	MOVED|g,a,b,c,d,e,f|0|c	UP: to the start of the row
+up	0	0	NOTHING|g,a,b,c,d,e,f|0|c	already there
+down	0	NOTHING|g,a,b,c,d,e,f|0|c	DOWN does nothing while carrying (the × is not reachable with an app in the hand)
+ok	0	DROPPED|g,a,b,c,d,e,f|0|-	dropped at the start
+new	5	6	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|6|c	with two rows of 3: pick up g
+up	0	3	MOVED|a,b,c,g,d,e,f|3|c	UP goes to the row above (three places back)
+up	0	3	MOVED|g,a,b,c,d,e,f|0|c	and again, to the first row
+new	5	1	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|1|c	a drop after a cancel is a pick-up again
+back	0	CANCELLED|a,b,c,d,e,f,g|1|-	cancelled
+ok	0	PICKED|a,b,c,d,e,f,g|1|c	picked up once more
+# focus without carrying: nothing moves in the row
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+move	0	1	FOCUS|a,b,c,d,e,f,g|3|-	a step moves the focus, the row stays
+move	0	-1	FOCUS|a,b,c,d,e,f,g|2|-	back
+move	0	-3	NOTHING|a,b,c,d,e,f,g|2|-	past the start: stays
+back	0	EXIT|a,b,c,d,e,f,g|2|-	Back with nothing in the hand leaves the mode (the screen saves the row)
+# the × and the undo chip
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN from a tile is its ×
+move	0	1	FOCUS|a,b,c,d,e,f,g|3|x	from a × the arrows go to the next ×
+ok	1000	REMOVED|a,b,c,e,f,g|3|-	OK on the × removes it at once, nothing asked; the focus is on the tile that took its place
+down	1000	FOCUS|a,b,c,e,f,g|3|x	the next ×
+up	1000	0	FOCUS|a,b,c,e,f,g|3|-	UP from the × is the tile
+up	1000	0	FOCUS|a,b,c,e,f,g|3|u	UP from the tile is «تراجع» while it shows
+ok	3000	UNDONE|a,b,c,d,e,f,g|3|-	OK on «تراجع» puts d back in its place
+undo	3100	NOTHING|a,b,c,d,e,f,g|3|-	there is nothing left to undo
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+undo	4999	UNDONE|a,b,c,d,e,f,g|2|-	the last millisecond of the 5 seconds still undoes
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+undo	5000	NOTHING|a,b,d,e,f,g|2|-	after 5 seconds it is final
+expire	5000	kept|false	the chip has nothing left to show
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+up	100	0	FOCUS|a,b,d,e,f,g|2|u	focus on «تراجع»
+expire	5200	expired|false	its time is over while the focus is on it: it goes, and the focus is back on the tile
+ok	5300	PICKED|a,b,d,e,f,g|2|c	so OK picks the tile up, it does not undo
+new	5	0	a,b,c,d,e,f	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f|0|x	the first ×
+ok	0	REMOVED|b,c,d,e,f|0|-	a is removed
+down	0	FOCUS|b,c,d,e,f|0|x	
+ok	0	TOO_FEW|b,c,d,e,f|0|x	five is the least: nothing is removed (the screen says so)
+undo	10	UNDONE|a,b,c,d,e,f|0|-	but the first removal can still be undone
+new	5	5	a,b,c,d,e,f	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f|5|x	the last ×
+ok	0	REMOVED|a,b,c,d,e|4|-	the last one removed: the focus is on the new last tile
+undo	1	UNDONE|a,b,c,d,e,f|5|-	and it comes back at the end
+# «تراجع» from the TV test: UP from the tile row reaches it, DOWN goes back and UP again; Back while it shows undoes, a second Back leaves
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed, the focus on the tile that took its place
+up	200	0	FOCUS|a,b,d,e,f,g|2|u	UP from the tile row: on «تراجع»
+down	300	FOCUS|a,b,d,e,f,g|2|-	DOWN: back on the tile
+up	400	0	FOCUS|a,b,d,e,f,g|2|u	UP again: on «تراجع» again
+up	500	0	NOTHING|a,b,d,e,f,g|2|u	UP on «تراجع» stays on it
+key	600	21	1	NOTHING|a,b,d,e,f,g|2|u	LEFT on «تراجع» stays on it
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+back	4999	UNDONE|a,b,c,d,e,f,g|2|-	Back within the 5 seconds, focus on the tile: c is back in its place
+back	5100	EXIT|a,b,c,d,e,f,g|2|-	a second Back leaves the mode
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+up	100	0	FOCUS|a,b,d,e,f,g|2|u	on «تراجع»
+back	200	UNDONE|a,b,c,d,e,f,g|2|-	Back on «تراجع» undoes too
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+back	5000	EXIT|a,b,d,e,f,g|2|-	after the 5 seconds Back leaves the mode, c stays removed
+new	5	2	a,b,c,d,e,f,g	-	a fresh row
+down	0	FOCUS|a,b,c,d,e,f,g|2|x	DOWN to the ×
+ok	0	REMOVED|a,b,d,e,f,g|2|-	c removed
+ok	100	PICKED|a,b,d,e,f,g|2|c	d picked up while «تراجع» shows
+back	200	CANCELLED|a,b,d,e,f,g|2|-	Back while carrying puts d back first, it does not undo
+back	300	UNDONE|a,b,c,d,e,f,g|2|-	the next Back, still within the seconds, undoes
+# RTL: the row reads from the right, so RIGHT goes toward the start of the row
+step	22	1	-1	RIGHT, Arabic: toward the start
+step	21	1	1	LEFT, Arabic: toward the end
+step	22	0	1	RIGHT, left to right: toward the end
+step	21	0	-1	LEFT, left to right: toward the start
+step	19	1	0	UP is not a side key
+step	23	1	0	OK is not a side key
+new	5	3	a,b,c,d,e,f,g	-	a fresh row
+ok	0	PICKED|a,b,c,d,e,f,g|3|c	pick up d
+key	0	22	1	MOVED|a,b,d,c,e,f,g|2|c	Arabic: RIGHT carries it toward the start, which is on the right of the screen
+key	0	21	1	MOVED|a,b,c,d,e,f,g|3|c	LEFT carries it back
+key	0	21	0	MOVED|a,b,d,c,e,f,g|2|c	left to right: LEFT is toward the start
+# a held key: one step per pace
+repeat	0	0	0	120	step	the first press always moves
+repeat	1	1000	1050	120	skip	a repeat 50 ms after a step waits
+repeat	2	1000	1119	120	skip	still waiting
+repeat	3	1000	1120	120	step	at the pace it steps again
+once	0	act	OK/Back act on the press
+once	1	skip	a held OK or Back is not a second pick-up, drop or exit
+once	7	skip	nor a longer hold
+# entering the mode: the same gate as the settings (قفل الإعدادات)
+gate	0		0	GO	no PIN: nothing asks
+gate	0	@urtv	0	GO	a lock kept without a PIN means nothing
+gate	1		0	GO	a PIN but the settings not locked: nothing asks
+gate	1	@urtv	0	ASK	PIN and the settings locked: the PIN is asked
+gate	1	@urtv	1	GO	opened with the PIN already (the menu asked) since the home screen came back: not asked twice
+gate	1	@wifi	0	GO	another pill's lock is not the settings'
+# the adhan: any key stops it first, in the mode too. The home screen asks AdhanKeys before the mode sees a key (checked in the source)
+adhanreset	-	a fresh press
+adhan	22	0	0	STOP	RIGHT while the adhan plays stops it
+adhan	22	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	22	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	21	0	0	STOP	LEFT while the adhan plays stops it
+adhan	21	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	21	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	19	0	0	STOP	UP while the adhan plays stops it
+adhan	19	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	19	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	20	0	0	STOP	DOWN while the adhan plays stops it
+adhan	20	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	20	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	23	0	0	STOP	OK while the adhan plays stops it
+adhan	23	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	23	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	66	0	0	STOP	ENTER while the adhan plays stops it
+adhan	66	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	66	1	0	EAT	and its release too
+adhanreset	-	a fresh press
+adhan	4	0	0	STOP	BACK while the adhan plays stops it
+adhan	4	0	1	EAT	its repeat is eaten: the mode never sees it
+adhan	4	1	0	EAT	and its release too
+adhanreset	-	fresh
+adhan	24	0	0	PASS	the volume key is left alone, even in the mode

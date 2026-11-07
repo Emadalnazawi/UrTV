@@ -1,0 +1,28 @@
+# UrTV community list: xgimi-mogo-3-pro
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xgimi-mogo-3-pro/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XGIMI
+# match-model: MOGO3PROPROJECTOR
+# match-device: ALTAI
+
+fusion.android.tv.demo
+com.xgimi.atvwifiverify
+com.xgimi.minitvfactory
+com.xgimi.bugreportsender
+com.google.android.feedback
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.dreamx
+com.google.android.videos
+com.google.android.play.games
+com.google.android.marvin.talkback
+air.ITVMobilePlayer
+com.google.android.katniss
+com.google.android.tv.assistant
+com.google.android.apps.mediashell
+com.google.android.tv.remote.service
+com.xgimi.screensaver
+com.xgimi.ota.accessories
+com.xgimi.gimiplayer
+com.xgimi.doubanfm

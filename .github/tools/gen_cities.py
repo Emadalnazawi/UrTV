@@ -5,6 +5,7 @@ usage: python3 .github/tools/gen_cities.py path/to/geonamescache/data/cities500.
 """
 import json
 import sys
+from itertools import groupby
 from pathlib import Path
 
 REGIONS = [  # GeoNames admin1 code, Arabic name, in display order
@@ -81,6 +82,114 @@ EXTRA = [
     ("20", "دومة الجندل", 29.8115, 39.8687), ("20", "القريات", 31.3317, 37.3428),
 ]
 
+# The other Gulf states (hand-checked coordinates, not from the dataset): country, IANA zone, then the capital and the big cities.
+# The zone is what picks the calculation (PrayerMethod in the app, PrayerMath in the launcher, CONFIG.prayerMethod in the page).
+GCC = [
+    ("البحرين", "Asia/Bahrain", [
+        ("المنامة", 26.2154, 50.5832), ("المحرق", 26.2572, 50.6119), ("الرفاع", 26.1300, 50.5550),
+        ("مدينة حمد", 26.1153, 50.5069), ("مدينة عيسى", 26.1736, 50.5478), ("سترة", 26.1547, 50.6208),
+        ("الحد", 26.2386, 50.6522), ("البديع", 26.2167, 50.4500)]),
+    ("الكويت", "Asia/Kuwait", [
+        ("مدينة الكويت", 29.3697, 47.9783), ("حولي", 29.3328, 48.0286), ("السالمية", 29.3339, 48.0761),
+        ("الفروانية", 29.2775, 47.9586), ("الجهراء", 29.3375, 47.6581), ("الأحمدي", 29.0769, 48.0839),
+        ("الفحيحيل", 29.0833, 48.1303), ("الصباحية", 29.1278, 48.0861)]),
+    ("قطر", "Asia/Qatar", [
+        ("الدوحة", 25.2854, 51.5310), ("الريان", 25.2919, 51.4244), ("الوكرة", 25.1715, 51.6034),
+        ("الخور", 25.6804, 51.4969), ("أم صلال", 25.4161, 51.4036), ("لوسيل", 25.4222, 51.4910),
+        ("الشمال", 26.1200, 51.2000), ("دخان", 25.4294, 50.7810), ("مسيعيد", 24.9908, 51.5483)]),
+    ("الإمارات", "Asia/Dubai", [
+        ("دبي", 25.2048, 55.2708), ("أبوظبي", 24.4539, 54.3773), ("الشارقة", 25.3463, 55.4209),
+        ("عجمان", 25.4052, 55.5136), ("العين", 24.2075, 55.7447), ("رأس الخيمة", 25.7895, 55.9432),
+        ("الفجيرة", 25.1288, 56.3265), ("أم القيوين", 25.5647, 55.5552), ("خورفكان", 25.3395, 56.3563),
+        ("كلباء", 25.0583, 56.3500), ("ليوا", 23.1167, 53.7667)]),
+    ("سلطنة عُمان", "Asia/Muscat", [
+        ("مسقط", 23.5880, 58.3829), ("صلالة", 17.0151, 54.0924), ("صحار", 24.3417, 56.7299),
+        ("نزوى", 22.9333, 57.5333), ("صور", 22.5667, 59.5289), ("البريمي", 24.2500, 55.7928),
+        ("الرستاق", 23.3908, 57.4244), ("عبري", 23.2257, 56.5157), ("السيب", 23.6702, 58.1891),
+        ("بركاء", 23.6833, 57.8833), ("بهلاء", 22.9667, 57.3000), ("إبراء", 22.6911, 58.5336),
+        ("مطرح", 23.6133, 58.5683), ("خصب", 26.1792, 56.2472), ("الدقم", 19.6667, 57.7167)]),
+]
+
+# Egypt, the Levant and North Africa (hand-checked coordinates): country, IANA zone, then the capital and the big cities. The zone picks the
+# calculation as for the Gulf (Africa/Cairo, Asia/Damascus, Asia/Beirut, Asia/Gaza, Asia/Hebron: the Egyptian method; Asia/Amman: Jordan's;
+# Africa/Casablanca, Africa/Algiers, Africa/Tunis: their own). A city may carry its own zone as a fourth item (Palestine has two).
+ARAB = [
+    ("مصر", "Africa/Cairo", [
+        ("القاهرة", 30.0444, 31.2357), ("الإسكندرية", 31.2001, 29.9187), ("الجيزة", 30.0131, 31.2089),
+        ("شبرا الخيمة", 30.1286, 31.2422), ("بورسعيد", 31.2653, 32.3019), ("السويس", 29.9668, 32.5498),
+        ("الأقصر", 25.6872, 32.6396), ("المنصورة", 31.0409, 31.3785), ("طنطا", 30.7865, 31.0004),
+        ("أسيوط", 27.1783, 31.1859), ("الإسماعيلية", 30.5965, 32.2715), ("الفيوم", 29.3084, 30.8428),
+        ("الزقازيق", 30.5877, 31.5020), ("أسوان", 24.0889, 32.8998), ("دمياط", 31.4165, 31.8133),
+        ("دمنهور", 31.0341, 30.4682), ("المنيا", 28.1099, 30.7503), ("بني سويف", 29.0661, 31.0994),
+        ("سوهاج", 26.5569, 31.6948), ("قنا", 26.1551, 32.7160), ("الغردقة", 27.2579, 33.8116),
+        ("شرم الشيخ", 27.9158, 34.3300), ("العريش", 31.1316, 33.7984), ("مرسى مطروح", 31.3543, 27.2373)]),
+    ("الأردن", "Asia/Amman", [
+        ("عمان", 31.9454, 35.9284), ("الزرقاء", 32.0728, 36.0876), ("إربد", 32.5556, 35.8469),
+        ("السلط", 32.0392, 35.7272), ("العقبة", 29.5321, 35.0063), ("مأدبا", 31.7160, 35.7939),
+        ("الكرك", 31.1853, 35.7048), ("معان", 30.1962, 35.7340), ("جرش", 32.2808, 35.8993),
+        ("عجلون", 32.3326, 35.7517), ("المفرق", 32.3406, 36.2080), ("الطفيلة", 30.8375, 35.6042),
+        ("الرصيفة", 32.0167, 36.0500), ("الرمثا", 32.5614, 36.0100)]),
+    ("سوريا", "Asia/Damascus", [
+        ("دمشق", 33.5138, 36.2765), ("حلب", 36.2021, 37.1343), ("حمص", 34.7324, 36.7137),
+        ("اللاذقية", 35.5317, 35.7901), ("حماة", 35.1318, 36.7578), ("طرطوس", 34.8890, 35.8866),
+        ("دير الزور", 35.3359, 40.1408), ("الرقة", 35.9528, 39.0079), ("الحسكة", 36.5024, 40.7477),
+        ("إدلب", 35.9306, 36.6339), ("درعا", 32.6189, 36.1021), ("السويداء", 32.7090, 36.5695),
+        ("القامشلي", 37.0522, 41.2311)]),
+    ("لبنان", "Asia/Beirut", [
+        ("بيروت", 33.8938, 35.5018), ("طرابلس", 34.4367, 35.8497), ("صيدا", 33.5630, 35.3688),
+        ("صور (لبنان)", 33.2705, 35.2038), ("النبطية", 33.3772, 35.4836), ("زحلة", 33.8463, 35.9020),
+        ("جونيه", 33.9808, 35.6178), ("بعلبك", 34.0047, 36.2110), ("عاليه", 33.8070, 35.6000)]),
+    ("فلسطين", "Asia/Hebron", [
+        ("القدس", 31.7683, 35.2137), ("رام الله", 31.9038, 35.2034), ("نابلس", 32.2211, 35.2544),
+        ("الخليل", 31.5326, 35.0998), ("بيت لحم", 31.7054, 35.2024), ("جنين", 32.4610, 35.2960),
+        ("طولكرم", 32.3104, 35.0286), ("قلقيلية", 32.1897, 34.9706), ("أريحا", 31.8611, 35.4616),
+        ("غزة", 31.5017, 34.4668, "Asia/Gaza"), ("خان يونس", 31.3402, 34.3063, "Asia/Gaza"),
+        ("رفح", 31.2969, 34.2435, "Asia/Gaza"), ("دير البلح", 31.4181, 34.3515, "Asia/Gaza")]),
+    ("المغرب", "Africa/Casablanca", [
+        ("الدار البيضاء", 33.5731, -7.5898), ("الرباط", 34.0209, -6.8416), ("فاس", 34.0331, -5.0003),
+        ("مراكش", 31.6295, -7.9811), ("طنجة", 35.7595, -5.8340), ("أكادير", 30.4278, -9.5981),
+        ("مكناس", 33.8935, -5.5473), ("وجدة", 34.6814, -1.9086), ("القنيطرة", 34.2610, -6.5802),
+        ("تطوان", 35.5785, -5.3684), ("سلا", 34.0531, -6.7985), ("الجديدة", 33.2316, -8.5007),
+        ("بني ملال", 32.3373, -6.3498), ("الناظور", 35.1681, -2.9335), ("الحسيمة", 35.2517, -3.9372),
+        ("آسفي", 32.2994, -9.2372), ("تازة", 34.2100, -4.0100), ("ورزازات", 30.9189, -6.8934),
+        ("الصويرة", 31.5085, -9.7595), ("شفشاون", 35.1688, -5.2636)]),
+    ("الجزائر", "Africa/Algiers", [
+        ("الجزائر", 36.7538, 3.0588), ("وهران", 35.6911, -0.6417), ("قسنطينة", 36.3650, 6.6147),
+        ("عنابة", 36.9000, 7.7667), ("البليدة", 36.4700, 2.8300), ("باتنة", 35.5559, 6.1741),
+        ("سطيف", 36.1898, 5.4108), ("سيدي بلعباس", 35.1899, -0.6309), ("بسكرة", 34.8500, 5.7333),
+        ("تلمسان", 34.8828, -1.3150), ("بجاية", 36.7509, 5.0567), ("ورقلة", 31.9539, 5.3250),
+        ("تيزي وزو", 36.7118, 4.0459), ("غرداية", 32.4909, 3.6736), ("جيجل", 36.8200, 5.7667),
+        ("مستغانم", 35.9311, 0.0892), ("الأغواط", 33.8000, 2.8833), ("تبسة", 35.4042, 8.1242)]),
+    ("تونس", "Africa/Tunis", [
+        ("تونس", 36.8065, 10.1815), ("صفاقس", 34.7406, 10.7603), ("سوسة", 35.8256, 10.6370),
+        ("القيروان", 35.6781, 10.0963), ("بنزرت", 37.2744, 9.8739), ("قابس", 33.8815, 10.0982),
+        ("أريانة", 36.8625, 10.1956), ("قفصة", 34.4250, 8.7842), ("المنستير", 35.7643, 10.8113),
+        ("مدنين", 33.3549, 10.5055), ("نابل", 36.4561, 10.7376), ("الحمامات", 36.4000, 10.6167),
+        ("حومة السوق", 33.8760, 10.8575), ("توزر", 33.9197, 8.1335), ("تطاوين", 32.9297, 10.4518),
+        ("جندوبة", 36.5011, 8.7803), ("الكاف", 36.1742, 8.7049), ("المهدية", 35.5047, 11.0622)]),
+]
+
+
+METHOD_IDS = {"MWL": 3, "ISNA": 2, "KARACHI": 1, "KEMENAG": 20, "JAKIM": 17,
+              "SINGAPORE": 11, "DIYANET": 13, "FRANCE_UOIF": 12, "RUSSIA": 14,
+              "MOONSIGHTING": 15, "EGYPT": 5, "MOROCCO": 21}
+
+
+def world_regions(root):
+    data = json.loads((root / '.github/tools/cities-world/cities-merged.json').read_text(encoding='utf-8'))
+    out = []
+    for cc, iterator in groupby(data, key=lambda c: c['country']):
+        cities = list(iterator)
+        assert len({c['method'] for c in cities}) == 1
+        # Packed strings avoid the JVM's 64 KB initializer limit. Each chunk is
+        # comfortably below the 65535-byte modified-UTF8 string-constant limit.
+        lines = ['|'.join((c['name_ar'], f"{c['lat']:.4f}", f"{c['lon']:.4f}", c['tz'], c['name_en'])) for c in cities]
+        assert all('|' not in c['name_ar'] + c['name_en'] and '\n' not in c['name_ar'] + c['name_en'] for c in cities)
+        chunks = [json.dumps('\n'.join(lines[i:i + 64]), ensure_ascii=False) for i in range(0, len(lines), 64)]
+        packed = ',\n            '.join(chunks)
+        out.append(f'        new Region({json.dumps(cities[0]["country_ar"], ensure_ascii=False)}, "{cc}", {METHOD_IDS[cities[0]["method"]]}, unpack("{cc}", new String[] {{\n            {packed}\n        }}))')
+    return ',\n'.join(out)
+
 
 def main(path):
     data = json.load(open(path, encoding="utf-8"))
@@ -105,26 +214,15 @@ def main(path):
         cities = sorted(by_region[code].items(), key=lambda kv: -kv[1][0])
         items = ",\n".join(f'            {{"{n}", "{lat:.4f}", "{lon:.4f}"}}' for n, (_, lat, lon) in cities)
         rows.append(f'        new Region("{rname}", new String[][] {{\n{items}\n        }})')
+    for rname, tz, cities in GCC + ARAB:   # the fourth field is the zone: the Saudi ones have none (Asia/Riyadh)
+        items = ",\n".join(f'            {{"{c[0]}", "{c[1]:.4f}", "{c[2]:.4f}", "{c[3] if len(c) > 3 else tz}"}}' for c in cities)
+        rows.append(f'        new Region("{rname}", new String[][] {{\n{items}\n        }})')
     body = ",\n".join(rows)
-    out = Path(__file__).resolve().parents[2] / "android/app/src/main/java/sa/urtv/screensaver/Cities.java"
-    out.write_text(f"""package sa.urtv.screensaver;
-
-/** Generated by .github/tools/gen_cities.py from GeoNames — do not edit by hand. */
-final class Cities {{
-    static final class Region {{
-        final String name;
-        final String[][] cities;   // name, latitude, longitude
-        Region(String name, String[][] cities) {{ this.name = name; this.cities = cities; }}
-    }}
-
-    static final Region[] REGIONS = {{
-{body}
-    }};
-
-    private Cities() {{}}
-}}
-""", encoding="utf-8")
-    print(f"{sum(len(v) for v in by_region.values())} cities in {len(REGIONS)} regions -> {out.name}")
+    root = Path(__file__).resolve().parents[2]
+    out = root / "android/app/src/main/java/sa/urtv/screensaver/Cities.java"
+    template = (root / '.github/tools/cities-world/Cities-support.java.txt').read_text(encoding='utf-8')
+    out.write_text(template.replace('__LEGACY__', body).replace('__WORLD__', world_regions(root)), encoding='utf-8')
+    print(f"generated {out.name}: legacy lists unchanged, world countries appended")
 
 
 if __name__ == "__main__":

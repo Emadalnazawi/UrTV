@@ -6,8 +6,8 @@ import android.content.Intent;
 
 /**
  * Some TVs (TCL) leave the app cold after a power cycle and the first dream fails.
- * Any boot broadcast that does arrive brings the process up and re-arms the update job;
- * the persisted job covers TVs that never send one.
+ * Any boot broadcast that does arrive brings the process up and re-arms the wake-up job (UpdateJob, which
+ * does no work of its own); the persisted job covers TVs that never send one.
  */
 public class BootReceiver extends BroadcastReceiver {
     @Override

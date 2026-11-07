@@ -1,0 +1,38 @@
+# UrTV community list: tcl-g05-google-tv
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-g05-google-tv/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: G054KUS SMARTTVPRO
+# match-device: G05
+
+com.tcl.tv.plus
+com.tcl.channelplus
+com.tcl.tv.tclchannel
+com.tcl.waterfall.overseas
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.usercenter
+com.tcl.dashboard
+com.tcl.suspension
+com.tcl.ttvs
+com.tcl.guard
+com.tcl.esticker
+com.tcl.ocean.instructions
+com.tcl.gamebar
+com.tcl.ui_mediaCenter
+com.tcl.gallery
+android.autoinstalls.config.google.gtvpai
+com.google.android.feedback
+com.google.android.marvin.talkback
+com.google.android.apps.tv.dreamx
+com.google.android.youtube.tvmusic
+com.google.android.play.games
+com.google.android.videos
+com.google.android.tungsten.setupwraith
+com.google.android.katniss
+com.tcl.assistant
+com.google.android.tv.assistant
+com.tcl.smartalexa
+com.google.android.apps.mediashell

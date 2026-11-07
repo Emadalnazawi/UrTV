@@ -1,0 +1,6 @@
+# date	name	expected	note
+2026-12-31	رحلة	رحلة (٣١ ديسمبر ٢٠٢٦)	the name first, the date in brackets, an Arabic month
+2026-01-05	عيد	عيد (٥ يناير ٢٠٢٦)	the day without a leading zero
+2026-09-23		٢٣ سبتمبر ٢٠٢٦	no name: the date alone
+2026-13-01	رحلة	رحلة (٢٠٢٦-١٣-٠١)	a month that does not exist: the digits as they are
+soon		soon	not a date at all

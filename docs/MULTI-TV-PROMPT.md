@@ -15,7 +15,7 @@ Repository: **https://github.com/tshi-dev/UrTV** (public). Work on a branch and 
 - `README.md` — overview, build, URL fragment parameters.
 - `src/template.html` — the whole screen: one HTML/CSS/JS page, no framework, no build step. `src/build.py` makes `dist/urtv.html` (fonts and photos inlined, ~2.9 MB, works from `file://` and offline) and `dist/tv.html` (0.3 MB, for the Android app).
 - `docs/RECREATE-PROMPT.md` — the full design and behaviour spec. Treat it as the source of truth for what the screen must show.
-- `android/` — the current native Android app: a `DreamService` (system screensaver), a settings screen (city, up to 10 teams, the card beside the clock, show filters), and auto-update that downloads `dist/tv.html` from `master` every 6 hours. Built by `.github/workflows/android.yml` and published to the `apk-latest` release.
+- `android/` — the current native Android app: a `DreamService` (system screensaver), a settings screen (city, up to 20 teams, the card beside the clock, show filters), and auto-update that downloads `dist/tv.html` from `master` when the screensaver starts, at most every 6 hours. Built by `.github/workflows/android.yml` and published to the `apk-latest` release.
 - `docs/TEST-PLAN.md` — how the Android build is tested; reuse its style.
 
 Settings reach the page through the URL fragment, not a query string:

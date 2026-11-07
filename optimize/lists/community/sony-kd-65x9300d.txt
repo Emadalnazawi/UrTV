@@ -1,0 +1,40 @@
+# UrTV community list: sony-kd-65x9300d
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-kd-65x9300d/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIAKD65X9300D SVPDTV15
+# match-device: 
+
+com.sony.dtv.sonyselect
+com.sony.dtv.discovery
+com.sony.dtv.bivlinfo
+com.sony.dtv.tvlaunchercustomizer
+com.sony.dtv.indiametarecommendation
+com.google.android.tvrecommendations
+android.autoinstalls.config.sony.bravia
+com.sony.dtv.da.service
+com.qterics.da.product
+com.google.android.tv.bugreportsender
+com.google.android.feedback
+com.sony.dtv.b2b.vendorprotocol
+com.sony.dtv.customersupport
+com.sony.dtv.smarthelp
+com.sony.dtv.imanual
+com.sony.dtv.touchpad.tutorial
+com.google.android.tvtutorials
+com.google.android.videos
+com.google.android.play.games
+com.google.android.music
+com.google.android.backdrop
+com.amazon.aiv.us
+com.sony.huey.dlna.module
+com.sony.huey.dlna.renderersettings
+com.sonyericsson.dlna
+com.sonyericsson.dlna.dtcpplayer
+com.sony.dtv.osat.music
+com.sony.dtv.osat.album
+com.sony.dtv.osat.video
+com.vewd.core.integration.dia
+com.google.android.inputmethod.japanese

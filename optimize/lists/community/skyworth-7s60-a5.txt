@@ -1,0 +1,32 @@
+# UrTV community list: skyworth-7s60-a5
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/skyworth-7s60-a5/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SKYWORTH
+# match-model: 6A658B 7S60A5 SKY8S34
+# match-device: 
+
+com.tianci.ad
+com.tianci.push
+com.coocaa.sysreport
+com.baidu.oases
+com.tianci.autoinstaller
+com.skyworth.skymarket
+com.coocaa.screensaver
+com.coocaa.guide
+com.coocaa.educate
+com.coocaa.lifeassistant
+com.tianci.appstore
+com.coocaa.app_browser
+com.coocaa.tvmanager
+com.loostone.tuning
+com.skyworth.angel.voice
+com.skyworth.aimanager
+com.coocaa.os.upgrade
+com.coocaa.teampresent
+com.coocaa.os.thememanager
+com.coocaa.messageprovider
+com.coocaa.sky.ccapi
+com.tianci.user
+com.coocaa.skycast.tool

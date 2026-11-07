@@ -1,0 +1,45 @@
+# UrTV community list: panasonic-4ktv-0su
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/panasonic-4ktv-0su/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: PANASONIC
+# match-model: 4KTV0SU SW4HPANATV
+# match-device: SW4H
+
+android.autoinstalls.config.SW
+fusion.android.tv.demo
+com.smartdevice.epopplayer
+com.mstar.android.tv.disclaimercustomization
+com.Smartdevice.emanual
+com.smartdevice.recommendation
+com.smartdevice.acr.recommendation
+com.smartdevice.leanbacklauncher.customizer
+com.smartdevice.firewall
+com.smartdevice.dtv.icast
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+com.google.android.tvrecommendations
+com.google.android.backdrop
+com.android.printspooler
+com.android.htmlviewer
+com.android.backupconfirm
+com.android.sharedstoragebackup
+com.android.wallpaperbackup
+com.google.android.syncadapters.calendar
+com.android.providers.calendar
+com.google.android.katniss
+com.google.android.apps.mediashell
+com.amazon.amazonvideo.livingroom
+com.google.android.videos
+com.google.android.youtube.tvmusic
+com.disney.disneyplus
+com.google.android.play.games
+com.google.android.apps.tachyon
+com.FDGEntertainment.redball4.gp
+com.joxdev.orbia
+com.pomelogames.MarsGame
+com.rkgames.basisgame
+com.qjy.browser
+com.tianci.localmedia

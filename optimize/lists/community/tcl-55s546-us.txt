@@ -1,0 +1,32 @@
+# UrTV community list: tcl-55s546-us
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-55s546-us/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: 55S546 5SERIES BEYONDTV4 G034KUS
+# match-device: BEYONDTV4
+
+com.tcl.bi
+com.tcl.xian.StartandroidService
+com.google.android.feedback
+com.tcl.dashboard
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.waterfall.overseas
+android.autoinstalls.config.google.gtvpai
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+com.tcl.guard
+com.tcl.usercenter
+com.tcl.ocean.instructions
+com.tcl.android.webview
+org.chromium.webview_shell
+com.google.android.syncadapters.calendar
+com.google.android.play.games
+com.tcl.gallery
+com.tcl.smartalexa
+com.tcl.assistant
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.dreamx

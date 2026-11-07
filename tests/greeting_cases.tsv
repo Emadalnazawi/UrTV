@@ -1,0 +1,36 @@
+# kind, inputs..., expected, note. part: now fajr dhuhr asr isha (minutes of the day); weather: code dust city temp digits; sun: label hh:mm digits
+part	120	290	700	900	1155	تصبح على خير	before Fajr: still the night
+part	290	290	700	900	1155	صباح الخير	Fajr itself
+part	600	290	700	900	1155	صباح الخير	mid-morning
+part	700	290	700	900	1155	طاب يومك	Dhuhr itself
+part	899	290	700	900	1155	طاب يومك	a minute before Asr
+part	900	290	700	900	1155	مساء الخير	Asr itself
+part	1154	290	700	900	1155	مساء الخير	a minute before Isha
+part	1155	290	700	900	1155	مساء الخير	Isha itself: still the evening (19:18 said «تصبح على خير», step 30)
+part	1274	290	700	900	1155	مساء الخير	a minute before two hours after Isha
+part	1275	290	700	900	1155	تصبح على خير	two hours after Isha: the night
+part	1400	290	700	900	1155	تصبح على خير	late night
+weather	0	0	الرياض	31	hindi	سماء صافية في الرياض، ٣١°	clear
+weather	0	0	Riyadh	30.6	latin	سماء صافية في Riyadh، 31°	latin digits, rounded
+weather	2	0	جدة	28.4	hindi	غائم جزئيًا في جدة، ٢٨°	partly cloudy
+weather	3	0	أبها	18	hindi	سماء غائمة في أبها، ١٨°	cloudy
+weather	63	0	الرياض	22	hindi	أمطار في الرياض، ٢٢°	rain
+weather	95	0	الدمام	25	hindi	عواصف رعدية في الدمام، ٢٥°	storm
+weather	42	0	الرياض	31	hindi	الرياض، ٣١°	a code with no word: the city alone
+sun	الغروب	17:57	hindi	الغروب ٥:٥٧ م	sunset
+sun	الشروق	05:48	hindi	الشروق ٥:٤٨ ص	sunrise
+sun	الغروب	00:05	latin	الغروب 12:05 ص	midnight in Latin digits
+sun	الغروب	12:00	hindi	الغروب ١٢:٠٠ م	noon
+weather	0	150	الرياض	35	hindi	سماء صافية وغبار في الرياض، ٣٥°	dust at 150 is told beside a clear sky, not instead of it
+weather	0	149.9	الرياض	35	hindi	سماء صافية في الرياض، ٣٥°	just under 150: the sky
+weather	0	399	الرياض	35	hindi	سماء صافية وغبار في الرياض، ٣٥°	399 is dust
+weather	0	400	الرياض	35	hindi	سماء صافية وغبار كثيف في الرياض، ٣٥°	400 and over is heavy dust
+weather	63	820	الرياض	35	latin	أمطار وغبار كثيف في الرياض، 35°	dust is beside the rain, as on the screensaver
+weather	42	200	الرياض	31	hindi	غبار في الرياض، ٣١°	a code with no word still gets the dust word
+# seen  dust  visibility (m, -1 unknown)  the dust level told (issue #29: CAMS dust over a clear Riyadh)
+seen	2466	20800	0	2466 µg/m³ with 20.8 km visibility (Riyadh, #29): no dust
+seen	2466	10000	0	10 km visibility: no dust
+seen	2466	4000	399	4 km: at most «غبار»
+seen	2466	800	2466	800 m: «غبار كثيف» possible
+seen	220	-1	220	no visibility known: the level as before
+seen	220	6000	220	6 km and 220: «غبار»

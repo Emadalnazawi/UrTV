@@ -1,0 +1,30 @@
+name: Verify the Uthmani Quran text
+
+# The Quran sources are unreachable from the dev container; CI compares every stored `uthmani` string with the
+# QPC Hafs text and pushes the report (and a corrected copy, if anything differs) to the data-quran-verify branch.
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, next, content, work/quran-verify]
+    paths: ['.github/tools/verify_uthmani.py', '.github/workflows/quran-verify.yml', 'assets/shared/verses.json', 'assets/shared/adhkar.json', 'assets/fonts/UthmanicHafs-v30.woff2']
+
+permissions:
+  contents: write
+
+jobs:
+  uthmani:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install fonttools brotli
+      - run: python3 .github/tools/verify_uthmani.py
+      - name: Push to data-quran-verify
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan data-quran-verify
+          git rm -rfq --cached .
+          git add -f quran-verify   # the folder is in .gitignore for local runs
+          git commit -qm "Uthmani text check against QPC Hafs"
+          git push -f origin data-quran-verify

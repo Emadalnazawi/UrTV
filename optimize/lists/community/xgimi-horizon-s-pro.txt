@@ -1,0 +1,31 @@
+# UrTV community list: xgimi-horizon-s-pro
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xgimi-horizon-s-pro/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XGIMI
+# match-model: HORIZONSPROPROJECTOR
+# match-device: XGIMIGALILEO
+
+fusion.android.tv.demo
+com.xgimi.burnin
+com.xgimi.atvwifiverify
+com.xgimi.minitvfactory
+com.xgimi.bugreportsender
+com.google.android.feedback
+android.autoinstalls.config.xgimi.xgimigalileo
+com.google.android.tvrecommendations
+com.google.android.play.games
+com.google.android.videos
+com.google.android.marvin.talkback
+com.google.android.youtube.tvmusic
+com.amazon.amazonvideo.livingroom
+com.ted.android.tv
+com.google.android.katniss
+com.google.android.apps.mediashell
+com.google.android.tv.remote.service
+com.xgimi.filemanager
+com.xgimi.gimiplayer
+com.xgimi.doubanfm
+com.xgimi.atmosphere
+com.google.android.backdrop

@@ -27,12 +27,12 @@
         <item>com.mediatek.wwtv.webview</item>    <!-- MediaTek TV WebView -->
     </string-array>
 
-    <!-- The TV's Live TV / tuner app, listed last in the Inputs menu. Empty to leave it out.
-         Common ones: com.tcl.tv (TCL), com.mediatek.wwtv.tvcenter (Xiaomi, many MediaTek sets),
-         com.google.android.tv (Google Live Channels), com.sony.dtv.tvx (Sony). -->
+    <!-- The TV's Live TV / tuner app, listed last in the Inputs menu, tried first. When the TV does not have it, the first
+         one of TvVendor.LIVE_TV it has is used (TCL, CultraView, MediaTek/Xiaomi, MStar, Sony, Philips, Google Live Channels). -->
     <string name="live_tv_package" translatable="false">com.tcl.tv</string>
 
-    <!-- The manufacturer's own source picker, used if switching to an input directly fails. -->
+    <!-- The manufacturer's own source picker, used if switching to an input directly fails; tried first, then TvVendor.PICKERS
+         (a package, or package/.Activity such as com.cultraview.setting/.SourceActivity). -->
     <string name="input_picker_package" translatable="false">com.tcl.suspension</string>
 
     <!-- Arabic order for the dock and the grid: the first app is at the right and has focus first. -->
@@ -40,4 +40,14 @@
 
     <!-- Tiles per row in the grid. -->
     <integer name="columns">5</integer>
+
+    <!-- The «تلاوة» button in the top bar: the Quran recitations and the radio, inside the home app.
+         Set it to false to leave the button out. -->
+    <bool name="show_listening">true</bool>
+
+    <!-- Where the TV is, for the adhan times (Umm al-Qura). The city picked in the screensaver wins;
+         these are the fallback when the screensaver is not installed. -->
+    <string name="latitude" translatable="false">24.6877</string>
+    <string name="longitude" translatable="false">46.7219</string>
+    <string name="timezone" translatable="false">Asia/Riyadh</string>
 </resources>

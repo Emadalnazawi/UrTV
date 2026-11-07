@@ -7,7 +7,8 @@ Names are compared after normalising:
   Arabic   harakat and tatweel gone; أ إ آ ٱ -> ا; ة -> ه; ى -> ي; the article ال dropped from every word
   English  lower case, accents gone (Atlético = Atletico), hyphens and dots gone, FC/SC/CF/AFC/Club dropped
 Both: «Al-Hilal», «Al Hilal», «alhilal» are one name, and «Hilal» is the same name without its «Al». In English,
-spellings that differ only in doubled letters or vowels are one name too («Al-Nasr» = «Al-Nassr», «Wahda» = «Wehda»).
+spellings that differ only in doubled letters or vowels are one name too («Al-Nasr» = «Al-Nassr», «Wahda» = «Wehda»);
+in Arabic the same goes for ا و ي after the first letter, and a leading تش is ش («تشلسي» = «تشيلسي» = «شيلسي»).
 
 A club matches by how much of its name the query is, best first:
   the same name (exactly, or only in doubled letters and vowels)   the start of a word, or of the name
@@ -51,11 +52,17 @@ def drop_al(words):
 
 
 def skeleton(word):
-    """«nassr» -> «nsr», «wehda» -> «whd»: an English name without doubled letters or vowels after the first."""
-    if not re.fullmatch("[a-z0-9]+", word):
+    """«nassr» -> «nsr», «wehda» -> «whd»: a name without doubled letters or vowels after the first. In Arabic the
+    vowel letters ا و ي go too, and a leading تش is ش: تشيلسي, تشلسي and شيلسي are one name."""
+    if re.fullmatch("[a-z0-9]+", word):
+        s = re.sub(r"(.)\1+", r"\1", word)
+        s = s[0] + re.sub("[aeiouy]", "", s[1:])
+    elif re.fullmatch("[ء-ي]+", word):
+        s = re.sub(r"(.)\1+", r"\1", word)
+        s = re.sub("^تش", "ش", s)
+        s = s[0] + re.sub("[اويء]", "", s[1:])
+    else:
         return ""
-    s = re.sub(r"(.)\1+", r"\1", word)
-    s = s[0] + re.sub("[aeiouy]", "", s[1:])
     return s if len(s) >= 3 else ""
 
 

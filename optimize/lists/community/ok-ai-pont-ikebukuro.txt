@@ -1,0 +1,39 @@
+# UrTV community list: ok-ai-pont-ikebukuro
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/ok-ai-pont-ikebukuro/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: 
+# match-model: OKAIPONT
+# match-device: IKEBUKURO
+
+tv.anoki.acr.controller
+com.homwee.aipont
+com.google.android.tvrecommendations
+android.autoinstalls.config.homwee
+com.homwee.store
+com.homwee.help
+com.google.android.feedback
+com.google.android.play.games
+com.google.android.videos
+com.google.android.youtube.tvmusic
+com.google.android.syncadapters.calendar
+com.google.android.katniss
+com.google.android.apps.mediashell
+com.homwee.multiscreenshare
+com.homwee.mmp.screenshare
+com.google.android.backdrop
+com.disney.disneyplus
+it.mediaset.infinitytv
+tv.pluto.android
+com.tiktok.tv
+it.radioplayer.android
+tv.arte.plus7
+com.google.android.onetimeinitializer
+com.google.android.partnersetup
+com.android.printspooler
+com.android.htmlviewer
+com.android.dynsystem
+com.android.wallpaperbackup
+com.homwee.mmp.fileexplorer
+com.homwee.mmp.imageplayer

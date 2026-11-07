@@ -9,11 +9,38 @@
     <permission android:name="sa.urtv.home.permission.SHOW_NOTE" android:protectionLevel="signature" />
     <!-- «تلفزيونك»'s settings screen changes the screensaver's settings (same signing key only) -->
     <permission android:name="sa.urtv.screensaver.permission.CONFIGURE" android:protectionLevel="signature" />
+    <!-- only used if the owner allows it for the app: the idle delay row and SaverReceiver's idle -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <!-- the launcher (same signing key) reads the settings for its home-screen card -->
     <permission
         android:name="sa.urtv.screensaver.READ_CONFIG"
         android:protectionLevel="signature" />
+
+    <!-- the launcher adds, finishes and deletes «المهام» through the same provider -->
+    <permission
+        android:name="sa.urtv.screensaver.WRITE_TASKS"
+        android:protectionLevel="signature" />
+
+    <!-- the launcher's «تحكم من الجوال» changes the city and the home cards through the same provider (ConfigProvider.call) -->
+    <permission
+        android:name="sa.urtv.screensaver.PHONE_SETTINGS"
+        android:protectionLevel="signature" />
+
+    <!-- the launcher says what it is playing, for the screen's «يُتلى الآن» card (same signing key) -->
+    <!-- the glass look: the home's small blurred backdrop for the settings (signature permission, same key). Declared here too, the same
+         as in the home app: this app is installed first, and Android grants a permission only from an app that declared it already -->
+    <permission
+        android:name="sa.urtv.home.READ_GLASS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="sa.urtv.home.READ_GLASS" />
+    <uses-permission android:name="sa.urtv.home.READ_NOW_PLAYING" />
+    <!-- opens the launcher's «حماية العائلة» screen (signature permission, same key) -->
+    <uses-permission android:name="sa.urtv.home.FAMILY_DNS" />
+
+    <!-- opens the launcher's «تحديث تلفزيوني» from settings (signature permission, same key) -->
+    <uses-permission android:name="sa.urtv.home.OPEN_UPDATE" />
+    <uses-permission android:name="sa.urtv.home.OPEN_PHONE" />
 
     <!-- opens the launcher's «ترتيب المفضلة» from settings -->
     <queries>
@@ -41,6 +68,9 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- «صور شاشة التوقف»: the photo packs, opened from the settings only -->
+        <activity android:name=".PhotoPacksActivity" android:exported="false" />
 
         <!-- full-screen preview; any remote key closes it -->
         <activity
@@ -101,6 +131,8 @@
                 <action android:name="sa.urtv.screensaver.SET" />
                 <action android:name="sa.urtv.screensaver.CITIES" />
                 <action android:name="sa.urtv.screensaver.UPDATE" />
+                <action android:name="sa.urtv.screensaver.TASKS" />
+                <action android:name="sa.urtv.screensaver.PHOTOS" />
             </intent-filter>
         </receiver>
 
@@ -108,6 +140,13 @@
             android:name=".ConfigProvider"
             android:authorities="sa.urtv.screensaver.config"
             android:exported="true"
-            android:readPermission="sa.urtv.screensaver.READ_CONFIG" />
+            android:readPermission="sa.urtv.screensaver.READ_CONFIG"
+            android:writePermission="sa.urtv.screensaver.WRITE_TASKS">
+            <!-- the shell hands over a photo here (`content write`, optimize/photos.sh); DUMP as for SaverReceiver -->
+            <path-permission
+                android:path="/own-in"
+                android:readPermission="android.permission.DUMP"
+                android:writePermission="android.permission.DUMP" />
+        </provider>
     </application>
 </manifest>

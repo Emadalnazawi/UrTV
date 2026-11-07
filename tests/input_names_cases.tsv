@@ -1,0 +1,41 @@
+# input names (InputNames.java). clean: raw, -, -, answer, note | label: saved, own, -, answer, note | id: id, -, -, answer, note | roundtrip: stored, id, name, answer, note
+clean	PS5			PS5	a plain name
+clean	  PS5  			PS5	spaces around are trimmed
+clean	BN Sport			BN Sport	a Latin name with a space
+clean	بي إن سبورت			بي إن سبورت	an Arabic name
+clean					nothing: the TV's own name comes back
+clean	   				only spaces is nothing too
+clean	12345678901234567890			12345678901234567890	20 characters is the most
+clean	123456789012345678901			NULL	21 characters is too long
+clean	ابتثجحخدذرزسشصضطظعغفق			NULL	21 Arabic letters is too long (counted as letters, not bytes)
+clean	ابتثجحخدذرزسشصضطظعغف			ابتثجحخدذرزسشصضطظعغف	20 Arabic letters fit
+clean	😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀			😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀	20 emoji are 20 characters (code points, not UTF-16 halves)
+clean	a\nb			NULL	a line break is refused
+clean	a\tb			NULL	a tab is refused
+clean	a\u0085b			NULL	a C1 control is refused
+label	-	HDMI 1		HDMI 1	nothing saved: the TV's own name, as always
+label		HDMI 1		HDMI 1	an empty saved name counts as none
+label	PS5	HDMI 1		PS5	the saved name wins
+id	com.vendor/.Service/HDMI12345			ok	a typical input id
+id	com.x/.Svc$Inner/HW1			ok	a $ is allowed (it is quoted for the shell)
+id	HW%20-1:a			ok	% : - are allowed
+id	a b			no	a space is not
+id	a'b			no	a quote is not
+id	a|b			no	a bar is not (it separates the id from the name when kept)
+id	a;b			no	a semicolon is not
+id				no	empty is not
+roundtrip		x/.S/HDMI1	PS5	x/.S/HDMI1|PS5;	nothing saved yet: one name kept
+roundtrip	x/.S/HDMI1|PS5\n	x/.S/HDMI2	PC	x/.S/HDMI1|PS5;x/.S/HDMI2|PC;	a second input keeps the first
+roundtrip	x/.S/HDMI1|PS5\ny/.S/HDMI9|Old\n	x/.S/HDMI1		y/.S/HDMI9|Old;	clearing one keeps the name of an input that is not shown
+roundtrip	x/.S/HDMI1|a|b\n	x/.S/HDMI2	PC	x/.S/HDMI1|a|b;x/.S/HDMI2|PC;	a bar inside a name is kept (only the first splits)
+roundtrip	junk\n|no id\nx|\n	x/.S/HDMI1	PS5	x/.S/HDMI1|PS5;	lines with no bar, no id or no name are ignored
+clean	a\u202eb			NULL	the right-to-left override is refused
+clean	a\u2028b			NULL	a line separator is refused
+clean	a\u2029b			NULL	a paragraph separator is refused
+clean	a\u200fb			NULL	the right-to-left mark is refused
+clean	\u200f			NULL	the mark alone is refused, not trimmed to nothing
+clean	\ufeffPS5			NULL	the byte order mark is refused
+clean	PS5\ue000			NULL	a private use character is refused
+clean	PS|5			NULL	a bar is refused (it separates the columns of input-names)
+clean	مي\u200cخواهم			مي‌خواهم	the zero-width non-joiner Persian names need is kept
+clean	PS5 🎮			PS5 🎮	an emoji (a surrogate pair, one character) is fine

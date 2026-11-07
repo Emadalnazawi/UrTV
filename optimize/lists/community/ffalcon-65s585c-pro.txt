@@ -1,0 +1,33 @@
+# UrTV community list: ffalcon-65s585c-pro
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/ffalcon-65s585c-pro/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: FFALCON
+# match-model: 
+# match-device: TCLMT5879CN
+
+com.tcl.bootadservice
+com.tcl.profilemanager
+com.tcl.xian.StartandroidService
+com.tcl.logkit
+com.tcl.recognize.service
+com.tcl.appreciate.art
+com.tcl.atomic.servicecenter
+com.tcl.c2dm.client
+com.tcl.wholenetsearch
+com.tcl.playskill
+com.tcl.repairguide
+com.tcl.useragreement
+android.autoinstalls.config.tcl.device
+com.tcl.ffeducation
+com.tcl.ffkaraoke
+com.tcl.versionUpdateApp
+com.tcl.UpdatePeripheral
+com.snm.upgrade
+com.tcl.usercenter
+com.tcl.walleve
+com.tcl.common.weather
+com.tcl.tvsmartalbum
+com.tcl.weixin
+com.tcl.videocall

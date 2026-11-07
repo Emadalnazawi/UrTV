@@ -1,0 +1,34 @@
+# UrTV community list: vidda-mt9653
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/vidda-mt9653/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: VIDDA
+# match-model: VIDAATV
+# match-device: MT9653
+
+com.hisense.hitv.das
+com.hisense.platformreport
+com.hisense.logupload
+com.hisense.service.hproxy
+com.hisense.service.message
+com.hisense.business.ad
+com.hisense.service.ad
+com.hisense.widget.pro
+com.hisense.tv.weather
+com.hisense.demonstrate
+com.hisense.hotelmenu
+com.meetingroom
+com.hisense.autotest
+com.hisense.electronictutorial
+com.hisense.ar.baike
+com.jamdeo.tv.fte
+com.hisense.usbupgrade
+com.hisense.tv.videoconference
+com.hisense.tv.fitmirror
+com.hisense.tv.foodmanage
+com.jamdeo.calendar
+com.vision.aibook
+com.jamdeo.screensaver
+com.android.printspooler
+com.keylab.speech.view.vidaa

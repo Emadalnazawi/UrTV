@@ -1,0 +1,47 @@
+# The usual names of the apps our lists turn off, for the list shown to the person after the setup («تنبيهات TCL»…).
+# One per line: package, then the name in Arabic (or the brand's own name). An app not listed here is shown by its package name.
+# Used by optimize/offlist.py (optimize/keep.sh off), and by the report.
+com.tcl.bi                              تتبّع استخدام TCL
+com.tcl.logkit                          سجلّات TCL
+com.tcl.usercenter                      حساب TCL
+com.tcl.partnercustomizer               عروض الشركاء
+com.tcl.overseasappshow                 معرض التطبيقات
+com.tcl.messagebox                      تنبيهات TCL
+com.tcl.esticker                        ملصقات TCL الترويجية
+com.tcl.exhibit                         وضع العرض في المعارض
+com.tcl.factory.view                    قائمة المصنع
+com.tcl.hotelmenu                       وضع الفنادق
+com.tcl.useragreement                   اتفاقية الاستخدام
+com.tcl.notereminder                    تذكيرات TCL
+com.tcl.repairguide                     دليل الإصلاح
+com.tcl.ocean.instructions              دليل المستخدم
+com.tcl.initsetup                       الإعداد الأولي لـ TCL
+com.tcl.copydatatotv                    نقل البيانات إلى التلفزيون
+com.tcl.xian.StartandroidService        خدمة بدء TCL
+com.google.android.tvrecommendations    توصيات الشاشة الرئيسية
+com.google.android.feedback             إرسال الملاحظات إلى قوقل
+com.google.android.partnersetup         إعداد شركاء قوقل
+com.google.android.onetimeinitializer   تهيئة قوقل لمرة واحدة
+com.google.android.play.games           ألعاب Play
+android.autoinstalls.config.google.gtvpai  تثبيت تطبيقات مقترحة تلقائياً
+com.google.android.apps.tv.dreamx       شاشة التوقف من قوقل
+com.google.android.backdrop             شاشة التوقف Backdrop
+com.tcl.channelplus                     قنوات TCL
+com.tcl.waterfall.overseas              تبويب TCL
+com.tcl.dashboard                       لوحة TCL
+com.tcl.t_solo                          محتوى TCL
+com.tcl.gamebar                         شريط الألعاب
+com.tcl.guard                           زر الحارس (Guard)
+com.tcl.interactive                     TCL التفاعلي
+com.tcl.MultiScreenInteraction_TV       T-Cast
+com.tcl.UpdatePeripheral                تحديث الملحقات
+com.google.android.videos               أفلام Google TV
+com.google.android.youtube.tvmusic      يوتيوب ميوزك
+com.android.dreams.basic                شاشة التوقف الأساسية
+uk.co.freeview.bbc_sounds               BBC Sounds
+com.hungama.movies.tv                   Hungama
+tv.airtel.xstream.tvapp                 Airtel Xstream
+com.internet.tvbrowser                  متصفح الإنترنت
+com.tcl.smartalexa                      Alexa
+com.tcl.airplay2                        AirPlay
+com.tcl.miracast                        عرض الشاشة (Miracast)

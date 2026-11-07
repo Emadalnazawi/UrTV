@@ -1,0 +1,50 @@
+# UrTV community list: sony-kd-65x80j
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-kd-65x80j/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIAKD65X80J BRAVIAVH2
+# match-device: 
+
+tv.samba.ssm
+com.sony.dtv.da.service
+com.qterics.da.product
+com.sonyericsson.idd.agent
+com.sony.dtv.sonybugreportsys
+com.google.android.tv.bugreportsender
+com.google.android.feedback
+com.sony.dtv.b2b.vendorprotocol
+com.sony.dtv.sonyselect
+com.sony.dtv.sonytab
+com.sony.dtv.launcherxcustomizer
+android.autoinstalls.config.sony.bravia
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+com.sony.dtv.customersupport
+com.sony.dtv.smarthelp
+com.sonypicturescore
+com.google.android.videos
+com.google.android.play.games
+com.sony.dtv.airplayapp
+com.sony.dtv.networkapp.wifidirect
+com.sony.huey.dlna.module
+com.sony.huey.dlna.renderersettings
+com.sonyericsson.dlna
+com.google.android.tungsten.setupwraith
+com.android.printspooler
+com.google.android.syncadapters.calendar
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+com.sony.dtv.QuickSetupCustomizer
+com.sony.dtv.b2b.hotelmode
+com.sony.dtv.b2b.noderuntime.normal
+com.sony.dtv.b2b.noderuntime.privilege
+com.sony.dtv.b2b.noderuntimeextension.bpk
+com.sony.dtv.b2b.noderuntimeextension.node_12_13_1
+com.sony.dtv.gestureapp
+com.sony.dtv.distancealert
+com.sony.dtv.sensingcamera.fwupdate
+com.sony.dtv.sensingcamera.settings
+com.sony.dtv.notificationcenter

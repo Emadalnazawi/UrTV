@@ -1,0 +1,25 @@
+# UrTV community list: eko-2k-google-tv-tennoji
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/eko-2k-google-tv-tennoji/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: EKO
+# match-model: 2KGOOGLETV MTK9216PAEKO
+# match-device: 
+
+tv.anoki.acr.anokiacroptin
+com.android.adservices.api
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.google.android.partnersetup
+com.mstar.android.tv.disclaimercustomization
+com.google.android.play.games
+com.google.android.syncadapters.calendar
+com.google.android.videos
+com.mediatek.androidbox
+com.google.android.katniss
+com.netflix.ninja
+com.amazon.amazonvideo.livingroom
+com.google.android.youtube.tvmusic
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.dreamx

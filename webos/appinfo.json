@@ -1,0 +1,13 @@
+{
+  "id": "sa.urtv.webos",
+  "version": "0.1.0",
+  "vendor": "UrTV",
+  "type": "web",
+  "main": "index.html",
+  "title": "تلفزيونك",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "iconColor": "#08281E",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true
+}

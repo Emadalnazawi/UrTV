@@ -1,0 +1,103 @@
+name: Screens
+
+# Real pictures of the Android screens, for looking at a design without a TV: both apps are built (debug, same key), put on an Android TV
+# emulator (1920x1080), driven with the remote's keys, and screencap's PNGs are pushed to the data-screens branch, one folder per run
+# plus latest/:  https://raw.githubusercontent.com/tshi-dev/UrTV/data-screens/latest/<name>.png  (the list: latest/index.txt).
+# The script that takes them is .github/screens/shoot.sh; a shot that cannot be taken is skipped, never fails the run.
+
+on:
+  push:
+    branches: [work/design]
+    paths: ['android/**', 'src/**', 'assets/**', '.github/workflows/screens.yml', '.github/screens/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screens
+  cancel-in-progress: true
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      # Thmanyah comes from the private fonts repository, as in android.yml: built in, never committed
+      - uses: actions/checkout@v4
+        with:
+          repository: tshi-dev/urtv-fonts
+          token: ${{ secrets.FONTS_TOKEN }}
+          path: .fonts-private
+      - name: Private fonts
+        run: |
+          cp .fonts-private/web/*.woff2 assets/fonts/
+          mkdir -p android/launcher/src/main/assets/fonts
+          cp .fonts-private/android/*.otf android/launcher/src/main/assets/fonts/
+          rm -rf .fonts-private
+
+      - name: Build the page
+        run: python3 src/build.py
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      # debug builds: both get the debug key, so the apps' signature permissions work between them
+      - name: Build debug APKs
+        env:
+          URTV_BRANCH: ${{ github.ref_name }}
+        run: gradle -p android assembleDebug --no-daemon
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Take the pictures on an Android TV emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: android-tv
+          arch: x86
+          profile: tv_1080p
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: bash .github/screens/shoot.sh android/app/build/outputs/apk/debug/app-debug.apk android/launcher/build/outputs/apk/debug/launcher-debug.apk screens-out
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens
+          path: screens-out
+
+      - name: Publish to data-screens
+        run: |
+          set -e
+          run="run-${GITHUB_RUN_NUMBER}-$(date -u +%m%d-%H%M)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          work=$(mktemp -d)
+          git clone --quiet --depth 20 --branch data-screens "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "$work" || {
+            git init --quiet "$work"; git -C "$work" checkout --quiet -b data-screens
+            git -C "$work" remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"; }
+          cd "$work"
+          # the last 15 runs stay; latest/ is this run's
+          ls -d run-* 2>/dev/null | sort | head -n -14 | xargs -r rm -rf
+          rm -rf latest "$run"; mkdir -p "$run"
+          cp "$GITHUB_WORKSPACE"/screens-out/*.png "$run"/ || true
+          cp "$GITHUB_WORKSPACE"/screens-out/*.txt "$run"/ || true
+          cp -r "$run" latest
+          ls "$run" | sed "s#^#https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/data-screens/$run/#" > "$run/index.txt"
+          cp "$run/index.txt" latest/index.txt
+          git add -A
+          git commit --quiet -m "Screens of ${GITHUB_SHA::7} (run ${GITHUB_RUN_NUMBER})" || true
+          git push --force origin data-screens
+          echo "Pictures: https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/data-screens/$run/index.txt"

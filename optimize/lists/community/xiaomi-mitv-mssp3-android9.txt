@@ -1,0 +1,27 @@
+# UrTV community list: xiaomi-mitv-mssp3-android9
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-mitv-mssp3-android9/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: MITVMSSP3
+# match-device: 
+
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.google.android.feedback
+com.mitv.tvhome.atv
+com.mitv.tvhome.michannel
+com.xm.webcontent
+com.xiaomi.floatingframe
+com.google.android.tvrecommendations
+android.autoinstalls.config.xiaomi.amelie
+com.xiaomi.mitv.tvmanager
+com.xiaomi.mitv.updateservice
+com.google.android.katniss
+com.google.android.backdrop
+com.mitv.dream
+com.xiaomi.mimusic2
+com.google.android.play.games
+com.google.android.videos
+com.mitv.gallery

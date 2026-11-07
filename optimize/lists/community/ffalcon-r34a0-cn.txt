@@ -1,0 +1,31 @@
+# UrTV community list: ffalcon-r34a0-cn
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/ffalcon-r34a0-cn/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: FFALCON
+# match-model: 
+# match-device: 
+
+com.tcl.bootadservice
+com.tcl.c2dm.client
+com.android.tcl.messagebox
+com.tcl.bi
+com.tcl.usagestats
+com.tcl.tvhealthcheck
+com.tcl.xian.StartandroidService
+com.tcl.vod
+com.tcl.waterfall.resource
+com.tcl.tshop
+com.tcl.gamecenter
+com.tcl.ffeducation
+com.pptv.tvsports.preinstall
+com.tencent.qqmusictv
+com.tcl.weixin
+com.tcl.browser
+com.iflytek.xiri
+com.iflytek.xiri.recorder.svc
+com.iflytek.xiri2.hal
+com.iflytek.xiri2.system
+com.tcl.walleve
+com.tcl.versionUpdateApp

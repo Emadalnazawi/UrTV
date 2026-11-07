@@ -1,0 +1,42 @@
+# UrTV community list: nvidia-shield-tv-2019
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/nvidia-shield-tv-2019/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: NVIDIA
+# match-model: SHIELDTV2019TUBE
+# match-device: 
+
+com.nvidia.stats
+com.nvidia.feedback
+com.nvidia.diagtools
+com.nvidia.shield.registration
+com.nvidia.developerwidget
+com.nvidia.tegraprofiler.security
+com.nvidia.factorysyschecker
+com.nvidia.factory
+com.nvidia.inputviewer
+android.autoinstalls.config.nvidia
+com.nvidia.shield.welcome
+com.nvidia.factorybundling
+com.nvidia.shield.beta
+com.nvidia.shieldbeta
+com.nvidia.tegrazone3
+com.android.gallery3d
+com.nvidia.shield.nas
+com.nvidia.shield.smbserver
+com.nvidia.shield.smbauth
+com.google.android.apps.nbu.smartconnect.tv
+com.nvidia.ota
+com.nvidia.NvCPLUpdater
+com.nvidia.KeyComboOta
+com.google.android.tv
+com.google.android.backdrop
+com.android.dynsystem
+com.android.hotspot2.osulogin
+com.android.bluetoothmidiservice
+com.android.cts.ctsshim
+com.android.cts.priv.ctsshim
+com.google.android.onetimeinitializer
+com.android.wallpaperbackup
+com.google.android.tvlauncher

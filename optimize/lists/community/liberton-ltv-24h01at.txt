@@ -1,0 +1,29 @@
+# UrTV community list: liberton-ltv-24h01at
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/liberton-ltv-24h01at/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: LIBERTON
+# match-model: LTV24H01AT
+# match-device: REDWOOD
+
+com.homwee.aipont
+com.homwee.store
+com.homwee.help
+com.homwee.chinstallapk
+com.homwee.chtvmanager
+android.autoinstalls.config.homwee
+com.homwee.mmp.fileexplorer
+com.homwee.mmp.imageplayer
+com.homwee.mmp.screenshare
+com.homwee.multiscreenshare
+com.google.android.tvrecommendations
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.syncadapters.calendar
+com.google.android.backdrop
+com.homwee.alexacontrol
+com.google.android.tv.remote.service
+com.google.android.play.games
+com.google.android.videos
+com.google.android.youtube.tvmusic

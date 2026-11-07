@@ -1,0 +1,17 @@
+# UrTV community list: ktc-4k-smart-tv-hongkong
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/ktc-4k-smart-tv-hongkong/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: KTC
+# match-model: 4KSMARTTV
+# match-device: HONGKONG
+
+tv.anoki.acr.anokiacroptin
+com.google.android.feedback
+com.ktc.serialport
+com.ktc.tv.factory
+ktc.factorymenu.ui
+mediatek.factorymenu.ui
+com.electronic.manual
+fusion.android.tv.demo

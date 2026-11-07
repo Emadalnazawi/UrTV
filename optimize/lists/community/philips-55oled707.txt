@@ -1,0 +1,41 @@
+# UrTV community list: philips-55oled707
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/philips-55oled707/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: PHILIPS
+# match-model: 55OLED70712
+# match-device: 
+
+org.droidtv.candeebug
+org.droidtv.gel
+org.droidtv.usagelogger
+org.droidtv.nettvrecommender
+org.droidtv.recommendation
+org.droidtv.nettv.market
+org.droidtv.nettvapps
+org.droidtv.nettvapp1814
+org.droidtv.nettvapp4546
+org.droidtv.nettvapp4932
+org.droidtv.nettvapp5326
+org.droidtv.nettvapp5512
+org.droidtv.nettvapp5527
+org.droidtv.nettvapp20004410
+org.droidtv.android.fitness
+org.droidtv.amazonalexa
+org.droidtv.demome
+com.phorus.playfi.softap
+com.google.android.feedback
+com.google.android.tungsten.setupwraith
+com.google.android.katniss
+com.google.android.play.games
+com.google.android.videos
+com.google.android.youtube.tvmusic
+com.mgmedia.androidApp
+com.singa.client
+com.ted.android.tv
+com.zeasn.whalelive
+tv.pluto.android
+tv.wuaki.apptv
+com.boosteroidtv.streaming
+com.google.android.tvrecommendations

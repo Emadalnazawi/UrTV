@@ -1,0 +1,72 @@
+# key: kind, keyCode, action (0 down, 1 up), repeat, playing, barShowing, barFocused, stopAny, expected, note
+# bar: kind, prayer (PrayerTimes number), friday, stopAny, expected, note
+reset								-	OK on the focused bar, with «any key» off
+key	23	0	0	1	1	1	0	STOP	OK on the focused bar stops the adhan
+key	23	0	1	1	1	1	0	EAT	a held OK is consumed
+key	23	1	0	0	1	1	0	EAT	the release is consumed, even if the adhan is already over (no click on the focused app)
+key	23	0	0	0	1	1	0	PASS	OK with no adhan playing is an ordinary OK
+reset								-	«any key» off: only OK on the bar
+key	23	0	0	1	1	0	0	PASS	off: OK on an app tile opens the app as always
+key	23	0	0	1	0	1	0	PASS	off: the bar is hidden: OK is ordinary
+key	21	0	0	1	1	1	0	PASS	off: a direction key goes on
+reset								-	«any key» ON (the default): the keys that stop it
+key	23	0	0	1	0	0	1	STOP	OK stops the adhan (focus anywhere, bar or no bar)
+key	23	1	0	1	0	0	1	EAT	OK: its release is consumed too
+key	21	0	0	1	0	0	1	STOP	left stops the adhan (focus anywhere, bar or no bar)
+key	21	1	0	1	0	0	1	EAT	left: its release is consumed too
+key	22	0	0	1	0	0	1	STOP	right stops the adhan (focus anywhere, bar or no bar)
+key	22	1	0	1	0	0	1	EAT	right: its release is consumed too
+key	19	0	0	1	0	0	1	STOP	up stops the adhan (focus anywhere, bar or no bar)
+key	19	1	0	1	0	0	1	EAT	up: its release is consumed too
+key	20	0	0	1	0	0	1	STOP	down stops the adhan (focus anywhere, bar or no bar)
+key	20	1	0	1	0	0	1	EAT	down: its release is consumed too
+key	4	0	0	1	0	0	1	STOP	Back stops the adhan (focus anywhere, bar or no bar)
+key	4	1	0	1	0	0	1	EAT	Back: its release is consumed too
+key	3	0	0	1	0	0	1	STOP	Home stops the adhan (focus anywhere, bar or no bar)
+key	3	1	0	1	0	0	1	EAT	Home: its release is consumed too
+key	176	0	0	1	0	0	1	STOP	settings stops the adhan (focus anywhere, bar or no bar)
+key	176	1	0	1	0	0	1	EAT	settings: its release is consumed too
+key	8	0	0	1	0	0	1	STOP	number 1 stops the adhan (focus anywhere, bar or no bar)
+key	8	1	0	1	0	0	1	EAT	number 1: its release is consumed too
+key	9	0	0	1	0	0	1	STOP	number 2 stops the adhan (focus anywhere, bar or no bar)
+key	9	1	0	1	0	0	1	EAT	number 2: its release is consumed too
+key	85	0	0	1	0	0	1	STOP	play/pause stops the adhan (focus anywhere, bar or no bar)
+key	85	1	0	1	0	0	1	EAT	play/pause: its release is consumed too
+key	87	0	0	1	0	0	1	STOP	media next stops the adhan (focus anywhere, bar or no bar)
+key	87	1	0	1	0	0	1	EAT	media next: its release is consumed too
+key	89	0	0	1	0	0	1	STOP	rewind stops the adhan (focus anywhere, bar or no bar)
+key	89	1	0	1	0	0	1	EAT	rewind: its release is consumed too
+key	82	0	0	1	0	0	1	STOP	menu stops the adhan (focus anywhere, bar or no bar)
+key	82	1	0	1	0	0	1	EAT	menu: its release is consumed too
+key	66	0	0	1	0	0	1	STOP	Enter stops the adhan (focus anywhere, bar or no bar)
+key	66	1	0	1	0	0	1	EAT	Enter: its release is consumed too
+key	183	0	0	1	0	0	1	STOP	red button stops the adhan (focus anywhere, bar or no bar)
+key	183	1	0	1	0	0	1	EAT	red button: its release is consumed too
+reset								-	the keys that do not
+key	24	0	0	1	1	1	1	PASS	volume up never stops it (the volume can be turned down; power is the system's)
+key	24	1	0	1	1	1	1	PASS	volume up: its release goes on too
+key	25	0	0	1	1	1	1	PASS	volume down never stops it (the volume can be turned down; power is the system's)
+key	25	1	0	1	1	1	1	PASS	volume down: its release goes on too
+key	164	0	0	1	1	1	1	PASS	mute never stops it (the volume can be turned down; power is the system's)
+key	164	1	0	1	1	1	1	PASS	mute: its release goes on too
+key	26	0	0	1	1	1	1	PASS	Power never stops it (the volume can be turned down; power is the system's)
+key	26	1	0	1	1	1	1	PASS	Power: its release goes on too
+key	223	0	0	1	1	1	1	PASS	sleep never stops it (the volume can be turned down; power is the system's)
+key	223	1	0	1	1	1	1	PASS	sleep: its release goes on too
+key	224	0	0	1	1	1	1	PASS	wake up never stops it (the volume can be turned down; power is the system's)
+key	224	1	0	1	1	1	1	PASS	wake up: its release goes on too
+reset								-	one press, one stop, consumed whole
+key	22	0	0	1	0	0	1	STOP	the first press stops it
+key	22	0	1	1	0	0	1	EAT	a held key's repeats are consumed (no seek, no focus move)
+key	22	0	2	0	0	0	1	EAT	and after the adhan is over, until it is released
+key	22	1	0	0	0	0	1	EAT	the release
+key	22	0	0	0	0	0	1	PASS	the next press, with no adhan playing, is an ordinary key: tomorrow's adhan is not touched
+bar	4	0	1	أذان المغرب  ·  أي زر يوقف الأذان	Maghrib, any key (the default)
+bar	4	0	0	أذان المغرب  ·  اختيار: إيقاف الأذان	Maghrib, only OK (the setting off)
+bar	0	0	1	أذان الفجر  ·  أي زر يوقف الأذان	Fajr
+bar	2	1	1	أذان الجمعة  ·  أي زر يوقف الأذان	a Friday's Dhuhr
+bar	2	0	1	أذان الظهر  ·  أي زر يوقف الأذان	Dhuhr
+bar	3	0	1	أذان العصر  ·  أي زر يوقف الأذان	Asr
+bar	5	0	0	أذان العشاء  ·  اختيار: إيقاف الأذان	Isha, only OK
+bar	-1	0	1	الأذان  ·  أي زر يوقف الأذان	from the computer: no prayer named
+bar	1	0	1	الأذان  ·  أي زر يوقف الأذان	sunrise has no adhan

@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-"""Fetch the text of the "verse of the day" list from api.alquran.cloud (Tanzil text) -> verses/verses.json.
+"""Fetch the text of the "verse of the day" list -> verses/verses.json. Per verse:
 
-Runs in CI (.github/workflows/verses.yml): the API is unreachable from the dev container. The screen never
+  text     api.alquran.cloud, edition quran-simple (Tanzil): plain script, kept for checks and as the fallback
+  uthmani  the KFGQPC / QPC Hafs text (`text_qpc_hafs` of the Quran.com API v4, Tarteel's QUL script), the text the font
+           assets/fonts/UthmanicHafs-v30.woff2 is made for; verify_uthmani.py compares it with the source in CI.
+           Never show it in another font.
+  tafsir   «التفسير الميسر» (King Fahd Complex), api.alquran.cloud edition ar.muyassar; the screen shows it
+           only with #tafsir=1
+
+Runs in CI (.github/workflows/verses.yml): api.alquran.cloud is unreachable from the dev container. The screen never
 holds Quran text typed by hand; it only shows what this script fetched, copied to assets/shared/verses.json.
+
+  python3 fetch_verses.py --uthmani   add `uthmani` (QPC Hafs) to assets/shared/verses.json and to the Quranic
+                                      entries of assets/shared/adhkar.json, in place
 """
 import json
+import sys
 import time
 import urllib.request
 from pathlib import Path
+
+import verify_uthmani as vu
 
 # surah:ayah. Short verses of remembrance, patience, gratitude and hope that fit the card.
 REFS = [
@@ -65,6 +78,8 @@ REFS = [
     "55:9", "57:9", "60:8", "67:19",
 ]
 EDITION = "quran-simple"   # standard Arabic script with diacritics; renders in any Arabic font
+TAFSIR_EDITION = "ar.muyassar"   # التفسير الميسر, King Fahd Glorious Quran Printing Complex
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def get(url):
@@ -79,15 +94,44 @@ def get(url):
     raise err
 
 
+class Uthmani:
+    """The QPC Hafs text by verse key, from the source verify_uthmani.py checks against. A range 112:1-4 joins its
+    ayahs with the ayah-end sign and number (U+06DD and digits), the form the font draws as the ornament."""
+
+    def __init__(self):
+        probes = []
+        name, self.src = vu.fetch_source(probes)
+        if not self.src:
+            raise SystemExit("no QPC Hafs source reachable: " + json.dumps(probes, ensure_ascii=False)[:500])
+
+    def ref(self, ref):
+        return vu.expected(ref, self.src)
+
+
+def add_uthmani():
+    u = Uthmani()
+    for name, key in (("verses", "ref"), ("adhkar", "quran")):
+        path = ROOT / "assets/shared" / f"{name}.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for v in data:
+            if v.get(key):
+                v["uthmani"] = u.ref(v[key])
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(path.relative_to(ROOT), sum("uthmani" in v for v in data), "with uthmani")
+
+
 def main():
+    u = Uthmani()
     out = []
     for ref in REFS:
         d = get(f"https://api.alquran.cloud/v1/ayah/{ref}/{EDITION}")["data"]
-        out.append({"ref": ref, "surah": d["surah"]["name"], "ayah": d["numberInSurah"], "text": d["text"]})
+        tafsir = get(f"https://api.alquran.cloud/v1/ayah/{ref}/{TAFSIR_EDITION}")["data"]["text"]
+        out.append({"ref": ref, "surah": d["surah"]["name"], "ayah": d["numberInSurah"], "text": d["text"],
+                    "uthmani": u.ref(ref), "tafsir": " ".join(tafsir.split())})
         print(ref, d["surah"]["name"], len(d["text"].split()), "words")
     Path("verses").mkdir(exist_ok=True)
     Path("verses/verses.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 if __name__ == "__main__":
-    main()
+    add_uthmani() if "--uthmani" in sys.argv else main()

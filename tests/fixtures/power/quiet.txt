@@ -1,0 +1,18 @@
+== deviceidle
+  mDeepEnabled=true
+  mLightEnabled=true
+  mState=IDLE
+  mLightState=IDLE
+== wakelocks
+Wake Locks: size=2
+  PARTIAL_WAKE_LOCK              'RILJ_ACK_WL' ACQ=-4s123ms (uid=1001 pid=1500)
+  PARTIAL_WAKE_LOCK              'NlpWakeLock' ACQ=-20s (uid=10077 pid=2100)
+  mWakeLockSummary=0x0
+  mWakefulness=Asleep
+== uids
+sa.urtv.home     userId=10142
+sa.urtv.screensaver     userId=10143
+== wifilocks
+  WifiLocks: Locks acquired: 0 full high perf, 0 full low latency
+== alarms
+== jobs

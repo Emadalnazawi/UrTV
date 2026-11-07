@@ -1,0 +1,16 @@
+# kind, inputs (1/0 flags, ms), expected, note
+# allowed: front display | due: front display lastFetchAt gapMs now | background: display
+allowed	1	1	yes	home in front, display on
+allowed	1	0	no	home in front, display off
+allowed	0	1	no	another app in front
+allowed	0	0	no	neither
+due	1	1	0	1800000	5000000	yes	never asked: due
+due	1	1	1000000	1800000	2000000	no	asked 1000 s ago, gap 1800 s
+due	1	1	1000000	1800000	2800000	yes	exactly the gap
+due	1	1	1000000	1800000	9000000	yes	long ago
+due	1	0	0	1800000	5000000	no	never asked but display off
+due	0	1	0	1800000	5000000	no	never asked but another app in front
+due	0	0	1	1800000	99000000000	no	long ago but neither
+due	1	1	9000000	1800000	5000000	yes	the clock was set back: due, not stuck
+background	1	yes	display on, whichever app is in front: the adhan's times
+background	0	no	display off: skipped

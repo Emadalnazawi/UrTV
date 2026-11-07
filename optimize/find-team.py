@@ -37,9 +37,9 @@ team_search = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(team_search)
 
 
-def plain(ar):   # Arabic compared without harakat, tatweel or hamza forms
-    ar = re.sub(r"[\u064B-\u0652\u0640]", "", ar.strip())
-    return ar.translate(str.maketrans("أإآة", "اااه"))
+def plain(ar):   # Arabic compared as the search does: no harakat/tatweel, one hamza and taa/yaa form, no ال, and the
+    words = team_search.normalize(ar)   # spelling variants (تشلسي = تشيلسي) folded to one skeleton
+    return "".join(team_search.skeleton(w) or w for w in words)
 
 
 def ours(q):   # the clubs in our list that match, best first

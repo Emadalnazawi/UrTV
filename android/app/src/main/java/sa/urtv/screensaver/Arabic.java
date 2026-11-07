@@ -113,7 +113,7 @@ final class Arabic {
             if (two != null) { out.append(two); i += 2; continue; }
             if (ch == 'e' && i > 0) { i++; continue; }
             if (ch == 'c' && i + 1 < x.length() && "eiy".indexOf(x.charAt(i + 1)) >= 0) { out.append('س'); i++; continue; }
-            if (ch >= '0' && ch <= '9') out.append((char) ('٠' + (ch - '0')));
+            if (ch >= '0' && ch <= '9') out.append(DigitsText.convert(String.valueOf(ch), false));
             else if (LETTERS.containsKey(ch)) out.append(LETTERS.get(ch));
             i++;
         }
@@ -156,13 +156,9 @@ final class Arabic {
             con.setConnectTimeout(10000);
             con.setReadTimeout(12000);
             con.setRequestProperty("User-Agent", "urtv/2 (Android TV screensaver)");
-            InputStream in = con.getInputStream();
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = in.read(buf)) > 0) b.write(buf, 0, n);
-            in.close();
-            return b.toString("UTF-8");
+            try (InputStream in = con.getInputStream()) {
+                return new String(Bounded.readAll(in, Bounded.JSON_MAX), "UTF-8");
+            }
         } finally {
             con.disconnect();
         }

@@ -1,0 +1,34 @@
+# UrTV community list: jvc-android-tv-menlo
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/jvc-android-tv-menlo/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: JVC
+# match-model: ANDROIDTV
+# match-device: MENLO
+
+com.vestel.vestelreporter
+com.vestel.tv.speedup
+com.vestel.smartcenter
+com.google.android.partnersetup
+com.google.android.feedback
+com.google.android.onetimeinitializer
+android.autoinstalls.config.vestel.coma
+com.mstar.android.tv.disclaimercustomization
+com.google.android.youtube.tvmusic
+com.google.android.videos
+com.google.android.play.games
+com.google.android.katniss
+com.android.mgstv
+com.tcl.browser
+com.android.printspooler
+com.android.backupconfirm
+com.android.sharedstoragebackup
+com.android.wallpaperbackup
+com.google.android.syncadapters.calendar
+com.android.providers.calendar
+com.android.dynsystem
+com.android.cts.ctsshim
+com.android.cts.priv.ctsshim
+com.google.android.tvrecommendations
+com.google.android.backdrop

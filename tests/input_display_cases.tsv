@@ -1,0 +1,36 @@
+# input display (InputDisplay.java). cec: raw | name: custom, cec, own | label: custom, cec, own, state ; answer, note
+cec	Amazon FireTV				Amazon FireTV	a plain device name
+cec	  PlayStation 5  				PlayStation 5	trimmed
+cec						empty is none
+cec	   					only spaces is none
+cec	Fire\nTV					two lines is none
+cec	Fire\tTV					a tab is none
+cec	Fire\u202eTV					a right-to-left override is none
+cec	\uFEFFFireTV					a byte order mark is none
+cec	Fire\u0000TV					a NUL is none
+cec	Fire\u2028TV					a line separator is none
+cec	A|B					a bar would break the columns
+cec	com.vendor/.Svc/HW5					a hardware id with slashes is not a name
+cec	HW5					HW and a number is a hardware id
+cec	HDMI HW2					HW as a word
+cec	Hwang Box				Hwang Box	HW inside a word is a name
+cec	جهاز الصالة				جهاز الصالة	an Arabic name
+cec	نت\u200Cفلكس				نت‌فلكس	the joiner Persian needs stays
+cec	1234567890123456789012345678901234567890				1234567890123456789012345678901234567890	40 characters stay
+cec	12345678901234567890123456789012345678901				1234567890123456789012345678901234567890	41 are cut to 40
+cec	123456789012345678901234567890123456789 89012				123456789012345678901234567890123456789	a cut ends on a space: trimmed again
+cec	ابتثجحخدذرزسشصضطظعغفقكلمنهوي ابتثجحخدذرزسشصضطظعغ				ابتثجحخدذرزسشصضطظعغفقكلمنهوي ابتثجحخدذرز	40 Arabic letters count as 40, not bytes
+cec	12345678901234567890123456789012345678\uD83D\uDE00x				12345678901234567890123456789012345678😀x	an emoji counts as one character: 40 stay
+cec	123456789012345678901234567890123456789\uD83D\uDE00x				123456789012345678901234567890123456789😀	a cut never splits an emoji
+name	PS5	FireTV	HDMI 2		PS5	the owner's name wins
+name	-	FireTV	HDMI 2		FireTV	no custom name: the CEC name
+name		FireTV	HDMI 2		FireTV	an empty custom name is no name
+name	-	-	HDMI 2		HDMI 2	no CEC device: the TV's own, as today
+name	-		HDMI 2		HDMI 2	an empty CEC name falls back
+name	-	a\nb	HDMI 2		HDMI 2	an unusable CEC name falls back to the TV's own
+name	PS5	-	HDMI 2		PS5	custom without CEC
+label	-	FireTV	HDMI 2	standby	FireTV · وضع الاستعداد	the CEC name and the standby mark
+label	-	FireTV	HDMI 2	on	FireTV	connected: no mark
+label	PS5	FireTV	HDMI 2	standby	PS5 · وضع الاستعداد	a custom name gets the mark too
+label	-	-	HDMI 2	standby	HDMI 2 · وضع الاستعداد	the TV's own name gets the mark too
+label	-	-	HDMI 2	on	HDMI 2	nothing changes from today with no CEC and not in standby

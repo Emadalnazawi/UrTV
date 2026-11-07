@@ -1,0 +1,48 @@
+# UrTV community list: tcl-43c645
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-43c645/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: G03BEYONDTV4FIRMWAREV8R51MT05LF1V652
+# match-device: BEYONDTV4
+
+com.tcl.bi
+com.tcl.dashboard
+com.tcl.esticker
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.overseasappshow
+com.google.android.partnersetup
+com.google.android.feedback
+com.google.android.onetimeinitializer
+com.google.android.tungsten.setupwraith
+com.tcl.useragreement
+com.tcl.android.webview
+com.tcl.guard
+com.tcl.keyhelp
+com.tcl.tv.tclhome_passive
+com.google.android.syncadapters.calendar
+com.google.android.videos
+tv.wuaki.apptv
+com.tcl.versionUpdateApp
+com.tcl.miracast
+com.tcl.ttvs
+com.tcl.logkit
+com.tcl.waterfall.overseas
+com.tcl.usercenter
+com.tcl.channelplus
+com.tcl.smartalexa
+com.tcl.ocean.instructions
+com.tcl.hearaid
+com.google.android.apps.nbu.smartconnect.tv
+com.google.android.marvin.talkback
+com.google.android.youtube.tvmusic
+com.google.android.play.games
+com.tcl.gallery
+com.tcl.browser
+com.tcl.ui_mediaCenter
+com.google.android.katniss
+com.tcl.assistant
+com.tcl.micmanager
+com.google.android.tv.assistant

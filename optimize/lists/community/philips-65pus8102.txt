@@ -1,0 +1,44 @@
+# UrTV community list: philips-65pus8102
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/philips-65pus8102/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: PHILIPS
+# match-model: 65PUS810212 PH7MEU5596 TPM171E
+# match-device: PH7MEU5596
+
+com.google.android.feedback
+com.google.android.tvtutorials
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+org.droidtv.demome
+org.droidtv.nettvrecommender
+org.droidtv.usagelogger
+org.droidtv.candeebug
+org.droidtv.gel
+org.droidtv.tv.frameworklogger
+tv.inscape.tvclient.inscapeacr
+org.droidtv.nettv.market
+org.droidtv.nettvapps
+org.droidtv.nettv_launcherapp
+org.droidtv.nettvregistration
+org.droidtv.nettvapp1814
+org.droidtv.nettvapp1984
+org.droidtv.nettvapp20004410
+org.droidtv.nettvapp20004412
+org.droidtv.nettvapp3073
+org.droidtv.nettvapp4546
+org.droidtv.nettvapp4649
+org.droidtv.nettvapp4655
+org.droidtv.nettvapp4771
+org.droidtv.nettvapp5225
+org.droidtv.nettvapp5251
+org.droidtv.nettvapp5326
+org.droidtv.nettvapp5512
+com.gameloft.android.HEP.GloftANHP
+com.ted.android.tv
+com.opera.sdk.example
+com.google.android.music
+com.google.android.videos
+com.google.android.katniss
+org.droidtv.amazonalexa

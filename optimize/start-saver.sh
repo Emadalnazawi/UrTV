@@ -11,7 +11,7 @@ tv() { "$PY" -I optimize/tv.py "$@"; }
 
 dreaming() {   # Android 11+ runs a dream in DreamActivity; dumpsys dreams has mCurrentDream (14) or
   local s      # mCurrentDreamToken (older), null while none runs
-  s=$(tv "dumpsys dreams | grep -E 'mCurrentDream(Token)?='; dumpsys activity activities | grep -m1 -E 'topResumedActivity|mResumedActivity'")
+  s=$(tv "dumpsys dreams | grep -E 'mCurrentDream(Token)?='; dumpsys activity activities 2> /dev/null | grep -m1 -E 'topResumedActivity|mResumedActivity'")
   grep -qE 'DreamActivity|mCurrentDream(Token)?=[^n ]' <<< "$s"
 }
 
@@ -22,7 +22,8 @@ tv "cmd dreams start-dreaming" > /dev/null 2>&1 || true    # Android 14's own wa
 sleep "${SAVER_WAIT_S:-6}"
 if dreaming; then echo dream; exit 0; fi
 if [ "${1:-}" = --preview ]; then
-  tv "am start -n sa.urtv.screensaver/.MainActivity" > /dev/null
+  # a fresh preview each time (one already open would come back as it was, with the settings it opened with)
+  tv "am start --activity-clear-task -n sa.urtv.screensaver/.MainActivity" > /dev/null
   echo preview
   exit 0
 fi

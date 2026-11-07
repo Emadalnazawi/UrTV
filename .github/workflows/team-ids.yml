@@ -8,6 +8,9 @@ name: Clubs and their ids
 # clubs: that run checks every team again; a push checks only new and renamed ones (.github/tools/teams-cache.json).
 # The data is pushed even when a check fails, and the job then goes red, naming the league.
 # One data branch per source branch (data-team-ids-master, data-team-ids-next), so runs on both never overwrite each other.
+# Teams of other sports (NBA, NFL, ...) are leagues of Prefs.LEAGUES like any other. One more part, "Events", finds the
+# Formula 1, UFC, boxing and tennis leagues by name and writes teams/events.json (assets/shared/events.json) and,
+# in report.json, what each answered and whether TheSportsDB has a Saudi basketball league.
 on:
   workflow_dispatch:
     inputs:

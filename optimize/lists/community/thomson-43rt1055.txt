@@ -1,0 +1,32 @@
+# UrTV community list: thomson-43rt1055
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/thomson-43rt1055/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: THOMSON
+# match-model: 43RT1055FASERIES
+# match-device: SAUVE
+
+tv.anoki.acr.anokiacroptin
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.android.adservices.api
+com.android.ondevicepersonalization.services
+com.android.federatedcompute.services
+com.google.android.tvrecommendations
+android.autoinstalls.config.rplus.device
+com.vewd.core.service
+com.realtek.retailmode
+com.google.android.syncadapters.calendar
+com.google.android.youtube.tvmusic
+com.recisio.kfandroid
+com.google.android.videos
+com.google.android.play.games
+com.rtk.mediabrowser
+com.cltv.fast
+com.google.android.apps.mediashell
+com.realsil.ota
+com.google.android.tv.dfuservice
+com.google.android.backdrop
+com.realtek.leanbacklauncher.partnercustomizer
+com.google.android.tvlauncher

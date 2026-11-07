@@ -1,0 +1,38 @@
+# UrTV community list: hisense-u75-hengshan
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/hisense-u75-hengshan/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: HISENSE
+# match-model: U75
+# match-device: HENGSHAN
+
+com.vt.tv.evservice
+com.vt.hishow
+net.vidaatv.hisense.android.tv
+com.vidaa.oemtabcontentprovider
+com.hisense.odinbrowser
+com.vt.storemode
+com.vt.tv.b2b
+com.vt.factory
+com.vt.fte
+com.vt.alexa
+tv.mopa.ginga
+com.vt.tv.interactive
+com.vt.tv.protector
+com.vt.tv.calmanconnector
+android.autoinstalls.config.google.gtvpai
+com.google.android.partnersetup
+com.google.android.feedback
+com.android.printspooler
+com.google.android.syncadapters.calendar
+com.android.providers.calendar
+com.android.providers.contacts
+com.vt.tv.mobiledeviceconnectiontips
+com.vt.tv.mediacenter
+com.vt.tv.dlna
+com.vt.tv.singlelisten
+com.vt.roomcalibration
+com.google.android.youtube.tvmusic
+com.google.android.play.games
+com.google.android.tungsten.setupwraith

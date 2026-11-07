@@ -20,12 +20,17 @@ final class PhotoCache {
     static final String REPO = "https://raw.githubusercontent.com/" + BuildConfig.REPO + "/" + BuildConfig.BRANCH + "/";
     private static final String BUNDLED = REPO + "assets/backgrounds/", HOSTED = REPO + "photos/",
         FONTS = REPO + "assets/fonts/";
+    /** the owner's own photos (Own): not a real address, the page asks for N.jpg here and only this app answers */
+    static final String OWN = "https://own.urtv.invalid/";
+    /** the downloaded photo packs (PackStore): not a real address either; the page asks for ID/N.jpg and ID/credits.json here */
+    static final String PACKS = "https://packs.urtv.invalid/";
     private static final int KEEP = 12;   // the 5-photo set plus room for the next one
 
     private PhotoCache() {}
 
     /** null lets the WebView load the URL itself */
-    static WebResourceResponse serve(Context c, String url) {
+    static WebResourceResponse serve(Context c, String requested) {
+        String url = Channel.own(requested, REPO);   // a next build gets the page's master URLs too
         try {
             if (url.startsWith(FONTS)) {
                 String name = url.substring(FONTS.length());
@@ -35,6 +40,13 @@ final class PhotoCache {
                 h.put("Access-Control-Allow-Origin", "*");
                 return new WebResourceResponse("font/woff2", null, 200, "OK", h, c.getAssets().open("fonts/" + name));
             }
+            if (url.startsWith(OWN)) {
+                String name = url.substring(OWN.length());
+                if (!name.matches("([1-9]|10)\\.jpg")) return null;
+                File f = Own.file(c, Integer.parseInt(name.substring(0, name.indexOf('.'))));
+                return f.isFile() ? jpeg(new FileInputStream(f)) : null;
+            }
+            if (url.startsWith(PACKS)) return pack(c, url.substring(PACKS.length()));
             if (url.startsWith(BUNDLED)) {
                 String name = safeName(url.substring(BUNDLED.length()));
                 return name == null ? null : jpeg(c.getAssets().open("backgrounds/" + name));
@@ -49,6 +61,26 @@ final class PhotoCache {
         return null;
     }
 
+    /** ID/N.jpg from the pack's folder, or ID/credits.json ("1": "author · licence") for the page; nothing else, and nothing for a pack not on the TV */
+    private static WebResourceResponse pack(Context c, String rest) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("([a-z][a-z0-9-]{1,30})/([1-9][0-9]{0,2}\\.jpg|credits\\.json)").matcher(rest);
+        if (!m.matches()) return null;
+        String id = m.group(1), name = m.group(2);
+        try {
+            if (name.equals("credits.json")) {
+                String json = PackStore.creditsJson(c, id);
+                if (json == null) return null;
+                java.util.Map<String, String> h = new java.util.HashMap<>();
+                h.put("Access-Control-Allow-Origin", "*");
+                return new WebResourceResponse("application/json", "UTF-8", 200, "OK", h, new java.io.ByteArrayInputStream(json.getBytes("UTF-8")));
+            }
+            File f = PackStore.photo(c, id, Integer.parseInt(name.substring(0, name.indexOf('.'))));
+            return f.isFile() ? jpeg(new FileInputStream(f)) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static String safeName(String s) {
         return s.matches("[A-Za-z0-9_-]+\\.jpg") ? s : null;
     }
@@ -61,7 +93,10 @@ final class PhotoCache {
     private static synchronized File hosted(Context c, String url, String name) throws java.io.IOException {
         File dir = new File(c.getFilesDir(), "photos");
         File f = new File(dir, name);
-        if (f.isFile() && f.length() > 0) return f;
+        if (f.isFile() && f.length() > 0) {
+            f.setLastModified(System.currentTimeMillis());   // served now: the next prune keeps it (it keeps the newest, by this time)
+            return f;
+        }
         if (!dir.isDirectory() && !dir.mkdirs()) return null;
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setConnectTimeout(15000);
@@ -69,16 +104,11 @@ final class PhotoCache {
         File tmp = new File(dir, name + ".tmp");
         try {
             if (con.getResponseCode() != HttpURLConnection.HTTP_OK) return null;
-            InputStream in = con.getInputStream();
-            FileOutputStream out = new FileOutputStream(tmp);
-            try {
-                byte[] buf = new byte[16384];
-                int n;
-                while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-            } finally {
-                out.close();
-                in.close();
-            }
+            if (con.getContentLength() > Bounded.IMAGE_MAX) return null;
+            byte[] data;
+            try (InputStream in = con.getInputStream()) { data = Bounded.readAll(in, Bounded.IMAGE_MAX); }
+            if (!validImage(data)) return null;   // an error page or a cut download is not kept as a photo
+            try (FileOutputStream out = new FileOutputStream(tmp)) { out.write(data); }
             if (!tmp.renameTo(f)) return null;
         } finally {
             con.disconnect();
@@ -88,13 +118,24 @@ final class PhotoCache {
         return f;
     }
 
-    /** Keep the newest few; older sets are not shown again for months. */
+    /** Whether these bytes are a picture that decodes (its size is read, not the pixels) and is not absurdly large. */
+    static boolean validImage(byte[] data) {
+        android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        android.graphics.BitmapFactory.decodeByteArray(data, 0, data.length, o);
+        return o.outWidth > 0 && o.outHeight > 0 && o.outWidth <= 12000 && o.outHeight <= 12000;
+    }
+
+    /** Keep the newest few, and no more than the size budget; older sets are not shown again for months. */
     private static void prune(File dir) {
         File[] all = dir.listFiles((d, n) -> n.endsWith(".jpg"));
-        if (all == null || all.length <= KEEP) return;
+        if (all == null) return;
         Arrays.sort(all, new Comparator<File>() {
             @Override public int compare(File a, File b) { return Long.compare(b.lastModified(), a.lastModified()); }
         });
-        for (int i = KEEP; i < all.length; i++) all[i].delete();
+        long[] sizes = new long[Math.min(all.length, KEEP)];
+        for (int i = 0; i < sizes.length; i++) sizes[i] = all[i].length();
+        int keep = Bounded.fitting(sizes, Bounded.CACHE_MAX);
+        for (int i = Math.max(1, keep); i < all.length; i++) all[i].delete();   // the one just fetched always stays
     }
 }

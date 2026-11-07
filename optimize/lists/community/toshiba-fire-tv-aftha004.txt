@@ -1,0 +1,44 @@
+# UrTV community list: toshiba-fire-tv-aftha004
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/toshiba-fire-tv-aftha004/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TOSHIBA
+# match-model: AFTHA004 FIRETV
+# match-device: 
+
+com.amazon.shoptv.client
+com.amazon.shoptv.firetv.client
+com.amazon.tv.acr
+com.amazon.tv.democontent.provider
+com.amazon.tv.fw.metrics
+com.amazon.neo.minerva
+com.amazon.neo.minerva.logcat
+com.amazon.wirelessmetrics.service
+com.amazon.perfcollection
+com.amazon.perfc
+com.amazon.dp.logger
+com.amazon.storm.lightning.tutorial
+com.amazon.tmm.tutorial
+com.amazon.gamehub
+com.amazon.bueller.music
+com.amazon.bueller.photos
+com.amazon.minitv.android.app
+com.amazon.naatyam
+com.amazon.cast.sink
+com.disney.disneyplus
+in.startv.hotstar
+com.hbo.hbonow
+com.hulu.plus
+com.peacock.peacockfiretv
+com.tubitv.ott
+tv.pluto.android
+com.onemainstream.sonyliv.android
+com.zee5.amazon
+com.suntv.sunnxt
+com.yupptv.firetv
+com.jio.media.stb.ondemand
+com.hungama.movies
+com.aajtak.firetv
+com.july.ndtv
+com.nexgtv.tv

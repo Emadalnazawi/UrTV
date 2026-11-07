@@ -1,0 +1,44 @@
+# UrTV community list: philips-65pus9435
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/philips-65pus9435/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: PHILIPS
+# match-model: 4SIDED 65PUS943512
+# match-device: 
+
+org.droidtv.candeebug
+org.droidtv.gel
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+com.google.android.syncadapters.calendar
+org.droidtv.nettvrecommender
+org.droidtv.recommendation
+org.droidtv.nettv.market
+org.droidtv.android.fitness
+org.droidtv.sticker
+com.google.android.tvrecommendations
+com.google.android.katniss
+org.droidtv.amazonalexa
+com.phorus.playfi.softap
+com.google.android.youtube.tvmusic
+com.crunchyroll.crunchyroid
+de.prosiebensat1digital.seventv
+de.rtli.tvnow
+com.novoda.dch
+tv.wuaki.apptv
+com.mgmedia.androidApp
+tv.pluto.android
+com.zeasn.whalelive
+com.blacknut.client
+com.boosteroidtv.streaming
+com.ted.android.tv
+com.nbaimd.gametime.nba2011
+dw.com.androidtv.live
+com.google.android.play.games
+org.droidtv.nettvapp3463
+org.droidtv.nettvapp4546
+org.droidtv.nettvapp5245
+org.droidtv.nettvapp5326
+org.droidtv.nettvapp5512

@@ -1,0 +1,19 @@
+# pill text (PillText.java). shown: label, focused, -, answer, note | sleep: minutes, -, answer, note | network: wired, wifi, ssid, answer, note
+shown	مؤقت النوم	0			a pill nobody is on: its icon only
+shown	مؤقت النوم	1		مؤقت النوم	the focused pill: its name
+shown	المصادر	0			the sources pill, icon only
+shown	تلاوة	1		تلاوة	the Quran pill, focused
+saver				شاشة التوقف · مطوّلًا: الإعدادات	OK starts the screensaver; the focused pill says a long OK opens its settings
+sleep	0			مؤقت النوم	no timer: the name alone
+sleep	-3			مؤقت النوم	a timer that has run out
+sleep	23			مؤقت النوم ٢٣ د	23 minutes left, in Arabic digits
+sleep	5			مؤقت النوم ٥ د	one digit
+sleep	90			مؤقت النوم ٩٠ د	the longest choice
+network	1	0		شبكة سلكية	a cable
+network	1	1	x	شبكة سلكية	a cable wins over Wi-Fi
+network	0	0		غير متصل	nothing connected
+network	0	1	"Home Net"	Home Net	the network name, quotes taken off
+network	0	1	<unknown ssid>	واي فاي	name hidden (no location access): just «واي فاي»
+network	0	1	""	واي فاي	empty name
+network	0	1	null	واي فاي	no name at all
+network	0	1	بيت العائلة	بيت العائلة	an Arabic network name

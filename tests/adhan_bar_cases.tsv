@@ -1,0 +1,22 @@
+# now	fajr	dhuhr	asr	maghrib	isha	friday	digits	expected	note   (minutes since midnight; Fajr 4:50, Dhuhr 11:40, Asr 15:00, Maghrib 17:45, Isha 19:15)
+1055	290	700	900	1065	1155	0	hindi	أذان المغرب بعد ١٠ دقائق	exactly 10 minutes before Maghrib
+1054	290	700	900	1065	1155	0	hindi	-	just over 10 minutes: nothing
+1057.5	290	700	900	1065	1155	0	hindi	أذان المغرب بعد ٨ دقائق	7.5 minutes left rounds up to 8
+1062	290	700	900	1065	1155	0	hindi	أذان المغرب بعد ٣ دقائق	three minutes
+1063	290	700	900	1065	1155	0	hindi	أذان المغرب بعد دقيقتين	two minutes: the dual
+1064.5	290	700	900	1065	1155	0	hindi	أذان المغرب بعد ١ دقيقة	half a minute left is one minute
+1057.5	290	700	900	1065	1155	0	latin	أذان المغرب بعد 8 دقائق	Latin digits
+1065	290	700	900	1065	1155	0	hindi	إقامة المغرب بعد ١٠ دقائق	at the adhan: Maghrib iqama in 10
+1070.2	290	700	900	1065	1155	0	hindi	إقامة المغرب بعد ٥ دقائق	Maghrib iqama, 4.8 minutes left
+1074.9	290	700	900	1065	1155	0	hindi	إقامة المغرب بعد ١ دقيقة	the last minute
+1075	290	700	900	1065	1155	0	hindi	-	the iqama itself: the bar goes
+290	290	700	900	1065	1155	0	hindi	إقامة الفجر بعد ٢٥ دقيقة	Fajr: 25 minutes
+700	290	700	900	1065	1155	0	hindi	إقامة الظهر بعد ٢٠ دقيقة	Dhuhr on a weekday: 20
+700	290	700	900	1065	1155	1	hindi	-	Dhuhr on a Friday: no iqama countdown
+692	290	700	900	1065	1155	1	hindi	أذان الجمعة بعد ٨ دقائق	Friday: the adhan before it still counts
+900	290	700	900	1065	1155	0	hindi	إقامة العصر بعد ٢٠ دقيقة	Asr: 20
+1155	290	700	900	1065	1155	0	hindi	إقامة العشاء بعد ٢٠ دقيقة	Isha: 20
+1162.5	290	700	900	1065	1155	0	hindi	إقامة العشاء بعد ١٣ دقيقة	Isha, 12.5 minutes left rounds up to 13
+600	290	700	900	1065	1155	0	hindi	-	between prayers: nothing
+0	290	700	900	1065	1155	0	hindi	-	midnight: nothing
+283	290	700	900	1065	1155	0	hindi	أذان الفجر بعد ٧ دقائق	Fajr: seven minutes before

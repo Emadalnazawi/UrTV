@@ -1,0 +1,40 @@
+# UrTV community list: xiaomi-mitv-ansp0
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-mitv-ansp0/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: MITVANSP0
+# match-device: 
+
+com.miui.analytics
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.xiaomi.tvqs
+com.xiaomi.mitv.csi
+com.mitv.cloudcontrol
+com.android.smspush
+com.xm.webcontent
+com.mitv.shoplugin
+com.gitvdemo.video
+com.duokan.videodaily
+com.xiaomi.mitv.tvmanager
+com.xiaomi.gamecenter.sdk.service.mibox
+com.xiaomi.mimusic2
+com.xiaomi.tv.gallery
+com.mitv.gallery
+com.xiaomi.screenrecorder
+com.xiaomi.mitv.calendar
+com.mitv.alarmcenter
+com.xiaomi.mitv.handbook
+com.xiaomi.tweather
+com.xiaomi.mitv.karaoke.service
+com.xiaomi.mitv.tvvideocall
+com.xiaomi.eetv.litehome
+com.xiaomi.mitv.light
+com.xiaomi.mitv.smartpanel
+com.xiaomi.smarthome.tv
+com.xiaomi.voicecontrol
+com.xiaomi.wakeupservice
+com.xiaomi.mico.mqtt.service.application.tv
+com.mitv.screensaver

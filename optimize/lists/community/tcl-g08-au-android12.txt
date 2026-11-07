@@ -1,0 +1,37 @@
+# UrTV community list: tcl-g08-au-android12
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-g08-au-android12/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: G084KGB SMARTTVPRO
+# match-device: G08
+
+com.tcl.dashboard
+com.tcl.exhibit
+com.tcl.esticker
+com.tcl.hotelmenu
+com.tcl.ocean.instructions
+com.tcl.repairguide
+com.tcl.logkit
+com.tcl.hearaid
+com.tcl.t_solo
+com.tcl.eva
+com.tcl.magiconnectfree
+com.tcl.gamebar
+com.tcl.UpdatePeripheral
+com.tcl.guard
+com.tcl.android.webview
+com.iplayer.android.webview
+com.mediatek.support.webview
+com.mediatek.backgrounddetection
+com.mediatek.network
+com.google.android.apps.tv.dreamx
+com.google.android.tts
+com.android.printspooler
+com.google.android.feedback
+com.tcl.waterfall.overseas
+com.tcl.channelplus
+com.amazon.amazonvideo.livingroom
+com.google.android.apps.tv.launcherx
+com.google.android.tungsten.setupwraith

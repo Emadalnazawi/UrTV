@@ -1,0 +1,19 @@
+# UrTV community list: tivo-stream-4k
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tivo-stream-4k/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TIVO
+# match-model: IPA1104HDW RA2400 SEI400TV STREAM4K
+# match-device: SEI400TV
+
+com.google.android.feedback
+com.google.android.partnersetup
+com.nes.tvbugtracker
+com.nes.coreservice
+com.nes.daemon
+com.tivo.sageservice
+com.google.android.tvrecommendations
+android.autoinstalls.config.sei
+com.android.printspooler
+com.google.android.marvin.talkback

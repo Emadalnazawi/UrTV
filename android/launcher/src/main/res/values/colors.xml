@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- the «تلاوة وأذان» screens take their colours from their theme (attrs.xml, styles.xml: one per «المظهر»); only the notification
+     keeps a plain colour of its own (it has no theme) -->
+<resources>
+    <color name="notify_accent">#DCB86F</color>
+</resources>

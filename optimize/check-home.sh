@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PY:-optimize/venv/bin/python}"
 tv() { "$PY" -I optimize/tv.py "$@"; }
-front_now() { tv "dumpsys activity activities | grep -m1 -E 'topResumedActivity|mResumedActivity'" | tr -d '\r'; }
+front_now() { tv "dumpsys activity activities 2> /dev/null | grep -m1 -E 'topResumedActivity|mResumedActivity'" | tr -d '\r'; }
 opened() {   # $1 package: started and in front (monkey says "No activities found" for an app without a launcher entry)
   local out
   out=$(tv "monkey -p $1 1" 2>&1 || true)

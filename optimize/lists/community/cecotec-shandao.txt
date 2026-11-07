@@ -1,0 +1,40 @@
+# UrTV community list: cecotec-shandao
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/cecotec-shandao/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: CECOTEC
+# match-model: VQU10065S
+# match-device: 
+
+com.vestel.vestelreporter
+com.vestel.smartlogger
+com.vestel.tv.speedup
+com.vestel.smartcenter
+com.android.adservices.api
+com.android.ondevicepersonalization.services
+com.android.federatedcompute.services
+com.google.android.partnersetup
+com.google.android.feedback
+com.android.tv.feedbackconsent
+android.autoinstalls.config.vestel.medusa
+com.google.android.youtube.tvmusic
+com.google.android.videos
+com.google.android.play.games
+com.google.android.katniss
+fusion.android.tv.demo
+com.mediatek.tv.freeviewplay
+com.smartdevice.tv.aircast
+com.google.android.backdrop
+com.google.android.tvrecommendations
+com.mediatek.wwtv.mediaplayer
+com.android.healthconnect.controller
+com.android.health.connect.backuprestore
+com.android.managedprovisioning
+com.android.dynsystem
+com.android.cts.ctsshim
+com.android.cts.priv.ctsshim
+com.google.android.syncadapters.calendar
+com.google.android.tts
+com.android.settings.intelligence
+com.android.se

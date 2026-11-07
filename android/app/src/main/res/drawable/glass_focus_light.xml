@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- the focused row of a dialog's list, light look: the solid focus fill (GlassStyle.LIGHT.focus) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#F214161A" />
+    <corners android:radius="12dp" />
+</shape>

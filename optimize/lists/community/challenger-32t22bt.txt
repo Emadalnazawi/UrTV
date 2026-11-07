@@ -1,0 +1,30 @@
+# UrTV community list: challenger-32t22bt
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/challenger-32t22bt/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: CHALLENGER
+# match-model: 32T22BT CVTMT5863COL TPMT5510PB781
+# match-device: CVTMT5863COL
+
+cn.cvte.tv.factory.autotest
+com.cvte.tcl.factory.at
+com.cvte.tv.audiotest
+com.cvte.fac.menu
+com.tcl.FactoryMode
+com.tcl.sticker
+com.cvte.tvclean
+com.cvte.tv.appstore
+cm.aptoidetv.pt.cvt_platform7
+cn.tcl.odm.android.vstoresubclient
+com.talents.huanclientauth
+com.creative.fastscreen.tv
+com.cvte.tv.ucservice
+com.mediatek.androidbox
+com.apps.usbmediaplayer
+com.cvte.tv.media
+com.cvte.tv.player
+com.ecloud.emedia
+com.android.htmlviewer
+com.android.browser
+com.cvte.tv.launcher

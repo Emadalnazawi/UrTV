@@ -27,7 +27,8 @@ fi
 
 # `input text` turns %s into a space and treats a real space as an argument break,
 # so spaces become %s; wrap in single quotes for the TV's shell, escaping any ' inside.
-esc=${text//\'/\'\\\'\'}
+# (sed, not a quote substitution inside a parameter expansion: bash 3.2, the macOS /bin/bash, reads the quotes there differently)
+esc=$(printf '%s' "$text" | sed "s/'/'\\\\''/g")
 esc=${esc// /%s}
 cmds="input text '$esc'"
 [ $enter = 1 ] && cmds="$cmds"$'\n'"input keyevent KEYCODE_ENTER"

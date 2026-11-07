@@ -41,7 +41,7 @@ final class Teams {
                 JSONObject o = a.optJSONObject(i);
                 if (o == null || o.optString("id").isEmpty()) continue;
                 TeamSearch.Team t = new TeamSearch.Team(o.optString("id"), o.optString("en"), o.optString("ar"),
-                    strings(o.optJSONArray("leagues")), strings(o.optJSONArray("alt")));
+                    strings(o.optJSONArray("leagues")), strings(o.optJSONArray("alt")), o.optString("sport", "Soccer"));
                 v.add(t);
                 BY_ID.put(t.id, t);
                 if ("translit".equals(o.optString("arFrom"))) TRANSLIT.add(t.id);
@@ -66,10 +66,10 @@ final class Teams {
         synchronized (Teams.class) { return BY_ID.get(id); }
     }
 
-    /** The name to show: Arabic, with the English one beside a mere transliteration. */
+    /** The name to show: Arabic, with the English one beside a mere transliteration; with «اللغة» English, the English name. */
     static String label(Context c, TeamSearch.Team t) {
         all(c);
-        if (t.ar.isEmpty()) return t.en;
+        if (t.ar.isEmpty() || (S.en() && !t.en.isEmpty())) return t.en;
         synchronized (Teams.class) { return TRANSLIT.contains(t.id) ? t.ar + "  ·  " + t.en : t.ar; }
     }
 

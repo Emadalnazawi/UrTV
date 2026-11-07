@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the settings' dialogs in the glass look (GlassStyle: the same colours; tests/glass_test.py checks them): smoked glass in the dark
+         look, frosted white glass with dark ink in the light one. SettingsActivity.Dlg picks the one of now and puts Thmanyah on their words. -->
+    <style name="UrDialog" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/glass_dialog</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#DADCE0</item>
+        <item name="android:textColorAlertDialogListItem">@color/glass_item</item>
+        <item name="android:backgroundDimAmount">0.4</item>   <!-- darker behind: white words only gain -->
+        <item name="android:colorAccent">#FFFFFF</item>
+        <item name="android:colorControlActivated">#FFFFFF</item>
+        <item name="android:colorControlNormal">#DADCE0</item>
+        <item name="android:listChoiceBackgroundIndicator">@drawable/glass_choice</item>
+    </style>
+    <style name="UrDialogLight" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/glass_dialog_light</item>
+        <item name="android:textColorPrimary">#14161A</item>
+        <item name="android:textColorSecondary">#3A3E46</item>
+        <item name="android:textColorAlertDialogListItem">@color/glass_item_light</item>
+        <item name="android:backgroundDimAmount">0</item>   <!-- no grey under frosted glass: the dark ink reads as checked -->
+        <item name="android:colorAccent">#14161A</item>
+        <item name="android:colorControlActivated">#14161A</item>
+        <item name="android:colorControlNormal">#3A3E46</item>
+        <item name="android:listChoiceBackgroundIndicator">@drawable/glass_choice_light</item>
+    </style>
+</resources>

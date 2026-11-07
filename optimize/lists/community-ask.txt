@@ -1,0 +1,15 @@
+# Packages of a community list that owners often want (field reports: a Xiaomi updater, voice, MiLink, a video player, YouTube Music).
+# optimize/community.sh leaves a package whose name matches one of these regular expressions ON and lists it in optimize/run/community-ask.txt:
+# the agent asks the person (in Arabic, one line) and, on a yes, adds the packages to optimize/lists/mine.txt. One regular expression per line.
+# an update service: the TV would stop getting its system or app updates
+(^|\.)(updater|ota|fota|systemupdate|swupdate|otaupdate|upgrade)(\.|$)
+updater
+# a firmware or app update service by any of its usual names (a Xiaomi TV's com.xiaomi.mitv.updateservice was turned off by a community list)
+(^|\.)update(service|r)?(\.|$)
+# voice and assistants
+voice
+assistant
+# phone-to-TV connect and casting helpers
+milink
+# a video or media player
+videoplayer|mediaplayer|mediaexplorer

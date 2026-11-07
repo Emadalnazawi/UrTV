@@ -1,0 +1,33 @@
+# UrTV community list: xiaomi-mi-box-3
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/xiaomi-mi-box-3/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: XIAOMI
+# match-model: MIBOX3
+# match-device: 
+
+com.miui.tv.analytics
+tv.alphonso.alphonso_eula
+com.google.android.feedback
+com.google.android.tv.bugreportsender
+com.mitv.tvhome.atv
+com.mitv.tvhome.michannel
+com.xm.webcontent
+com.google.android.tvrecommendations
+android.autoinstalls.config.xioami.mibox3
+com.google.android.katniss
+com.google.android.speech.pumpkin
+com.mitv.milinkservice
+com.mitv.videoplayer
+com.google.android.tv.remote.service
+com.amazon.amazonvideo.livingroom
+com.netflix.ninja
+com.google.android.youtube.tvmusic
+com.google.android.youtube.tvkids
+com.google.android.videos
+com.google.android.play.games
+com.google.android.tv
+com.google.android.marvin.talkback
+com.android.printspooler
+com.google.android.tvlauncher

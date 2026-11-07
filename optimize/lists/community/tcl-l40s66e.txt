@@ -1,0 +1,24 @@
+# UrTV community list: tcl-l40s66e
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/tcl-l40s66e/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: TCL
+# match-model: L40S66E
+# match-device: C06
+
+com.google.android.feedback
+android.autoinstalls.config.tcl.device
+com.google.android.partnersetup
+com.google.android.syncadapters.calendar
+com.google.android.tvrecommendations
+com.tcl.partnercustomizer
+com.tcl.waterfall.overseas
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.useragreement
+com.tcl.usercenter
+com.tcl.guard
+com.google.android.apps.nbu.smartconnect.tv
+com.tcl.t_solo
+com.google.android.tungsten.setupwraith

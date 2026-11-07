@@ -1,0 +1,24 @@
+# UrTV community list: byintek-u4
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/byintek-u4/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: BYINTEK
+# match-model: LOVEU4 RGHS352D1E8SWB10
+# match-device: 
+
+com.zeasn.deviceportal.asdprovider.skyworth_hisi352
+zeasn.open.technical.tv.store
+cn.wps.moffice_i18n_TV
+ru.vk.store.tv
+com.google.android.partnersetup
+com.google.android.carriersetup
+com.android.simappdialog
+com.google.android.syncadapters.contacts
+com.google.android.apps.pixelmigrate
+com.android.wallpaperbackup
+com.android.sharedstoragebackup
+com.toofifi.lineserver
+com.mphotool.usbcastserver
+com.google.android.feedback
+com.android.bips

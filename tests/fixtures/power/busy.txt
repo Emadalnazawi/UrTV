@@ -1,0 +1,23 @@
+== deviceidle
+  mDeepEnabled=true
+  mLightEnabled=true
+  mState=ACTIVE
+  mLightState=ACTIVE
+    sa.urtv.home
+== wakelocks
+Wake Locks: size=3
+  PARTIAL_WAKE_LOCK              'MediaPlayer-WakeLock' ACQ=-2m3s (uid=10142 pid=3011 ws=WorkSource{10142 sa.urtv.home})
+  PARTIAL_WAKE_LOCK              'RILJ_ACK_WL' ACQ=-9s (uid=1001 pid=1500)
+  PARTIAL_WAKE_LOCK              'AudioMix' ACQ=-1m (uid=1041 pid=800 ws=WorkSource{10142})
+  mWakefulness=Awake
+== uids
+sa.urtv.home     userId=10142
+sa.urtv.screensaver     userId=10143
+== wifilocks
+  WifiLocks: Locks acquired: 1 full high perf, 0 full low latency
+  Lock{urtv:listening type=3 uid=10142 workSource=WorkSource{10142}}
+== alarms
+    RTC_WAKEUP #3: Alarm{1a2b3c4 type 0 origWhen 1790000000000 whenElapsed 123456 sa.urtv.home}
+    ELAPSED #1: Alarm{5d6e7f8 type 3 origWhen 123999 whenElapsed 123999 sa.urtv.home}
+== jobs
+  JOB #u0a143/7: 9f8e7d6 sa.urtv.screensaver/.UpdateJob u=0 s=1

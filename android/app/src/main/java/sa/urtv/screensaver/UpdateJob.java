@@ -8,8 +8,10 @@ import android.content.ComponentName;
 import android.content.Context;
 
 /**
- * Periodic page update. The job is persisted, so after a reboot the system itself starts
- * the app's process again, which also wakes it up for the first screensaver run.
+ * Wakes the app's process, and does nothing else. The job is persisted, so after a reboot the system
+ * itself starts the process again, which some TVs (TCL) need for the first screensaver to start.
+ * The page and version check no longer runs here: it runs when the screensaver starts
+ * (Updater.checkIfDue), so the TV does no network work while it is idle.
  */
 public class UpdateJob extends JobService {
     private static final int ID = 1;
@@ -26,14 +28,8 @@ public class UpdateJob extends JobService {
     }
 
     @Override
-    public boolean onStartJob(final JobParameters p) {
-        new Thread(new Runnable() {
-            @Override public void run() {
-                Updater.check(getApplicationContext(), false);
-                jobFinished(p, false);
-            }
-        }).start();
-        return true;
+    public boolean onStartJob(JobParameters p) {
+        return false;   // nothing to do: the process is up, and the job is finished
     }
 
     @Override

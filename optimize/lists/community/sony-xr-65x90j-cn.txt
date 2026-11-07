@@ -1,0 +1,43 @@
+# UrTV community list: sony-xr-65x90j-cn
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-xr-65x90j-cn/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIAVH2 XR65X90J
+# match-device: 
+
+com.sonyericsson.idd.agent
+com.sony.dtv.sonybugreportsys
+com.sony.dtv.usercontext
+com.sony.dtv.seeds.auth
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+com.sony.dtv.customersupport
+com.sony.dtv.customersupport.provider.res
+com.sony.dtv.helpguidecontents
+com.sony.dtv.distancealert
+com.sony.dtv.osat.music
+com.sony.dtv.sensingfusionservice
+com.sony.dtv.sensingcamera.settings
+com.sony.dtv.sensingcamera.fwupdate
+com.sony.dtv.gestureapp
+com.sony.dtv.videochatrecord
+com.jd.smartservicetwo
+com.uei.quicksetsdk.sony
+com.sony.dtv.b2b.hotelmode
+com.sony.dtv.b2b.adminpassword
+com.sony.dtv.b2b.deviceadminsettings
+com.sony.dtv.b2b.frameworkextension
+com.sony.dtv.b2b.importexport
+com.sony.dtv.b2b.noderuntime.normal
+com.sony.dtv.b2b.noderuntime.privilege
+com.sony.dtv.b2b.noderuntimeextension.bpk
+com.sony.dtv.b2b.noderuntimeextension.node_16_13_1
+com.sony.dtv.b2b.prosettings
+com.sony.dtv.b2b.rs232csupport
+com.sony.dtv.b2b.webappruntimedrm
+com.sonyericsson.dlna
+com.sony.huey.dlna.module
+com.sony.huey.dlna.renderersettings

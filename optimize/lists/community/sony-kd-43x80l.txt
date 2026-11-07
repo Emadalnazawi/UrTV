@@ -1,0 +1,45 @@
+# UrTV community list: sony-kd-43x80l
+# Packages only, from the CleanYourTV project's tested debloat list for this model: https://github.com/Gathin23/cleanyourtv
+# MIT licence, Copyright (c) 2026 Gathin: see LICENSE-CleanYourTV.txt in this folder.
+# Source: examples/sony-kd-43x80l/debloat.txt at commit 3cd274f866b71ec15e4f7d8c796514b0baa8033c, taken 2026-11-02.
+# Made by .github/tools/community_lists.py. Used only when this TV is matched (optimize/community.py): never for another model.
+# match-brand: SONY
+# match-model: BRAVIAKD43X80L BRAVIAVH22 BRAVIAVH22MEU
+# match-device: BRAVIAVH22
+
+tv.samba.ssm
+tv.samba.ssm.ui
+com.qterics.da.product
+com.sony.dtv.da.service
+com.sonyericsson.idd.agent
+com.sony.dtv.sonybugreportsys
+com.google.android.feedback
+com.sony.dtv.usercontext
+com.sony.dtv.promos
+com.sony.dtv.sonyselect
+com.sony.dtv.sonytab
+com.sony.dtv.customersupport
+com.sony.dtv.smarthelp
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+com.sony.dtv.gestureapp
+com.vewd.core.integration.dia
+com.vewd.core.service
+com.uei.quicksetsdk.sony
+com.sony.dtv.seeds.iot
+com.sony.dtv.seeds.iot.remotestart
+com.sony.dtv.seeds.auth
+com.sony.dtv.b2b.prosettings
+com.sony.dtv.b2b.hotelmode
+com.sony.dtv.b2b.adminpassword
+com.sony.dtv.b2b.deviceadminsettings
+com.sony.dtv.b2b.importexport
+com.sony.dtv.b2b.rs232csupport
+com.google.android.videos
+com.google.android.play.games
+com.google.android.youtube.tvmusic
+com.google.android.katniss
+com.sony.dtv.voicesearch
+com.sony.dtv.assistantadapter
+com.google.android.tungsten.setupwraith
