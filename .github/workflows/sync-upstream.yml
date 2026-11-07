@@ -33,4 +33,5 @@ jobs:
         run: |
           git add dist
           git diff --cached --quiet || git commit -m "Rebuild the screen page after syncing with the original"
-          git push origin emad
+          # master too: the TV's apps are built from master and the screensaver fetches its page from there
+          git push origin emad emad:master
