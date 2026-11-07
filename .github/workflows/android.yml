@@ -15,7 +15,8 @@ jobs:
   # master publishes to apk-latest, which every installed TV updates from: the same checks as checks.yml must pass first.
   # next builds without waiting (apk-next is a test build); a skipped checks job counts as passed there.
   checks:
-    if: github.ref_name == 'master'
+    # a fork has no access to the original's private fonts, which the checks need: there the build goes on without them
+    if: github.ref_name == 'master' && github.repository == 'tshi-dev/UrTV'
     uses: ./.github/workflows/checks.yml
     secrets: inherit
 
@@ -27,12 +28,15 @@ jobs:
       - uses: actions/checkout@v4
       # Thmanyah's licence allows its files only inside a built product: they live in the private
       # tshi-dev/urtv-fonts and are put in place here, never committed to this repository
+      # (a fork builds without them: the screens fall back to the TV's own Arabic font)
       - uses: actions/checkout@v4
+        if: github.repository == 'tshi-dev/UrTV'
         with:
           repository: tshi-dev/urtv-fonts
           token: ${{ secrets.FONTS_TOKEN }}
           path: .fonts-private
       - name: Private fonts
+        if: github.repository == 'tshi-dev/UrTV'
         run: |
           cp .fonts-private/web/*.woff2 assets/fonts/
           mkdir -p android/launcher/src/main/assets/fonts
@@ -75,6 +79,7 @@ jobs:
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           URTV_VERSION_BASE: ${{ vars.URTV_VERSION_BASE }}
+          URTV_REPO: ${{ github.repository }}   # the screensaver fetches its page from this repository (a fork: its own)
           URTV_BRANCH: ${{ github.ref_name }}   # the screensaver fetches its page from the branch it was built from
           URTV_PIN_RECOVERY: ${{ secrets.PIN_RECOVERY_RECORD }}   # the PIN recovery code's salted record, never the code; unset = none (AGENTS.md)
         run: gradle -p android assembleRelease --no-daemon
